@@ -1963,6 +1963,11 @@ def _filter_ins_for_bids(ins_data: dict, bids: list) -> dict:
 def _format_ins_items(ins_data: dict) -> str:
     items = ins_data.get("items", []) or ins_data.get("line_items", [])
     if not items:
+        # If we have raw markdown from the platform, use it directly —
+        # Claude can parse the insurance estimate inline.
+        raw = ins_data.get("raw_markdown") or ins_data.get("raw_text")
+        if raw:
+            return f"(Raw insurance estimate — parse line items from this text)\n\n{raw}"
         return "(no insurance items parsed)"
     lines = []
     for i, item in enumerate(items, 1):
@@ -2042,6 +2047,11 @@ def _format_ev_data(ev_data: dict) -> str:
     """Format EagleView data for AI context. Handles both flat and nested structures."""
     if not ev_data:
         return "(no EagleView data)"
+
+    # If we have raw markdown from the platform, use it directly
+    raw = ev_data.get("raw_markdown") or ev_data.get("raw_text")
+    if raw and not ev_data.get("roofing_summary") and not ev_data.get("area_sq"):
+        return f"(Raw EagleView report — extract measurements from this text)\n\n{raw}"
 
     lines = []
 

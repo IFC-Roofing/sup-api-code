@@ -538,8 +538,13 @@ def load_pricelist() -> dict[str, dict]:
     if _pricelist_cache is not None:
         return _pricelist_cache
 
-    from googleapiclient.discovery import build
-    creds = get_service_account()
+    try:
+        from googleapiclient.discovery import build
+        creds = get_service_account()
+    except Exception as e:
+        print(f"[pipeline] ⚠️  Cannot load pricelist (no credentials): {e}")
+        _pricelist_cache = {}
+        return _pricelist_cache
     service = build("sheets", "v4", credentials=creds)
 
     result = service.spreadsheets().values().get(

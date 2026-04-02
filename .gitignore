@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.egg
+
+# Environment
+.env
+
+# Caches
+.pipeline_cache/
+data/cache/
+data/learning/*.db
+fonts/_google_fonts_cache.json
+
+# Generated outputs
+*_estimate.json
+*_estimate.html
+*_pipeline.json
+*_flow_package.json
+*_payload_*.json
+*.pdf
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Symlinks we created for local dev
+tools/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node (executive-dashboard/mission-control)
+node_modules/
+dist/
+build/

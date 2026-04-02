@@ -42,6 +42,7 @@ def parse_args():
     parser.add_argument("--json-only", action="store_true", help="Stop after building estimate.json")
     parser.add_argument("--html-only", action="store_true", help="Stop after building estimate.html")
     parser.add_argument("--from-json", metavar="PATH", help="Load estimate.json from file, skip pipeline")
+    parser.add_argument("--from-pipeline", metavar="PATH", help="Load pipeline_data from JSON, skip IFC API fetch")
     parser.add_argument("--output-dir", metavar="DIR", help="Output directory (default: current dir)")
     parser.add_argument("--version", metavar="VER", help="Supplement version override (e.g. 1.0)")
     return parser.parse_args()
@@ -51,9 +52,10 @@ def main():
     args = parse_args()
     project_name = " ".join(args.project_name) if args.project_name else None
 
-    if not project_name and not args.from_json:
+    if not project_name and not args.from_json and not args.from_pipeline:
         print("Usage: python3 generate.py \"Rose Brock\"")
         print("       python3 generate.py \"Rose Brock\" --skip-upload")
+        print("       python3 generate.py --from-pipeline pipeline_data.json")
         sys.exit(1)
 
     output_dir = Path(args.output_dir) if args.output_dir else Path(__file__).parent
@@ -79,13 +81,35 @@ def main():
             "notes": {"supplement": [], "momentum": [], "ifc": []},
         }
         project_folder_id = None
+    elif args.from_pipeline:
+        # IFC platform pushes pre-assembled pipeline data — skip IFC API fetch
+        print(f"[generate] Loading pipeline data from: {args.from_pipeline}")
+        with open(args.from_pipeline) as f:
+            pipeline_data = json.load(f)
+        project_name = project_name or pipeline_data.get("project", {}).get("name", "UNKNOWN")
+        project_folder_id = pipeline_data.get("project_folder_id")
+        if not pipeline_data.get("lastname"):
+            pipeline_data["lastname"] = project_name.strip().split()[-1].upper() if project_name else "UNKNOWN"
+        # Load pricelist if not provided
+        if not pipeline_data.get("pricelist"):
+            try:
+                print("[generate] Loading pricelist (not in payload)...")
+                from data_pipeline import load_pricelist
+                pipeline_data["pricelist"] = load_pricelist()
+            except Exception as e:
+                print(f"[generate] ⚠️  Could not load pricelist: {e}")
+                print("[generate] Continuing with empty pricelist — prices will use defaults")
+                pipeline_data["pricelist"] = {}
+        estimate = None  # Will be built in Step 2
     else:
         print("[generate] Step 1/6: Running data pipeline...")
         from data_pipeline import run as pipeline_run
         pipeline_data = pipeline_run(project_name)
         project_folder_id = pipeline_data.get("project_folder_id")
+        estimate = None  # Will be built in Step 2
 
-        # ── Step 2: Estimate Builder (AI) ─────────────────────
+    # ── Step 2: Estimate Builder (AI) ─────────────────────────
+    if estimate is None:
         print("\n[generate] Step 2/6: Building estimate (AI)...")
         from estimate_builder import build_estimate
         estimate = build_estimate(pipeline_data)
@@ -95,6 +119,7 @@ def main():
         from qa_agent import qa_review
         estimate = qa_review(estimate, pipeline_data)
 
+    if not args.from_json:
         # Save pipeline data for standalone QA reruns
         pipeline_json_path = output_dir / f"{pipeline_data['lastname']}_pipeline.json"
         try:
@@ -152,18 +177,22 @@ def main():
         print("\n[generate] ⚠️  No project_folder_id — skipping Drive upload")
     else:
         print("\n[generate] Step 5/6: Uploading to project Supplement folder...")
-        from uploader import upload
-        file_id = upload(
-            pdf_path,
-            project_name=project_name or pipeline_data.get("lastname", "UNKNOWN"),
-            lastname=lastname,
-            version=args.version,
-            project_folder_id=project_folder_id,
-        )
-        if file_id:
-            drive_link = f"https://drive.google.com/file/d/{file_id}/view?usp=drivesdk"
-            pipeline_data["uploaded_pdf_link"] = drive_link
-            print(f"[generate] ✅ Uploaded to Supplement/: {drive_link}")
+        try:
+            from uploader import upload
+            file_id = upload(
+                pdf_path,
+                project_name=project_name or pipeline_data.get("lastname", "UNKNOWN"),
+                lastname=lastname,
+                version=args.version,
+                project_folder_id=project_folder_id,
+            )
+            if file_id:
+                drive_link = f"https://drive.google.com/file/d/{file_id}/view?usp=drivesdk"
+                pipeline_data["uploaded_pdf_link"] = drive_link
+                print(f"[generate] ✅ Uploaded to Supplement/: {drive_link}")
+        except Exception as e:
+            print(f"[generate] ⚠️  Drive upload failed: {e}")
+            print("[generate] PDF saved locally — upload manually or fix credentials")
 
     # ── Step 6: Flow Package ──────────────────────────────────
     print("\n[generate] Step 6/6: Generating Flow card package...")
