@@ -1,0 +1,24 @@
+# PDF Generator + Orchestrator dependencies
+# Install: pip install -r requirements.txt
+
+# Core
+python-dotenv
+
+# AI providers
+anthropic
+google-generativeai
+
+# Google APIs (Drive, Sheets, Auth)
+google-api-python-client
+google-auth
+google-auth-httplib2
+
+# PDF generation
+weasyprint
+PyMuPDF
+
+# Templating
+jinja2
+
+# HTTP
+requests

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ estimate.estimate_name }} — IFC Supplement</title>
+  <link rel="stylesheet" href="{{ css_path }}">
+</head>
+<body>
+
+{# Footer string anchors (invisible, read by CSS string-set for @page footer) #}
+<span class="footer-name">{{ estimate.estimate_name }}</span>
+<span class="footer-date">{{ estimate.date_entered }}</span>
+
+{# ══════════════════════════════════════════════════════ #}
+{# RUNNING HEADER — appears at top of every physical page #}
+{# ══════════════════════════════════════════════════════ #}
+<div id="running-header">
+  <table style="width:100%; border-collapse:collapse;">
+    <tr>
+      <td style="width:75px; vertical-align:top;">
+        <img class="page-header-logo" src="{{ logo_path }}" alt="IFC Roofing">
+      </td>
+      <td style="vertical-align:top; padding-left:8px;">
+        <div class="page-header-company">IFC Roofing &amp; Construction</div>
+        <hr class="page-header-rule">
+        <div class="page-header-tagline">IFC Roofing &amp; Construction serving the DFW area 20+ years.</div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+{# ══════════════════════════════════════════════════════ #}
+{# COVER PAGE                                            #}
+{# ══════════════════════════════════════════════════════ #}
+<div class="cover-page">
+
+  {# Insured / Property #}
+  <table class="cover-fields">
+    <tr>
+      <td class="label">Insured:</td>
+      <td class="value">{{ estimate.policy_holder }}</td>
+      <td class="label" style="padding-left:30px;">E-mail:</td>
+      <td class="value">{{ estimate.get('client_email', '') }}</td>
+    </tr>
+    <tr>
+      <td class="label">Property:</td>
+      <td class="value" colspan="3">{{ estimate.address }}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="value" colspan="3">{{ estimate.city }}{% if estimate.city %}, {% endif %}{{ estimate.state }} {{ estimate.zip }}</td>
+    </tr>
+  </table>
+
+  <hr class="cover-divider">
+
+  {# Estimator #}
+  <table class="cover-fields">
+    <tr>
+      <td class="label">Estimator:</td>
+      <td class="value">{{ estimate.get('estimator_name', '') }}</td>
+      <td class="label" style="padding-left:30px;">Business:</td>
+      <td class="value">(817) 716-3523</td>
+    </tr>
+    <tr>
+      <td class="label">Business:</td>
+      <td class="value" colspan="3">5115 Colleyville Blvd<br>76034</td>
+    </tr>
+    <tr>
+      <td class="label">E-mail:</td>
+      <td class="value" colspan="3">{{ estimate.get('estimator_email', '') }}</td>
+    </tr>
+  </table>
+
+  <hr class="cover-divider">
+
+  {# Contractor #}
+  <table class="cover-fields">
+    <tr>
+      <td class="label">Contractor:</td>
+      <td class="value">&nbsp;</td>
+      <td class="label" style="padding-left:30px;">Business:</td>
+      <td class="value">(817) 706-6070</td>
+    </tr>
+    <tr>
+      <td class="label">Company:</td>
+      <td class="value" colspan="3">IFC Contracting Solutions</td>
+    </tr>
+    <tr>
+      <td class="label">Business:</td>
+      <td class="value" colspan="3">5115 Colleyville Blvd<br>Colleyville, TX 76034</td>
+    </tr>
+  </table>
+
+  <hr class="cover-divider">
+
+  {# Claim info row #}
+  <div class="claim-row">
+    <span class="claim-label">Claim Number:</span> {{ estimate.claim_number }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="claim-label">Policy Number:</span> {{ estimate.policy_number }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="claim-label">Type of Loss:</span> {{ estimate.type_of_loss }}
+  </div>
+
+  {# Dates #}
+  <table class="date-fields">
+    <tr>
+      <td class="label">Date of Loss:</td>
+      <td>{{ estimate.date_of_loss }}</td>
+      <td class="label" style="padding-left:30px;">Date Received:</td>
+      <td>{{ estimate.get('date_received', '') }}</td>
+    </tr>
+    <tr>
+      <td class="label">Date Inspected:</td>
+      <td>{{ estimate.date_inspected }}</td>
+      <td class="label" style="padding-left:30px;">Date Entered:</td>
+      <td>{{ estimate.date_entered }}</td>
+    </tr>
+  </table>
+
+  <hr class="cover-divider">
+
+  {# Price list / Estimate #}
+  <table class="estimate-block">
+    <tr>
+      <td class="label">Price List:</td>
+      <td>{{ estimate.price_list }}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Restoration/Service/Remodel</td>
+    </tr>
+    <tr>
+      <td class="label">Estimate:</td>
+      <td class="estimate-name">{{ estimate.estimate_name }}</td>
+    </tr>
+  </table>
+
+</div>
+{# END COVER PAGE #}
+
+
+{# ══════════════════════════════════════════════════════ #}
+{# LINE ITEM SECTIONS — one table per section            #}
+{# Trade name above column headers (matches Xactimate)   #}
+{# ══════════════════════════════════════════════════════ #}
+
+{# Estimate name centered at top of first estimate page #}
+<div class="estimate-page-title">{{ estimate.estimate_name }}</div>
+
+{% for section in estimate.sections %}
+<table class="items-table section-table">
+  <thead>
+    {# Trade name row — repeats on continuation pages with column headers #}
+    <tr class="section-name-row">
+      <th colspan="7">{{ section.name }}</th>
+    </tr>
+    <tr class="col-header-row">
+      <th class="col-desc">DESCRIPTION</th>
+      <th class="col-qty">QTY</th>
+      <th class="col-money">REMOVE</th>
+      <th class="col-money">REPLACE</th>
+      <th class="col-money">TAX</th>
+      <th class="col-money">O&amp;P</th>
+      <th class="col-money">TOTAL</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in section.line_items %}
+    <tr class="data-row avoid-break{% if item.f9 %} has-f9{% endif %}">
+      <td class="col-desc">
+        {{ item.num }}.&nbsp;&nbsp;{{ item.description }}{% if item.is_bid %} (Bid Item){% endif %}
+      </td>
+      <td class="col-qty">{{ item.qty|money }} {{ item.unit }}</td>
+      <td class="col-money">{{ item.remove|money }}</td>
+      <td class="col-money">{{ item.replace|money }}</td>
+      <td class="col-money">{{ item.tax|money }}</td>
+      <td class="col-money">{{ item.op|money }}</td>
+      <td class="col-money">{{ item.total|money }}</td>
+    </tr>
+
+    {% if item.f9 %}
+    <tr class="f9-row avoid-break">
+      <td colspan="7">{{ item.f9 | replace("\n", "<br>") }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+
+    {# Section totals #}
+    <tr class="section-totals-row">
+      <td class="col-desc">Totals:&nbsp;&nbsp;{{ section.name }}</td>
+      <td class="col-qty"></td>
+      <td class="col-money">{{ section.totals.remove|money }}</td>
+      <td class="col-money">{{ section.totals.replace|money }}</td>
+      <td class="col-money">{{ section.totals.tax|money }}</td>
+      <td class="col-money">{{ section.totals.op|money }}</td>
+      <td class="col-money">{{ section.totals.total|money }}</td>
+    </tr>
+  </tbody>
+</table>
+{% endfor %}
+
+
+{# ══════════════════════════════════════════════════════ #}
+{# LINE ITEM TOTALS                                      #}
+{# ══════════════════════════════════════════════════════ #}
+<table class="items-table" style="margin-top:12px;">
+  <tbody>
+    <tr class="line-item-totals-row">
+      <td class="col-desc">Line Item Totals: {{ estimate.estimate_name }}</td>
+      <td class="col-qty"></td>
+      <td class="col-money"></td>
+      <td class="col-money"></td>
+      <td class="col-money">{{ estimate.tax_total|money }}</td>
+      <td class="col-money">{{ estimate.op_total|money }}</td>
+      <td class="col-money">{{ "${:,.2f}".format(estimate.rcv_total) }}</td>
+    </tr>
+  </tbody>
+</table>
+
+
+{# ══════════════════════════════════════════════════════ #}
+{# SUMMARY PER COVERAGE                                  #}
+{# ══════════════════════════════════════════════════════ #}
+{% for cov, amount in estimate.coverage_split.items() %}
+{% if amount > 0 %}
+<div class="page-break"></div>
+
+<div class="summary-title">Summary for {{ cov }}</div>
+
+<table class="summary-block">
+  {% set cov_line_total = namespace(val=0.0) %}
+  {% set cov_tax = namespace(val=0.0) %}
+  {% set cov_op = namespace(val=0.0) %}
+  {% for section in estimate.sections %}
+    {% if section.coverage == cov %}
+      {% for item in section.line_items %}
+        {% set cov_line_total.val = cov_line_total.val + item.remove + item.replace %}
+        {% set cov_tax.val = cov_tax.val + item.tax %}
+        {% set cov_op.val = cov_op.val + item.op %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  <tr><td>Line Item Total</td><td class="val">{{ "${:,.2f}".format(cov_line_total.val) }}</td></tr>
+  <tr class="sub-rule"><td>Material Sales Tax</td><td class="val">{{ "${:,.2f}".format(cov_tax.val) }}</td></tr>
+  <tr><td>Subtotal</td><td class="val">{{ "${:,.2f}".format(cov_line_total.val + cov_tax.val) }}</td></tr>
+  <tr><td>Overhead</td><td class="val">{{ "${:,.2f}".format(cov_op.val / 2) }}</td></tr>
+  <tr class="sub-rule"><td>Profit</td><td class="val">{{ "${:,.2f}".format(cov_op.val / 2) }}</td></tr>
+  <tr class="final-row"><td>Replacement Cost Value</td><td class="val">${{ "{:,.2f}".format(amount) }}</td></tr>
+  <tr class="final-row double-rule"><td>Net Claim</td><td class="val">${{ "{:,.2f}".format(amount) }}</td></tr>
+</table>
+
+<div class="signature-line"></div>
+<div class="signature-name">{{ estimate.get('estimator_name', 'IFC Contracting Solutions') }}</div>
+
+{% endif %}
+{% endfor %}
+
+
+{# ══════════════════════════════════════════════════════ #}
+{# RECAP OF TAXES, OVERHEAD AND PROFIT                  #}
+{# ══════════════════════════════════════════════════════ #}
+<div class="page-break"></div>
+
+<div class="recap-section">
+  <div class="recap-title">Recap of Taxes, Overhead and Profit</div>
+  <table class="recap-table">
+    <thead>
+      <tr>
+        <th style="text-align:left;"></th>
+        <th>Overhead (10%)</th>
+        <th>Profit (10%)</th>
+        <th>Material Sales Tax<br>(8.25%)</th>
+        <th>Manuf. Home Tax (5%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Line Items</td>
+        <td>{{ "${:,.2f}".format(estimate.op_total / 2) }}</td>
+        <td>{{ "${:,.2f}".format(estimate.op_total / 2) }}</td>
+        <td>{{ "${:,.2f}".format(estimate.tax_total) }}</td>
+        <td>0.00</td>
+      </tr>
+      <tr class="total-row">
+        <td>Total</td>
+        <td>{{ "${:,.2f}".format(estimate.op_total / 2) }}</td>
+        <td>{{ "${:,.2f}".format(estimate.op_total / 2) }}</td>
+        <td>{{ "${:,.2f}".format(estimate.tax_total) }}</td>
+        <td>0.00</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+{# ══════════════════════════════════════════════════════ #}
+{# RECAP BY ROOM                                         #}
+{# ══════════════════════════════════════════════════════ #}
+<div class="page-break"></div>
+
+<div class="recap-section">
+  <div class="recap-title">Recap by Room</div>
+  <div style="font-weight:bold; font-size:10pt; margin-bottom:8px;">Estimate: {{ estimate.estimate_name }}</div>
+  <table class="recap-table">
+    <tbody>
+      {% for section in estimate.sections %}
+      <tr>
+        <td class="room-name">{{ section.name }}</td>
+        <td>{{ "${:,.2f}".format(section.totals.total) }}</td>
+        <td>{{ "%.2f"|format(section.totals.total / estimate.rcv_total * 100 if estimate.rcv_total else 0) }}%</td>
+      </tr>
+      {% endfor %}
+      <tr class="total-row"><td>Subtotal of Areas</td><td>{{ "${:,.2f}".format(estimate.rcv_total) }}</td><td>100.00%</td></tr>
+      <tr class="total-row"><td>Total</td><td>{{ "${:,.2f}".format(estimate.rcv_total) }}</td><td>100.00%</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+{# ══════════════════════════════════════════════════════ #}
+{# RECAP BY CATEGORY                                     #}
+{# ══════════════════════════════════════════════════════ #}
+<div class="page-break"></div>
+
+<div class="recap-section">
+  <div class="recap-title">Recap by Category</div>
+  <table class="recap-table">
+    <thead>
+      <tr>
+        <th style="text-align:left;">O&amp;P Items</th>
+        <th>Total</th>
+        <th>%</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cat, amount in categories.items() %}
+      {% if amount > 0 %}
+      <tr>
+        <td class="category-name">{{ cat }}</td>
+        <td>{{ "${:,.2f}".format(amount) }}</td>
+        <td>{{ "%.2f"|format(amount / estimate.rcv_total * 100 if estimate.rcv_total else 0) }}%</td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+      <tr class="total-row"><td>O&amp;P Items Subtotal</td><td>{{ "${:,.2f}".format(estimate.rcv_total - estimate.tax_total) }}</td><td>{{ "%.2f"|format((estimate.rcv_total - estimate.tax_total) / estimate.rcv_total * 100 if estimate.rcv_total else 0) }}%</td></tr>
+      <tr><td>Material Sales Tax</td><td>{{ "${:,.2f}".format(estimate.tax_total) }}</td><td>{{ "%.2f"|format(estimate.tax_total / estimate.rcv_total * 100 if estimate.rcv_total else 0) }}%</td></tr>
+      <tr><td>Overhead</td><td>{{ "${:,.2f}".format(estimate.op_total / 2) }}</td><td>{{ "%.2f"|format(estimate.op_total / 2 / estimate.rcv_total * 100 if estimate.rcv_total else 0) }}%</td></tr>
+      <tr><td>Profit</td><td>{{ "${:,.2f}".format(estimate.op_total / 2) }}</td><td>{{ "%.2f"|format(estimate.op_total / 2 / estimate.rcv_total * 100 if estimate.rcv_total else 0) }}%</td></tr>
+      <tr class="total-row"><td>Total</td><td>{{ "${:,.2f}".format(estimate.rcv_total) }}</td><td>100.00%</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

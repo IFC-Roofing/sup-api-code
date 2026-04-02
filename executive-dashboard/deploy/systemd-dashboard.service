@@ -1,0 +1,29 @@
+[Unit]
+Description=IFC Executive Dashboard API
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/executive-dashboard/backend
+Environment="PATH=/opt/executive-dashboard/venv/bin"
+EnvironmentFile=/opt/executive-dashboard/backend/.env
+ExecStart=/opt/executive-dashboard/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8091 --workers 4
+Restart=always
+RestartSec=10
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/executive-dashboard
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ifc-dashboard
+
+[Install]
+WantedBy=multi-user.target

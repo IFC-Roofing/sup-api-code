@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sup — Mission Control</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- Top Bar -->
+    <header id="topbar">
+      <div class="topbar-left">
+        <button id="btn-home" class="icon-btn" title="Home"><img src="ifc_logo.avif" alt="IFC" class="topbar-logo"></button>
+        <h1>Sup <span class="subtitle">Mission Control</span></h1>
+      </div>
+      <div class="topbar-center">
+        <div class="search-wrapper">
+          <input type="text" id="search-input" placeholder="Search projects..." autocomplete="off">
+          <div id="search-results" class="search-dropdown hidden"></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="user-email" class="user-badge">local-dev@ifcroofing.com</span>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+      <!-- HOME VIEW -->
+      <div id="view-home" class="view active">
+        <div class="home-layout">
+          <!-- Left: Tasks -->
+          <section class="home-tasks">
+            <h2>📋 My Pending Tasks</h2>
+            <div id="tasks-list" class="tasks-list">
+              <div class="loading-spinner">Loading tasks...</div>
+            </div>
+          </section>
+          <!-- Right: Chat -->
+          <section class="home-chat">
+            <h2>💬 Ask Sup</h2>
+            <div id="home-chat-container" class="chat-container">
+              <div id="home-chat-messages" class="chat-messages">
+                <div class="chat-msg assistant">Hey! Search for a project or ask me anything about supplements, jobs, or the team. 🏗️</div>
+              </div>
+              <div class="chat-input-row">
+                <input type="text" id="home-chat-input" placeholder="Ask about any project or question..." autocomplete="off">
+                <button id="home-chat-send" class="btn-send">Send</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- PROJECT VIEW -->
+      <div id="view-project" class="view">
+        <div class="project-layout">
+          <!-- Left: Project Info -->
+          <section class="project-info">
+            <div class="project-header">
+              <h2 id="proj-name">—</h2>
+              <span id="proj-status" class="status-badge">—</span>
+              <a id="proj-app-link" href="#" target="_blank" class="btn-outline">Open in App ↗</a>
+            </div>
+            
+            <div class="project-meta">
+              <div class="meta-row"><span class="label">Address:</span> <span id="proj-address">—</span></div>
+              <div class="meta-row"><span class="label">Sales Rep:</span> <span id="proj-rep">—</span></div>
+              <div class="meta-row"><span class="label">Contact:</span> <span id="proj-contact">—</span></div>
+              <div class="meta-row"><span class="label">Status Changed:</span> <span id="proj-status-date">—</span></div>
+              <div class="meta-row"><span class="label">Last Contacted:</span> <span id="proj-last-contact">—</span></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button class="btn-action" id="btn-estimate" title="Generate PDF estimate">📋 @estimate</button>
+              <button class="btn-action" id="btn-markup" title="Run bid markup">📄 @markup</button>
+              <button class="btn-action" id="btn-review" title="QA review gate">✅ @review</button>
+              <button class="btn-action" id="btn-precall" title="Pre-supplement call script">📞 @precall</button>
+              <button class="btn-action" id="btn-calling" title="Carrier call script">☎️ @calling</button>
+            </div>
+
+            <!-- Flow Cards -->
+            <div class="section-header collapsible" data-target="flow-cards">
+              <h3>▶ 📊 Flow Cards</h3>
+            </div>
+            <div id="flow-cards" class="flow-cards collapsible-body collapsed">
+              <div class="loading-spinner">Loading flow...</div>
+            </div>
+
+            <!-- Drive Files -->
+            <div class="section-header collapsible" data-target="drive-files">
+              <h3>▶ 📁 Supplement Files</h3>
+            </div>
+            <div id="drive-files" class="drive-files collapsible-body collapsed">
+              <div class="loading-spinner">Loading files...</div>
+            </div>
+
+            <!-- Convo Timeline -->
+            <div class="section-header collapsible" data-target="convo-timeline">
+              <h3>▶ 📝 Conversation Timeline</h3>
+            </div>
+            <div id="convo-timeline" class="convo-timeline collapsible-body collapsed">
+              <div class="loading-spinner">Loading...</div>
+            </div>
+          </section>
+
+          <!-- Right: Project Chat -->
+          <section class="project-chat">
+            <div class="chat-header">
+              <h3>💬 Chat about this project</h3>
+              <button id="btn-collapse-chat" class="btn-collapse-chat" title="Collapse/Expand chat">◀</button>
+            </div>
+            <div id="project-chat-container" class="chat-container">
+              <div id="project-chat-messages" class="chat-messages"></div>
+              <div class="chat-input-row">
+                <input type="text" id="project-chat-input" placeholder="Ask about this project..." autocomplete="off">
+                <button id="project-chat-send" class="btn-send">Send</button>
+                <button id="btn-stop" class="btn-stop hidden" title="Stop generation">⏹</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+{
+  "_comment": "BUILD → SUP handoff schema. BUILD produces this, SUP consumes it.",
+  "project": {
+    "name": "string — insured name",
+    "address": "string — property address",
+    "project_id": "number — IFC project ID",
+    "date_of_loss": "string — mm/dd/yyyy",
+    "price_list": "string — Xactimate pricelist code (e.g. TXFW8X_MAR26)"
+  },
+  "strategy": {
+    "ifc_notes": "string — @ifc game plan (internal only, never in F9s)",
+    "supplement_notes": "string — @supplement strategy (internal only)",
+    "momentum_notes": "string — @momentum context",
+    "phase": "1 | 2 — Phase 1 = first send, Phase 2 = post-response"
+  },
+  "measurements": {
+    "source": "eagleview",
+    "structures": [
+      {
+        "id": 1,
+        "name": "Main Dwelling",
+        "total_sq": "number — measured SQ (no waste)",
+        "suggested_sq": "number — suggested SQ (with waste)",
+        "waste_pct": "number — waste percentage",
+        "eaves_lf": "number",
+        "rakes_lf": "number",
+        "ridges_lf": "number",
+        "hips_lf": "number",
+        "valleys_lf": "number",
+        "step_flashing_lf": "number",
+        "drip_edge_lf": "number — eaves + rakes",
+        "pitch": "string — e.g. 6/12",
+        "stories": "number"
+      }
+    ]
+  },
+  "insurance_estimate": {
+    "version": "string — e.g. ins 1.0",
+    "total_rcv": "number",
+    "items": [
+      {
+        "item_num": "string — insurance line number",
+        "description": "string",
+        "trade": "string — @tag (e.g. @shingle_roof, @gutter)",
+        "qty": "number",
+        "unit": "string — SQ, LF, EA, SF, HR, etc.",
+        "unit_price": "number",
+        "total": "number",
+        "section": "string — insurance section name"
+      }
+    ]
+  },
+  "previous_insurance_estimate": {
+    "_comment": "Only present in Phase 2 (post-response). null for Phase 1.",
+    "version": "string — e.g. ins 1.0",
+    "total_rcv": "number",
+    "items": "same structure as insurance_estimate.items"
+  },
+  "bids": [
+    {
+      "trade": "string — @tag",
+      "sub_name": "string — subcontractor company name",
+      "scope": "string — what the bid covers",
+      "wholesale_total": "number — original bid amount",
+      "retail_total": "number — after 30% markup",
+      "line_items": [
+        {
+          "description": "string",
+          "amount": "number — retail"
+        }
+      ]
+    }
+  ],
+  "analysis": {
+    "_comment": "BUILD's core output — the comparison and recommendations",
+    "line_items": [
+      {
+        "id": "string — unique item identifier",
+        "description": "string — Xactimate description",
+        "trade": "string — @tag",
+        "category": "string — F9 matrix category",
+        "qty": "number — recommended qty",
+        "unit": "string",
+        "source": "ins | added | adjusted",
+        "ins_item_num": "string | null — maps to insurance line",
+        "ins_qty": "number | null — what insurance has",
+        "ins_total": "number | null",
+        "ev_qty": "number | null — EagleView measurement",
+        "scenario": "string — forgot | qty_wrong | quality_wrong | price_wrong | bid_replacement",
+        "is_bid": "boolean",
+        "sub_name": "string | null",
+        "evidence": {
+          "photos": "boolean — photo evidence available",
+          "eagleview": "boolean — EV measurement supports this",
+          "code": "boolean — building code supports this",
+          "production": "boolean — production condition justifies this",
+          "bid": "boolean — sub bid supports this"
+        },
+        "flags": ["string — ADDED_VS_INSURANCE | UNDER_SCOPED | OVER_SCOPED | CARRIER_HIGHER_THAN_EV | LOW_CONFIDENCE | WEAK_PHOTO_EVIDENCE"],
+        "build_notes": "string — BUILD's internal analysis note for SUP"
+      }
+    ],
+    "phase2_changes": {
+      "_comment": "Only present in Phase 2",
+      "newly_approved": ["string — item descriptions approved in new INS"],
+      "increased": ["string — items with higher qty/amount"],
+      "still_denied": ["string — items still not in INS"],
+      "denial_reasons": [
+        {
+          "item": "string",
+          "reason": "string — carrier's stated reason"
+        }
+      ],
+      "previous_rcv": "number",
+      "current_rcv": "number",
+      "difference": "number"
+    }
+  },
+  "pricing": {
+    "pricelist_code": "string",
+    "sample_rates": [
+      {
+        "description": "string — Xactimate line description",
+        "unit": "string",
+        "remove_rate": "number",
+        "replace_rate": "number"
+      }
+    ]
+  }
+}

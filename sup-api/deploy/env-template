@@ -1,0 +1,20 @@
+# Sup AI — Environment Variables
+# Copy to /opt/sup/.env and fill in values
+
+# ── Sup API Config ─────────────────────────────────────
+SUP_API_KEY=CHANGE_ME_generate_a_secure_random_key
+SUP_ENV=production
+SUP_PORT=8090
+SUP_WORKSPACE=/opt/sup
+SUP_CORS_ORIGINS=https://app.ifcroofing.com,https://flow.ifcroofing.com
+
+# ── AI Keys ────────────────────────────────────────────
+ANTHROPIC_API_KEY=sk-ant-...
+GOOGLE_API_KEY=...
+
+# ── IFC API ────────────────────────────────────────────
+IFC_TOKEN=...
+
+# ── Optional ───────────────────────────────────────────
+# SUP_DATA_DIR=/opt/sup/data/learning
+# SUP_DOMAIN=sup.ifcroofing.com

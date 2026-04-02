@@ -1,0 +1,397 @@
+/* IFC Supplement PDF Stylesheet
+   Matches Xactimate estimate format exactly (reference: BAFNA_Supp 2.0).
+   Font: Times New Roman (serif). No colors, no shading. Thin black rules only.
+   Designed for WeasyPrint.
+*/
+
+/* ── Running header — placed in @page top margin on every page ── */
+#running-header {
+    position: running(header);
+    padding-top: 36px;
+}
+
+/* ── Page setup ──────────────────────────────────────── */
+@page {
+    size: letter;
+    margin: 1.0in 0.5in 0.7in 0.6in;
+    @top-left {
+        content: element(header);
+        vertical-align: top;
+    }
+    @bottom-left {
+        content: string(estimate-name);
+        font-size: 8.5pt;
+        font-family: "Times New Roman", Times, serif;
+        color: #000;
+    }
+    @bottom-center {
+        content: string(estimate-date);
+        font-size: 8.5pt;
+        font-family: "Times New Roman", Times, serif;
+        color: #000;
+    }
+    @bottom-right {
+        content: "Page: " counter(page);
+        font-size: 8.5pt;
+        font-family: "Times New Roman", Times, serif;
+        color: #000;
+    }
+}
+
+/* Strings for footer */
+.footer-name { string-set: estimate-name content(); font-size: 0; line-height: 0; display: block; height: 0; overflow: hidden; }
+.footer-date { string-set: estimate-date content(); font-size: 0; line-height: 0; display: block; height: 0; overflow: hidden; }
+
+/* ── Base ─────────────────────────────────────────────── */
+body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 10pt;
+    color: #000;
+    margin: 0;
+    padding: 0;
+    line-height: 1.35;
+}
+
+/* ── Page breaks ─────────────────────────────────────── */
+.page-break {
+    page-break-after: always;
+    break-after: page;
+}
+.avoid-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+/* ── Running Page Header ──────────────────────────────── */
+.page-header-logo {
+    width: 65px;
+    height: auto;
+    vertical-align: top;
+}
+.page-header-company {
+    font-size: 13pt;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+.page-header-rule {
+    border: none;
+    border-top: 0.75pt solid #000;
+    margin: 2px 0;
+}
+.page-header-tagline {
+    font-size: 9pt;
+    font-style: italic;
+    margin-bottom: 2px;
+}
+
+/* ── Cover Page ──────────────────────────────────────── */
+.cover-page {
+    page-break-after: always;
+}
+.cover-fields {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+.cover-fields td {
+    padding: 1px 4px;
+    font-size: 10pt;
+    vertical-align: top;
+}
+.cover-fields .label {
+    font-weight: normal;
+    white-space: nowrap;
+    text-align: right;
+    width: 110px;
+    padding-right: 6px;
+}
+.cover-fields .value {
+    min-width: 180px;
+}
+.cover-fields .value-underline {
+    border-bottom: 1px solid #000;
+    min-width: 150px;
+}
+.cover-divider {
+    border: none;
+    border-top: 0.75pt solid #000;
+    margin: 8px 0;
+}
+
+/* Claim number row */
+.claim-row {
+    border-top: 0.75pt solid #000;
+    border-bottom: 0.75pt solid #000;
+    padding: 4px 0;
+    margin: 8px 0;
+    font-size: 10pt;
+}
+.claim-row .claim-label {
+    font-weight: bold;
+}
+
+/* Date fields */
+.date-fields {
+    font-size: 10pt;
+    margin: 6px 0;
+}
+.date-fields td {
+    padding: 1px 4px;
+}
+.date-fields .label {
+    text-align: right;
+    padding-right: 6px;
+    white-space: nowrap;
+}
+
+/* Estimate block */
+.estimate-block {
+    font-size: 10pt;
+    margin-top: 8px;
+}
+.estimate-block .label {
+    text-align: right;
+    padding-right: 6px;
+}
+.estimate-name {
+    font-weight: normal;
+    font-size: 10pt;
+}
+
+/* ── Estimate Page Title ─────────────────────────────── */
+.estimate-page-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12pt;
+    margin-bottom: 16px;
+    page-break-inside: avoid;
+}
+
+/* ── Section Name Block ──────────────────────────────── */
+.section-name-block {
+    font-weight: bold;
+    font-size: 11pt;
+    margin-top: 28px;
+    margin-bottom: 0;
+    padding-bottom: 2px;
+    border-bottom: 0.75pt solid #000;
+    page-break-after: avoid;
+}
+
+/* First section after title — less top margin */
+.estimate-page-title + .section-name-block {
+    margin-top: 0;
+}
+
+/* ── Line Item Table ──────────────────────────────────── */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10pt;
+    margin-bottom: 2px;
+}
+
+/* Column header row */
+.col-header-row th {
+    font-weight: bold;
+    font-size: 9.5pt;
+    text-transform: uppercase;
+    text-align: right;
+    border-bottom: 0.5pt solid #000;
+    padding: 2px 4px;
+    background: none;
+}
+.col-header-row th.col-desc {
+    text-align: left;
+}
+
+/* Data cells */
+.items-table td {
+    padding: 2px 4px;
+    vertical-align: top;
+    border: none;
+}
+.items-table td.col-desc {
+    text-align: left;
+    min-width: 200px;
+}
+.items-table td.col-qty {
+    text-align: right;
+    width: 65px;
+    white-space: nowrap;
+}
+.items-table td.col-money {
+    text-align: right;
+    width: 68px;
+    white-space: nowrap;
+}
+
+/* Data rows — subtle spacing between items for readability */
+.items-table tr.data-row td {
+    border-top: none;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+/* Section table — one per trade, flush under its title block */
+.section-table {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Section/trade name row — above column headers, matches Xactimate style */
+.section-name-row th {
+    font-weight: bold;
+    font-size: 11pt;
+    text-align: left;
+    padding: 12px 4px 2px 0;
+    border-bottom: 0.75pt solid #000;
+}
+/* Section/trade name in thead — repeats on every page with column headers */
+/* First section after estimate title — no extra top padding */
+tbody tr.section-divider-row:first-child td {
+    padding-top: 4px;
+}
+
+/* Column headers repeat on every page via thead */
+.items-table thead {
+    display: table-header-group;
+}
+.items-table thead tr.col-header-row th {
+    border-bottom: 0.75pt solid #000;
+}
+
+/* ── F9-flagged rows — bold only key disputed items ──── */
+.data-row.has-f9 td {
+    font-weight: bold;
+}
+.data-row.has-f9 td.col-money,
+.data-row.has-f9 td.col-qty {
+    font-weight: normal;
+}
+
+/* ── F9 Notes — italicized like human-made supplements ── */
+.f9-row td {
+    padding: 1px 4px 4px 20px;
+    font-size: 9.5pt;
+    font-weight: normal;
+    font-style: italic;
+    color: #000;
+    white-space: pre-line;
+    line-height: 1.3;
+    border: none;
+}
+
+/* ── Section Totals ──────────────────────────────────── */
+.section-totals-row td {
+    padding: 3px 4px;
+    font-weight: bold;
+    border-top: 1.5pt double #000;
+}
+.section-totals-row td.col-desc {
+    font-size: 10pt;
+}
+
+/* ── Grand Totals (Line Item Totals) ─────────────────── */
+.line-item-totals-row td {
+    font-weight: bold;
+    font-size: 10pt;
+    padding: 4px 4px;
+    border-top: 1.5pt double #000;
+    border-bottom: 1.5pt double #000;
+}
+
+/* ── Summary Tables (per coverage) ───────────────────── */
+.summary-title {
+    font-size: 13pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 30px;
+}
+.summary-block {
+    width: 55%;
+    margin: 0 auto;
+    font-size: 10pt;
+}
+.summary-block td {
+    padding: 2px 4px;
+}
+.summary-block td.val {
+    text-align: right;
+    min-width: 110px;
+}
+.summary-block .sub-rule td.val {
+    border-bottom: 0.75pt solid #000;
+}
+.summary-block .final-row td {
+    font-weight: bold;
+}
+.summary-block .double-rule td.val {
+    border-bottom: 3px double #000;
+}
+
+/* ── Signature ───────────────────────────────────────── */
+.signature-line {
+    border-top: 1px solid #000;
+    width: 200px;
+    margin-top: 50px;
+    margin-bottom: 2px;
+}
+.signature-name {
+    font-size: 10pt;
+}
+
+/* ── Recap Sections ──────────────────────────────────── */
+.recap-section {
+    page-break-inside: avoid;
+    margin-top: 12px;
+}
+.recap-title {
+    font-size: 13pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    margin-top: 30px;
+}
+.recap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10pt;
+}
+.recap-table th {
+    font-weight: bold;
+    padding: 3px 4px;
+    text-align: right;
+    font-size: 10pt;
+    border-bottom: 0.75pt solid #000;
+}
+.recap-table th:first-child {
+    text-align: left;
+}
+.recap-table td {
+    padding: 3px 4px;
+}
+.recap-table td:not(:first-child) {
+    text-align: right;
+}
+.recap-table tr.total-row td {
+    font-weight: bold;
+    border-top: 0.75pt solid #000;
+}
+
+/* Recap by Room — indented room names */
+.recap-table td.room-name {
+    padding-left: 24px;
+}
+
+/* Recap by Category — ALL CAPS trade names */
+.recap-table td.category-name {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* ── Utility ─────────────────────────────────────────── */
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-bold { font-weight: bold; }

@@ -1,0 +1,9 @@
+{"event_id": 1, "type": "generation", "project": "Rose Brock Test", "carrier": "Allstate", "strategies": ["steep_on_waste", "full_fence_scope"], "amount": 32794.58, "timestamp": "2026-03-09T15:43:18.684619"}
+{"event_id": 2, "type": "generation", "project": "Rose Brock", "carrier": "Allstate", "strategies": ["O&P"], "amount": 32863.37, "timestamp": "2026-03-09T15:47:14.112863"}
+{"event_id": 3, "type": "generation", "project": "Test Project 0", "carrier": "Allstate", "strategies": ["O&P"], "amount": 25000.0, "timestamp": "2026-03-09T16:00:59.048367"}
+{"event_id": 4, "type": "generation", "project": "Test Project 1", "carrier": "Allstate", "strategies": ["O&P"], "amount": 26000.0, "timestamp": "2026-03-09T16:00:59.050057"}
+{"event_id": 5, "type": "generation", "project": "Test Project 2", "carrier": "Allstate", "strategies": ["O&P"], "amount": 27000.0, "timestamp": "2026-03-09T16:00:59.051523"}
+{"event_id": 6, "type": "generation", "project": "Test Project 3", "carrier": "Allstate", "strategies": ["O&P"], "amount": 28000.0, "timestamp": "2026-03-09T16:00:59.052679"}
+{"event_id": 7, "type": "generation", "project": "Test Project 4", "carrier": "Allstate", "strategies": ["O&P"], "amount": 29000.0, "timestamp": "2026-03-09T16:00:59.053803"}
+{"event_id": 8, "type": "generation", "project": "Rose Brock", "carrier": "Allstate", "strategies": ["O&P"], "amount": 33152.69, "timestamp": "2026-03-09T16:23:41.003125"}
+{"event_id": 9, "type": "generation", "project": "Rose Brock", "carrier": "Allstate", "strategies": ["O&P"], "amount": 34434.04, "timestamp": "2026-03-09T22:27:15.020857"}

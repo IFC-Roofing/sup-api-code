@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sup AI — Presentation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #090b1a;
+  color: #e8e8e8;
+  overflow-x: hidden;
+}
+
+.slide {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 80px;
+  position: relative;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.slide-number {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.2);
+  font-weight: 300;
+}
+
+.logo {
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.3);
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.title-slide {
+  background: linear-gradient(135deg, #0a0e27 0%, #121836 50%, #0d1229 100%);
+  text-align: center;
+  align-items: center;
+}
+
+.title-slide h1 {
+  font-size: 64px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f59e0b, #f97316, #ef4444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+
+.title-slide .subtitle {
+  font-size: 24px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 300;
+  margin-bottom: 48px;
+}
+
+.title-slide .tagline {
+  font-size: 18px;
+  color: rgba(255,255,255,0.3);
+  font-weight: 300;
+  font-style: italic;
+}
+
+h2 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 40px;
+  color: #f59e0b;
+}
+
+h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #fbbf24;
+}
+
+p, li {
+  font-size: 20px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.75);
+}
+
+li {
+  margin-bottom: 12px;
+  padding-left: 8px;
+}
+
+ul { list-style: none; padding-left: 0; }
+ul li::before {
+  content: '→';
+  color: #f59e0b;
+  font-weight: 700;
+  margin-right: 12px;
+}
+
+.highlight { color: #fff; font-weight: 600; }
+.accent { color: #f59e0b; font-weight: 600; }
+
+.two-worlds {
+  display: flex;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.world {
+  flex: 1;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.world h3 { margin-bottom: 16px; }
+.world p { font-size: 17px; color: rgba(255,255,255,0.5); }
+
+.gap-arrow {
+  display: flex;
+  align-items: center;
+  font-size: 48px;
+  color: #ef4444;
+  opacity: 0.6;
+}
+
+.flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 30px 0;
+}
+
+.flow-step {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 18px;
+  color: rgba(255,255,255,0.8);
+  width: 420px;
+  text-align: center;
+}
+
+.flow-arrow { color: #f59e0b; font-size: 20px; }
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.skill-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.skill-card .emoji { font-size: 28px; margin-bottom: 8px; }
+.skill-card h4 { font-size: 18px; color: #fbbf24; margin-bottom: 8px; }
+.skill-card p { font-size: 15px; color: rgba(255,255,255,0.5); }
+
+.check-list li::before { content: '✅'; margin-right: 12px; }
+
+.ask-items {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.ask-item { display: flex; align-items: flex-start; gap: 20px; }
+
+.ask-number {
+  background: #f59e0b;
+  color: #000;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.ask-text h4 { font-size: 20px; color: #fff; margin-bottom: 4px; }
+.ask-text p { font-size: 16px; color: rgba(255,255,255,0.5); }
+
+.future-items {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 20px;
+}
+
+.future-item { display: flex; gap: 20px; align-items: flex-start; }
+.future-icon { font-size: 32px; flex-shrink: 0; }
+
+.bottom-line {
+  background: linear-gradient(135deg, #0f1429 0%, #1a1f3a 100%);
+  text-align: center;
+  align-items: center;
+}
+
+.bottom-line h2 { font-size: 48px; margin-bottom: 32px; }
+
+.bottom-line .big-text {
+  font-size: 28px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 700px;
+}
+
+.bottom-line .closer {
+  margin-top: 48px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #f59e0b;
+}
+</style>
+</head>
+<body>
+
+<!-- Slide 1: Title -->
+<div class="slide title-slide">
+  <div class="logo">IFC CONTRACTING</div>
+  <h1>Sup AI</h1>
+  <div class="subtitle">Supplement Intelligence — Inside the App</div>
+  <div class="tagline">One tab. One conversation. Full pipeline.</div>
+</div>
+
+<!-- Slide 2: The Problem -->
+<div class="slide">
+  <div class="slide-number">01</div>
+  <div class="logo">SUP AI</div>
+  <h2>The Problem</h2>
+  <p style="font-size: 22px; margin-bottom: 32px; color: rgba(255,255,255,0.6);">Our supplement work lives in two separate worlds.</p>
+  <div class="two-worlds">
+    <div class="world">
+      <h3>🏢 The IFC App</h3>
+      <p>Projects, flow cards, conversations, tracking — everything the team lives in every day.</p>
+    </div>
+    <div class="gap-arrow">✕</div>
+    <div class="world">
+      <h3>🤖 Sup AI Tools</h3>
+      <p>Supplement PDFs, bid markups, call scripts, QA reviews — powerful but separate.</p>
+    </div>
+  </div>
+  <p style="margin-top: 32px; font-size: 20px; text-align: center; color: rgba(255,255,255,0.4);">The team has to jump between both. There's no bridge. <span class="accent">Until now.</span></p>
+</div>
+
+<!-- Slide 3: The Solution -->
+<div class="slide">
+  <div class="slide-number">02</div>
+  <div class="logo">SUP AI</div>
+  <h2>What We Built</h2>
+  <p style="font-size: 22px; margin-bottom: 16px;">A small service that <span class="highlight">translates</span> between the IFC app and our supplement tools.</p>
+  <div class="flow">
+    <div class="flow-step">💬 Rep types in the supplement tab</div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">📡 IFC app sends request to our service</div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">⚙️ Sup AI runs the full pipeline</div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">📄 PDF generated + uploaded to Drive</div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">✅ Results appear right in the app</div>
+  </div>
+  <p style="text-align: center; color: rgba(255,255,255,0.4); margin-top: 16px;">No new logins. No new tools. No new tabs.</p>
+</div>
+
+<!-- Slide 4: Five Skills -->
+<div class="slide">
+  <div class="slide-number">03</div>
+  <div class="logo">SUP AI</div>
+  <h2>Five Skills, One Tab</h2>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="emoji">📋</div>
+      <h4>"Generate a supplement"</h4>
+      <p>Full pipeline — estimate, render, upload to Drive. Rep gets the link and dollar breakdown.</p>
+    </div>
+    <div class="skill-card">
+      <div class="emoji">📊</div>
+      <h4>"Run a bid markup"</h4>
+      <p>Compares sub bids to Xactimate pricing. Flags discrepancies and markup issues.</p>
+    </div>
+    <div class="skill-card">
+      <div class="emoji">📞</div>
+      <h4>"Build a pre-call script"</h4>
+      <p>Pulls full project context and builds a consultation prep guide.</p>
+    </div>
+    <div class="skill-card">
+      <div class="emoji">☎️</div>
+      <h4>"Give me a calling script"</h4>
+      <p>Structured phone script for the adjuster call with all the context baked in.</p>
+    </div>
+  </div>
+  <div style="margin-top: 20px;">
+    <div class="skill-card" style="max-width: 49%;">
+      <div class="emoji">🔍</div>
+      <h4>"Review this supplement"</h4>
+      <p>QA gate — verifies bids, measurements, photos, and F9 justifications.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 5: What Doesn't Change -->
+<div class="slide">
+  <div class="slide-number">04</div>
+  <div class="logo">SUP AI</div>
+  <h2>What Doesn't Change</h2>
+  <ul class="check-list" style="max-width: 700px;">
+    <li><span class="highlight">The IFC app stays exactly the same</span> — we're adding to it, not changing it</li>
+    <li><span class="highlight">Same supplement quality</span> — same pipeline, same output, same tools</li>
+    <li><span class="highlight">No new infrastructure burden</span> — costs less than Netflix to run</li>
+    <li><span class="highlight">Secure</span> — every request requires authentication, locked to the IFC app</li>
+    <li><span class="highlight">No ongoing maintenance</span> from the IFC dev team after setup</li>
+  </ul>
+</div>
+
+<!-- Slide 6: The Ask -->
+<div class="slide">
+  <div class="slide-number">05</div>
+  <div class="logo">SUP AI</div>
+  <h2>What We Need</h2>
+  <div class="ask-items">
+    <div class="ask-item">
+      <div class="ask-number">1</div>
+      <div class="ask-text">
+        <h4>Review 5 small files</h4>
+        <p>Ruby tool files that tell the IFC app how to talk to our service. Plus a setup script.</p>
+      </div>
+    </div>
+    <div class="ask-item">
+      <div class="ask-number">2</div>
+      <div class="ask-text">
+        <h4>Two environment variables</h4>
+        <p>A URL (where our service lives) and a key (for authentication). That's it.</p>
+      </div>
+    </div>
+    <div class="ask-item">
+      <div class="ask-number">3</div>
+      <div class="ask-text">
+        <h4>Approval to merge</h4>
+        <p>One-time setup. After that, it's live and self-running.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 7: What's Next -->
+<div class="slide">
+  <div class="slide-number">06</div>
+  <div class="logo">SUP AI</div>
+  <h2>What's Next</h2>
+  <div class="future-items">
+    <div class="future-item">
+      <div class="future-icon">🧠</div>
+      <div>
+        <h3>Gets smarter over time</h3>
+        <p>Learns from every supplement decision — what carriers fight on, what trades get approved, what works. Feeds lessons back to every rep automatically.</p>
+      </div>
+    </div>
+    <div class="future-item">
+      <div class="future-icon">⚡</div>
+      <div>
+        <h3>Faster repeat work</h3>
+        <p>Caching so back-to-back requests on the same project don't start from scratch. Less waiting, less cost.</p>
+      </div>
+    </div>
+    <div class="future-item">
+      <div class="future-icon">🔧</div>
+      <div>
+        <h3>More skills coming</h3>
+        <p>Response analysis, reinspection strategy, appraisal prep — all from the same tab.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 8: Bottom Line -->
+<div class="slide bottom-line">
+  <div class="logo">SUP AI</div>
+  <h2>The Bottom Line</h2>
+  <div class="big-text">
+    We're not replacing anything.<br><br>
+    We're connecting what already works — on both sides — so the team can do supplement work <span class="accent">without leaving the tool they already live in.</span>
+  </div>
+  <div class="closer">One tab. One conversation. Full pipeline. 🏗️</div>
+</div>
+
+</body>
+</html>

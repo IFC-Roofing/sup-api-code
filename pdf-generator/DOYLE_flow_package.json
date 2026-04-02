@@ -1,0 +1,149 @@
+{
+  "project_id": 4501,
+  "project_name": "Mark Doyle ",
+  "rcv_total": 126587.9,
+  "cards": [
+    {
+      "action": "update",
+      "project_id": 4501,
+      "action_type": "bid",
+      "tag": "@chimney",
+      "flow_card_id": 5378,
+      "payload": {
+        "retail_exactimate_bid": 1007.5,
+        "op_from_ifc_supplement": 167.92,
+        "original_sub_bid_price": 775.0,
+        "latest_rcv_non_recoverable_depreciation": 0.0,
+        "supplement_notes": "INS at $0 \u2014 no coverage issued; full $1,007.50 is out-of-pocket or needs supplement. Flag for immediate rebuttal."
+      }
+    },
+    {
+      "action": "update",
+      "project_id": 4501,
+      "action_type": "bid",
+      "tag": "@gazebo/pergola",
+      "flow_card_id": 5384,
+      "payload": {
+        "retail_exactimate_bid": 617.5,
+        "op_from_ifc_supplement": 102.92,
+        "original_sub_bid_price": 475.0,
+        "latest_rcv_rcv": 1161.14,
+        "latest_rcv_op": 189.46,
+        "latest_rcv_non_recoverable_depreciation": 0.0,
+        "how_far_are_we_off": -543.64,
+        "supplement_notes": "INS short $543.64; confirm O&P is included in their $1,161.14 figure and push back on line-item gaps."
+      }
+    },
+    {
+      "action": "update",
+      "project_id": 4501,
+      "action_type": "bid",
+      "tag": "@gutter",
+      "flow_card_id": 374,
+      "payload": {
+        "retail_exactimate_bid": 7554.19,
+        "op_from_ifc_supplement": 1197.34,
+        "latest_rcv_rcv": 6135.5,
+        "latest_rcv_op": 994.24,
+        "latest_rcv_non_recoverable_depreciation": 0.0,
+        "how_far_are_we_off": 1418.69,
+        "supplement_notes": "We're $1,418.69 over INS \u2014 O&P approved but delta needs to be addressed in supplement or negotiation with adjuster."
+      }
+    },
+    {
+      "action": "update",
+      "project_id": 4501,
+      "action_type": "bid",
+      "tag": "@hvac",
+      "flow_card_id": 5380,
+      "payload": {
+        "retail_exactimate_bid": 41600.0,
+        "op_from_ifc_supplement": 6933.33,
+        "original_sub_bid_price": 32000.0,
+        "latest_rcv_rcv": 392.09,
+        "latest_rcv_op": 65.36,
+        "latest_rcv_non_recoverable_depreciation": 0.0,
+        "how_far_are_we_off": 41207.91,
+        "supplement_notes": "Massive $41,207.91 gap \u2014 INS issued only $392.09 against our $41,600 scope; escalate immediately, full rebuttal required."
+      }
+    },
+    {
+      "action": "update",
+      "project_id": 4501,
+      "action_type": "bid",
+      "tag": "@interior",
+      "flow_card_id": 5383,
+      "payload": {
+        "retail_exactimate_bid": 2407.09,
+        "op_from_ifc_supplement": 380.45,
+        "latest_rcv_rcv": 1902.32,
+        "latest_rcv_op": 311.0,
+        "latest_rcv_non_recoverable_depreciation": 0.0,
+        "how_far_are_we_off": 504.77,
+        "supplement_notes": "INS short $504.77; O&P approved \u2014 submit supplement with supporting documentation to close the gap."
+      }
+    },
+    {
+      "action": "update",
+      "project_id": 4501,
+      "action_type": "bid",
+      "tag": "@metal",
+      "flow_card_id": 4990,
+      "payload": {
+        "retail_exactimate_bid": 4485.0,
+        "op_from_ifc_supplement": 747.5,
+        "original_sub_bid_price": 3450.0,
+        "latest_rcv_rcv": 1054.24,
+        "latest_rcv_op": 171.82,
+        "latest_rcv_non_recoverable_depreciation": 0.0,
+        "how_far_are_we_off": 3430.76,
+        "supplement_notes": "INS short $3,430.76; O&P approved but significant delta \u2014 verify all metal line items are scoped and documented for rebuttal."
+      }
+    },
+    {
+      "action": "create",
+      "project_id": 4501,
+      "action_type": "bid",
+      "tag": "@shingle_roof",
+      "flow_card_id": null,
+      "payload": {
+        "retail_exactimate_bid": 53330.89,
+        "op_from_ifc_supplement": 8499.64,
+        "latest_rcv_rcv": 42945.88,
+        "latest_rcv_op": 7009.9,
+        "latest_rcv_non_recoverable_depreciation": 0.0,
+        "how_far_are_we_off": 10385.01,
+        "supplement_notes": "INS short $10,385.01; O&P approved \u2014 review estimate line by line and submit supplement to recover delta."
+      }
+    },
+    {
+      "action": "update",
+      "project_id": 4501,
+      "action_type": "bid",
+      "tag": "@skylight",
+      "flow_card_id": 4975,
+      "payload": {
+        "retail_exactimate_bid": 3243.71,
+        "op_from_ifc_supplement": 540.62,
+        "original_sub_bid_price": 2495.16,
+        "latest_rcv_rcv": 193.5,
+        "latest_rcv_op": 30.68,
+        "latest_rcv_non_recoverable_depreciation": 0.0,
+        "how_far_are_we_off": 3050.21,
+        "supplement_notes": "INS issued only $193.50 against our $3,243.71 \u2014 nearly fully underpaid; O&P approved but full rebuttal needed with photos and specs."
+      }
+    },
+    {
+      "action": "update",
+      "project_id": 4501,
+      "action_type": "pricelist",
+      "tag": null,
+      "flow_card_id": 5672,
+      "payload": {
+        "our_price_list": "TXDF8X_FEB26"
+      }
+    }
+  ],
+  "warnings": [],
+  "skipped": []
+}

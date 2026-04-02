@@ -1,0 +1,1309 @@
+{
+  "missing": [
+    {
+      "desc": "R&R Gutter guard/screen",
+      "count": 6,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "DAWSON"
+      ],
+      "unit": "LF",
+      "description": "R&R Gutter guard/screen"
+    },
+    {
+      "desc": "R&R Glazing bead - Vinyl",
+      "count": 2,
+      "projects": [
+        "GRANGER",
+        "MARTIN"
+      ],
+      "unit": "LF",
+      "description": "R&R Glazing bead - Vinyl"
+    },
+    {
+      "desc": "HiTech_Chimney Cap (Bid Item)",
+      "count": 2,
+      "projects": [
+        "DAWSON",
+        "HOOK"
+      ],
+      "unit": "EA",
+      "description": "HiTech_Chimney Cap (Bid Item)"
+    },
+    {
+      "desc": "FoGlass_Window Screen (Bid Item)",
+      "count": 2,
+      "projects": [
+        "DAWSON",
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "FoGlass_Window Screen (Bid Item)"
+    },
+    {
+      "desc": "R&R Furnace vent - rain cap only, up to 5\"",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "EA",
+      "description": "R&R Furnace vent - rain cap only, up to 5\""
+    },
+    {
+      "desc": "Tear off painted acoustic ceiling (popcorn) texture",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "SF",
+      "description": "Tear off painted acoustic ceiling (popcorn) texture"
+    },
+    {
+      "desc": "R&R Acoustic ceiling (popcorn) texture",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "SF",
+      "description": "R&R Acoustic ceiling (popcorn) texture"
+    },
+    {
+      "desc": "City of Grapevine permit",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "EA",
+      "description": "City of Grapevine permit"
+    },
+    {
+      "desc": "Electrician - per hour",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "HR",
+      "description": "Electrician - per hour"
+    },
+    {
+      "desc": "Copper Masters Inc._Chimney Chase and Cap (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Copper Masters Inc._Chimney Chase and Cap (Bid Item)"
+    },
+    {
+      "desc": "R&R Half Round Leaf Guard",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "LF",
+      "description": "R&R Half Round Leaf Guard"
+    },
+    {
+      "desc": "3 Nails Gutter_Painting (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "3 Nails Gutter_Painting (Bid Item)"
+    },
+    {
+      "desc": "FoGlass_Windows (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "FoGlass_Windows (Bid Item)"
+    },
+    {
+      "desc": "Grizzly Fence & Patio_Iron Fence (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Grizzly Fence & Patio_Iron Fence (Bid Item)"
+    },
+    {
+      "desc": "Grizzly Fence & Patio_Wood Fence (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Grizzly Fence & Patio_Wood Fence (Bid Item)"
+    },
+    {
+      "desc": "Grizzly Fence & Patio_Power Wash and Stain Pergola (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Grizzly Fence & Patio_Power Wash and Stain Pergola (Bid Item)"
+    },
+    {
+      "desc": "Grizzly Fence & Patio_Detach and Reset Pergola (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Grizzly Fence & Patio_Detach and Reset Pergola (Bid Item)"
+    },
+    {
+      "desc": "Grizzly Fence & Patio_ Shutter (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Grizzly Fence & Patio_ Shutter (Bid Item)"
+    },
+    {
+      "desc": "Grizzly Fence & Patio_Corbels (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Grizzly Fence & Patio_Corbels (Bid Item)"
+    },
+    {
+      "desc": "Grizzly Fence & Patio_Pilar (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Grizzly Fence & Patio_Pilar (Bid Item)"
+    },
+    {
+      "desc": "Copper Masters Inc._Copper Bay Window(Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Copper Masters Inc._Copper Bay Window(Bid Item)"
+    },
+    {
+      "desc": "Copper Masters Inc._Dormer (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Copper Masters Inc._Dormer (Bid Item)"
+    },
+    {
+      "desc": "Copper Masters Inc._Porch (Bid Item)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Copper Masters Inc._Porch (Bid Item)"
+    },
+    {
+      "desc": "Copper Masters Inc._Copper Bay Window (Bid Item)",
+      "count": 1,
+      "projects": [
+        "GRANGER"
+      ],
+      "unit": "EA",
+      "description": "Copper Masters Inc._Copper Bay Window (Bid Item)"
+    },
+    {
+      "desc": "HiTech_metal bay roof (Bid Item)",
+      "count": 1,
+      "projects": [
+        "GRANGER"
+      ],
+      "unit": "EA",
+      "description": "HiTech_metal bay roof (Bid Item)"
+    },
+    {
+      "desc": "Skylight Solutions_Skylights (Bid Item)",
+      "count": 1,
+      "projects": [
+        "GRANGER"
+      ],
+      "unit": "EA",
+      "description": "Skylight Solutions_Skylights (Bid Item)"
+    },
+    {
+      "desc": "Morales Painting_Interoior (Bid Item)",
+      "count": 1,
+      "projects": [
+        "GRANGER"
+      ],
+      "unit": "EA",
+      "description": "Morales Painting_Interoior (Bid Item)"
+    },
+    {
+      "desc": "HiTech_Chimney Chase and Flue cap(Bid Item)",
+      "count": 1,
+      "projects": [
+        "MARTIN"
+      ],
+      "unit": "EA",
+      "description": "HiTech_Chimney Chase and Flue cap(Bid Item)"
+    },
+    {
+      "desc": "Morales_garage entrance small door (Bid Item)",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "Morales_garage entrance small door (Bid Item)"
+    },
+    {
+      "desc": "Morales_Fence (Bid Item)",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "Morales_Fence (Bid Item)"
+    },
+    {
+      "desc": "Tandem axle dump trailer - per load - including dump fees",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "Tandem axle dump trailer - per load - including dump fees"
+    },
+    {
+      "desc": "O&P RESET",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "O&P RESET"
+    },
+    {
+      "desc": "R&R Leaf Guard",
+      "count": 1,
+      "projects": [
+        "HOOK"
+      ],
+      "unit": "LF",
+      "description": "R&R Leaf Guard"
+    },
+    {
+      "desc": "R&R Storage shed - Vinyl - 8' x 4'",
+      "count": 1,
+      "projects": [
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "R&R Storage shed - Vinyl - 8' x 4'"
+    },
+    {
+      "desc": "Grizzly Fence & Patio_Fence",
+      "count": 1,
+      "projects": [
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "Grizzly Fence & Patio_Fence"
+    },
+    {
+      "desc": "Outdoor Heater (Bid Item)",
+      "count": 1,
+      "projects": [
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "Outdoor Heater (Bid Item)"
+    },
+    {
+      "desc": "Stain - wood fence/gate",
+      "count": 1,
+      "projects": [
+        "BAE"
+      ],
+      "unit": "SF",
+      "description": "Stain - wood fence/gate"
+    },
+    {
+      "desc": "Grizzly_Louvers (Bid Item)",
+      "count": 1,
+      "projects": [
+        "BAE"
+      ],
+      "unit": "EA",
+      "description": "Grizzly_Louvers (Bid Item)"
+    }
+  ],
+  "found": [
+    {
+      "desc": "Remove Laminated - comp. shingle rfg. - w/ felt",
+      "count": 3,
+      "projects": [
+        "BROCK",
+        "DAWSON"
+      ],
+      "unit": "SQ",
+      "description": "Remove Laminated - comp. shingle rfg. - w/ felt"
+    },
+    {
+      "desc": "Roofing felt - 15 lb.",
+      "count": 8,
+      "projects": [
+        "BROCK",
+        "GRANGER",
+        "MARTIN",
+        "DAWSON",
+        "HOOK",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "SQ",
+      "description": "Roofing felt - 15 lb."
+    },
+    {
+      "desc": "Laminated - comp. shingle rfg. - w/out felt",
+      "count": 8,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "GRANGER",
+        "DAWSON",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "SQ",
+      "description": "Laminated - comp. shingle rfg. - w/out felt"
+    },
+    {
+      "desc": "Hip / Ridge cap - Standard profile - composition shingles",
+      "count": 6,
+      "projects": [
+        "BROCK",
+        "GRANGER",
+        "DAWSON",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "LF",
+      "description": "Hip / Ridge cap - Standard profile - composition shingles"
+    },
+    {
+      "desc": "Drip edge",
+      "count": 10,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "GRANGER",
+        "MARTIN",
+        "DAWSON",
+        "HOOK",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "LF",
+      "description": "Drip edge"
+    },
+    {
+      "desc": "Asphalt starter - universal starter course",
+      "count": 10,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "GRANGER",
+        "MARTIN",
+        "DAWSON",
+        "HOOK",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "LF",
+      "description": "Asphalt starter - universal starter course"
+    },
+    {
+      "desc": "R&R Valley metal",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "LF",
+      "description": "R&R Valley metal"
+    },
+    {
+      "desc": "Step flashing",
+      "count": 6,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "MARTIN",
+        "DAWSON",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "LF",
+      "description": "Step flashing"
+    },
+    {
+      "desc": "R&R Counterflashing - Apron flashing",
+      "count": 5,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "MARTIN",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "LF",
+      "description": "R&R Counterflashing - Apron flashing"
+    },
+    {
+      "desc": "R&R Flashing - pipe jack",
+      "count": 3,
+      "projects": [
+        "BROCK",
+        "GRANGER",
+        "BAE"
+      ],
+      "unit": "EA",
+      "description": "R&R Flashing - pipe jack"
+    },
+    {
+      "desc": "Prime & paint roof jack",
+      "count": 5,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "GRANGER",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "EA",
+      "description": "Prime & paint roof jack"
+    },
+    {
+      "desc": "Prime & paint roof vent",
+      "count": 4,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "GRANGER",
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "Prime & paint roof vent"
+    },
+    {
+      "desc": "R&R Roof vent - turbine type",
+      "count": 2,
+      "projects": [
+        "BROCK",
+        "GRANGER"
+      ],
+      "unit": "EA",
+      "description": "R&R Roof vent - turbine type"
+    },
+    {
+      "desc": "Roofer - per hour",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "HR",
+      "description": "Roofer - per hour"
+    },
+    {
+      "desc": "R&R Chimney flashing - average (32\" x 36\")",
+      "count": 5,
+      "projects": [
+        "BROCK",
+        "MARTIN",
+        "DAWSON",
+        "HOOK",
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "R&R Chimney flashing - average (32\" x 36\")"
+    },
+    {
+      "desc": "R&R Flue cap",
+      "count": 2,
+      "projects": [
+        "BROCK",
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "R&R Flue cap"
+    },
+    {
+      "desc": "Remove Additional charge for steep roof - 10/12 - 12/12 slope",
+      "count": 6,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "GRANGER",
+        "DAWSON",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "SQ",
+      "description": "Remove Additional charge for steep roof - 10/12 - 12/12 slope"
+    },
+    {
+      "desc": "Additional charge for steep roof -",
+      "count": 12,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "GRANGER",
+        "DAWSON",
+        "HOOK",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "SQ",
+      "description": "Additional charge for steep roof -"
+    },
+    {
+      "desc": "Remove Additional charge for steep roof greater than 12/12 slope",
+      "count": 3,
+      "projects": [
+        "BROCK",
+        "ISBELL"
+      ],
+      "unit": "SQ",
+      "description": "Remove Additional charge for steep roof greater than 12/12 slope"
+    },
+    {
+      "desc": "Additional charge for steep roof greater than 12/12 slope",
+      "count": 3,
+      "projects": [
+        "BROCK",
+        "ISBELL"
+      ],
+      "unit": "SQ",
+      "description": "Additional charge for steep roof greater than 12/12 slope"
+    },
+    {
+      "desc": "Remove Additional charge for high roof (2 stories or greater)",
+      "count": 7,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "GRANGER",
+        "DAWSON",
+        "HOOK",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "SQ",
+      "description": "Remove Additional charge for high roof (2 stories or greater)"
+    },
+    {
+      "desc": "Additional charge for high roof (2 stories or greater)",
+      "count": 7,
+      "projects": [
+        "BROCK",
+        "ISBELL",
+        "GRANGER",
+        "DAWSON",
+        "HOOK",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "SQ",
+      "description": "Additional charge for high roof (2 stories or greater)"
+    },
+    {
+      "desc": "R&R Gutter - aluminum - up to 5\"",
+      "count": 6,
+      "projects": [
+        "BROCK",
+        "DAWSON",
+        "SCHMIDT"
+      ],
+      "unit": "LF",
+      "description": "R&R Gutter - aluminum - up to 5\""
+    },
+    {
+      "desc": "R&R Downspout - aluminum - up to 5\"",
+      "count": 8,
+      "projects": [
+        "BROCK",
+        "MARTIN",
+        "DAWSON",
+        "HOOK",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "LF",
+      "description": "R&R Downspout - aluminum - up to 5\""
+    },
+    {
+      "desc": "Remove Additional charge for steep roof - 7/12 to 9/12 slope",
+      "count": 5,
+      "projects": [
+        "BROCK",
+        "GRANGER",
+        "HOOK",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "SQ",
+      "description": "Remove Additional charge for steep roof - 7/12 to 9/12 slope"
+    },
+    {
+      "desc": "Seal/prime (1 coat) then paint (1 coat) the surface area",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "SF",
+      "description": "Seal/prime (1 coat) then paint (1 coat) the surface area"
+    },
+    {
+      "desc": "Paint the surface area - one coat",
+      "count": 2,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "SF",
+      "description": "Paint the surface area - one coat"
+    },
+    {
+      "desc": "Detach & Reset Ceiling fan & light",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "EA",
+      "description": "Detach & Reset Ceiling fan & light"
+    },
+    {
+      "desc": "Protect contents - Cover with plastic RESET",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "SF",
+      "description": "Protect contents - Cover with plastic RESET"
+    },
+    {
+      "desc": "Protect contents - Cover with plastic",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "SF",
+      "description": "Protect contents - Cover with plastic"
+    },
+    {
+      "desc": "Haul debris - per pickup truck load - including dump fees",
+      "count": 5,
+      "projects": [
+        "BROCK",
+        "GRANGER",
+        "HOOK",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "EA",
+      "description": "Haul debris - per pickup truck load - including dump fees"
+    },
+    {
+      "desc": "Two ladders with jacks and plank 2.00 DA (per day)",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": null,
+      "description": "Two ladders with jacks and plank 2.00 DA (per day)"
+    },
+    {
+      "desc": "On-Site Evaluation and/or Supervisor/Admin - per hour",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "HR",
+      "description": "On-Site Evaluation and/or Supervisor/Admin - per hour"
+    },
+    {
+      "desc": "Drywall labor minimum",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "EA",
+      "description": "Drywall labor minimum"
+    },
+    {
+      "desc": "Electrical labor minimum",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "EA",
+      "description": "Electrical labor minimum"
+    },
+    {
+      "desc": "General labor - labor minimum",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "EA",
+      "description": "General labor - labor minimum"
+    },
+    {
+      "desc": "Heat, vent, & air cond. labor minimum RESET",
+      "count": 1,
+      "projects": [
+        "BROCK"
+      ],
+      "unit": "EA",
+      "description": "Heat, vent, & air cond. labor minimum RESET"
+    },
+    {
+      "desc": "Fireplace repair labor minimum",
+      "count": 2,
+      "projects": [
+        "BROCK",
+        "GRANGER"
+      ],
+      "unit": "EA",
+      "description": "Fireplace repair labor minimum"
+    },
+    {
+      "desc": "Tear off, haul and dispose of comp. shingles - Laminated",
+      "count": 5,
+      "projects": [
+        "ISBELL",
+        "GRANGER",
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "SQ",
+      "description": "Tear off, haul and dispose of comp. shingles - Laminated"
+    },
+    {
+      "desc": "Roofing felt - synthetic underlayment",
+      "count": 2,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "SQ",
+      "description": "Roofing felt - synthetic underlayment"
+    },
+    {
+      "desc": "Hip / Ridge cap - High profile - composition shingles",
+      "count": 2,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "LF",
+      "description": "Hip / Ridge cap - High profile - composition shingles"
+    },
+    {
+      "desc": "Ice & water barrier",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "SF",
+      "description": "Ice & water barrier"
+    },
+    {
+      "desc": "Flashing - pipe jack",
+      "count": 4,
+      "projects": [
+        "ISBELL",
+        "MARTIN",
+        "DAWSON",
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "Flashing - pipe jack"
+    },
+    {
+      "desc": "Roof vent - turbine type",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Roof vent - turbine type"
+    },
+    {
+      "desc": "Roof vent - turtle type - Metal",
+      "count": 2,
+      "projects": [
+        "ISBELL",
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "Roof vent - turtle type - Metal"
+    },
+    {
+      "desc": "Exhaust cap - through roof - 6\" to",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "Exhaust cap - through roof - 6\" to"
+    },
+    {
+      "desc": "R&R Pool Tarp  (labor and material)",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "SF",
+      "description": "R&R Pool Tarp  (labor and material)"
+    },
+    {
+      "desc": "R&R Chimney flashing - large (32\" x 60\")",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "EA",
+      "description": "R&R Chimney flashing - large (32\" x 60\")"
+    },
+    {
+      "desc": "R&R Gutter / downspout - aluminum - up to 5\"",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "LF",
+      "description": "R&R Gutter / downspout - aluminum - up to 5\""
+    },
+    {
+      "desc": "R&R downspout - aluminum -",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "LF",
+      "description": "R&R downspout - aluminum -"
+    },
+    {
+      "desc": "R&R Gutter splash guard",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "LF",
+      "description": "R&R Gutter splash guard"
+    },
+    {
+      "desc": "R&R Gutter / downspout - half round - copper - 6\"",
+      "count": 1,
+      "projects": [
+        "ISBELL"
+      ],
+      "unit": "LF",
+      "description": "R&R Gutter / downspout - half round - copper - 6\""
+    },
+    {
+      "desc": "R&R Rain cap - up to 5\"",
+      "count": 3,
+      "projects": [
+        "GRANGER",
+        "MARTIN",
+        "HOOK"
+      ],
+      "unit": "EA",
+      "description": "R&R Rain cap - up to 5\""
+    },
+    {
+      "desc": "R&R Roof vent - turtle type - Metal",
+      "count": 1,
+      "projects": [
+        "GRANGER"
+      ],
+      "unit": "EA",
+      "description": "R&R Roof vent - turtle type - Metal"
+    },
+    {
+      "desc": "R&R Gable cornice return - laminated",
+      "count": 1,
+      "projects": [
+        "GRANGER"
+      ],
+      "unit": "EA",
+      "description": "R&R Gable cornice return - laminated"
+    },
+    {
+      "desc": "Digital satellite system - Detach & reset",
+      "count": 4,
+      "projects": [
+        "GRANGER",
+        "MARTIN",
+        "DAWSON",
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "Digital satellite system - Detach & reset"
+    },
+    {
+      "desc": "R&R Pool Tarp (labor and material)",
+      "count": 1,
+      "projects": [
+        "GRANGER"
+      ],
+      "unit": "SF",
+      "description": "R&R Pool Tarp (labor and material)"
+    },
+    {
+      "desc": "R&R Gutter / downspout - aluminum - 6\"",
+      "count": 1,
+      "projects": [
+        "GRANGER"
+      ],
+      "unit": "LF",
+      "description": "R&R Gutter / downspout - aluminum - 6\""
+    },
+    {
+      "desc": "R&R Window screen, 10 - 16 SF",
+      "count": 1,
+      "projects": [
+        "GRANGER"
+      ],
+      "unit": "EA",
+      "description": "R&R Window screen, 10 - 16 SF"
+    },
+    {
+      "desc": "Window labor minimum",
+      "count": 3,
+      "projects": [
+        "GRANGER",
+        "MARTIN",
+        "BAE"
+      ],
+      "unit": "EA",
+      "description": "Window labor minimum"
+    },
+    {
+      "desc": "Tear off composition shingles - 3 tab (no haul off)",
+      "count": 1,
+      "projects": [
+        "MARTIN"
+      ],
+      "unit": "SQ",
+      "description": "Tear off composition shingles - 3 tab (no haul off)"
+    },
+    {
+      "desc": "3 tab - 25 yr. - comp. shingle roofing - w/out felt",
+      "count": 2,
+      "projects": [
+        "MARTIN",
+        "HOOK"
+      ],
+      "unit": "SQ",
+      "description": "3 tab - 25 yr. - comp. shingle roofing - w/out felt"
+    },
+    {
+      "desc": "Hip / Ridge cap - cut from 3 tab - composition shingles",
+      "count": 2,
+      "projects": [
+        "MARTIN",
+        "HOOK"
+      ],
+      "unit": "LF",
+      "description": "Hip / Ridge cap - cut from 3 tab - composition shingles"
+    },
+    {
+      "desc": "R&R Power attic vent cover only - metal",
+      "count": 3,
+      "projects": [
+        "MARTIN",
+        "DAWSON",
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "R&R Power attic vent cover only - metal"
+    },
+    {
+      "desc": "R&R Metal roofing",
+      "count": 1,
+      "projects": [
+        "MARTIN"
+      ],
+      "unit": "SF",
+      "description": "R&R Metal roofing"
+    },
+    {
+      "desc": "R&R Gutter  - aluminum - up to 5\"",
+      "count": 2,
+      "projects": [
+        "MARTIN",
+        "BAE"
+      ],
+      "unit": "LF",
+      "description": "R&R Gutter  - aluminum - up to 5\""
+    },
+    {
+      "desc": "Prime & paint gutter / downspout",
+      "count": 2,
+      "projects": [
+        "MARTIN",
+        "SCHMIDT"
+      ],
+      "unit": "LF",
+      "description": "Prime & paint gutter / downspout"
+    },
+    {
+      "desc": "R&R Window screen, 1 - 9 SF",
+      "count": 3,
+      "projects": [
+        "MARTIN",
+        "BAE"
+      ],
+      "unit": "EA",
+      "description": "R&R Window screen, 1 - 9 SF"
+    },
+    {
+      "desc": "Dumpster load - Approx. 12 yards,",
+      "count": 1,
+      "projects": [
+        "MARTIN"
+      ],
+      "unit": "EA",
+      "description": "Dumpster load - Approx. 12 yards,"
+    },
+    {
+      "desc": "Painting labor minimum",
+      "count": 1,
+      "projects": [
+        "MARTIN"
+      ],
+      "unit": "EA",
+      "description": "Painting labor minimum"
+    },
+    {
+      "desc": "Valley metal",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "LF",
+      "description": "Valley metal"
+    },
+    {
+      "desc": "Detach & Reset Roof vent - turtle type - Plastic",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "Detach & Reset Roof vent - turtle type - Plastic"
+    },
+    {
+      "desc": "Exhaust cap - through roof - up to",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "Exhaust cap - through roof - up to"
+    },
+    {
+      "desc": "Remove Additional charge for steep roof - 7/12 to 9/12 slope RESET",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "SQ",
+      "description": "Remove Additional charge for steep roof - 7/12 to 9/12 slope RESET"
+    },
+    {
+      "desc": "R&R Counterflashing - Apron flashing RESET",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "LF",
+      "description": "R&R Counterflashing - Apron flashing RESET"
+    },
+    {
+      "desc": "FoGlass_Insulated Window Glass (Bid Item) RESET",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "FoGlass_Insulated Window Glass (Bid Item) RESET"
+    },
+    {
+      "desc": "Southwest Garage Door Service_ Garage Door (Bid Item)",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "Southwest Garage Door Service_ Garage Door (Bid Item)"
+    },
+    {
+      "desc": "R&R Clothes dryer vent cover",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "R&R Clothes dryer vent cover"
+    },
+    {
+      "desc": "Morales Painting_Back Door (Bid Item) RESET",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "Morales Painting_Back Door (Bid Item) RESET"
+    },
+    {
+      "desc": "Heat, vent, & air cond. labor minimum",
+      "count": 1,
+      "projects": [
+        "DAWSON"
+      ],
+      "unit": "EA",
+      "description": "Heat, vent, & air cond. labor minimum"
+    },
+    {
+      "desc": "Remove 3 tab - 25 yr. - composition shingle roofing - incl. felt",
+      "count": 1,
+      "projects": [
+        "HOOK"
+      ],
+      "unit": "SQ",
+      "description": "Remove 3 tab - 25 yr. - composition shingle roofing - incl. felt"
+    },
+    {
+      "desc": "Flashing - pipe jack - lead",
+      "count": 1,
+      "projects": [
+        "HOOK"
+      ],
+      "unit": "EA",
+      "description": "Flashing - pipe jack - lead"
+    },
+    {
+      "desc": "Roof vent - turbine type - Standard grade",
+      "count": 1,
+      "projects": [
+        "HOOK"
+      ],
+      "unit": "EA",
+      "description": "Roof vent - turbine type - Standard grade"
+    },
+    {
+      "desc": "Roof vent - turtle type - Plastic",
+      "count": 2,
+      "projects": [
+        "HOOK",
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "Roof vent - turtle type - Plastic"
+    },
+    {
+      "desc": "Fireplace - chimney chase cover - sheet metal",
+      "count": 1,
+      "projects": [
+        "HOOK"
+      ],
+      "unit": "EA",
+      "description": "Fireplace - chimney chase cover - sheet metal"
+    },
+    {
+      "desc": "R&R Gutter  - aluminum - up to",
+      "count": 1,
+      "projects": [
+        "HOOK"
+      ],
+      "unit": "LF",
+      "description": "R&R Gutter  - aluminum - up to"
+    },
+    {
+      "desc": "Paint trim - one coat",
+      "count": 2,
+      "projects": [
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "LF",
+      "description": "Paint trim - one coat"
+    },
+    {
+      "desc": "R&R Exhaust cap - through roof -",
+      "count": 1,
+      "projects": [
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "R&R Exhaust cap - through roof -"
+    },
+    {
+      "desc": "R&R Exhaust cap - through roof - up to 4\"",
+      "count": 2,
+      "projects": [
+        "SCHMIDT",
+        "BAE"
+      ],
+      "unit": "EA",
+      "description": "R&R Exhaust cap - through roof - up to 4\""
+    },
+    {
+      "desc": "R&R Fireplace - chimney chase cover - sheet metal",
+      "count": 1,
+      "projects": [
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "R&R Fireplace - chimney chase cover - sheet metal"
+    },
+    {
+      "desc": "Cleaning labor minimum",
+      "count": 1,
+      "projects": [
+        "SCHMIDT"
+      ],
+      "unit": "EA",
+      "description": "Cleaning labor minimum"
+    },
+    {
+      "desc": "R&R Roof vent - turtle type - Plastic",
+      "count": 1,
+      "projects": [
+        "BAE"
+      ],
+      "unit": "EA",
+      "description": "R&R Roof vent - turtle type - Plastic"
+    },
+    {
+      "desc": "Clean with pressure/chemical spray",
+      "count": 1,
+      "projects": [
+        "BAE"
+      ],
+      "unit": "SF",
+      "description": "Clean with pressure/chemical spray"
+    }
+  ]
+}

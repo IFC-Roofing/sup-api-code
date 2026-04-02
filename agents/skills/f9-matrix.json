@@ -1,0 +1,597 @@
+[
+  {
+    "category": "CATEGORY",
+    "line_item": "LINE ITEM",
+    "xact_description": "XACTIMATE DESCRIPTION",
+    "scenario": "SCENARIO",
+    "f9": "F9 NOTE"
+  },
+  {
+    "category": "O&P",
+    "line_item": "O&P",
+    "xact_description": "O&P",
+    "scenario": "Did INS forget the line item?",
+    "f9": "For decades we have vetted, managed, trained and warrantied subcontractors for roofing, gutters, painting, fencing, siding etc. due to storm restoration in the DFW area.\n\nWe charge a minimum 20% overhead and profit above the subcontractors cost as we act as the single point of contact for all subcontractors' trade complexities, plus cover all their liability and warranty for our clients.\n\nProject Requires General Contracting\nThis project involves coordination of multiple trades\u2014including roofing, gutter replacement, exterior painting, window screen repair, and possible stucco or interior restoration. Per industry standards and Xactimate guidelines, O&P is warranted whenever three or more trades are involved and coordinated by a general contractor.\n\nComplex Scheduling and Management\nEach trade must be scheduled in the correct sequence, managed for quality and timing, and supervised for code compliance and safety. This requires administrative staff, project managers, and dedicated personnel which all reside at our physical office \u2014all part of our company\u2019s operational infrastructure.\n\nWe Are Not a Single-Trade Contractor\nUnlike subcontractors, we do not perform only one scope of work. We maintain a physical office, estimators, coordinators, insurance claim specialists, and field supervisors. These are all actual employees of IFC Contracting Solutions\u2014 these employees are the overhead which is built into O&P. These costs are necessary to support project execution, client communication, and warranty management.\n\nInsurance Restoration Demands Administrative Oversight\nInsurance jobs require extra documentation, invoicing, inspection scheduling, supplemental negotiation, and warranty coordination, all of which involve personnel beyond the jobsite. These employees reside at our physical location and work to adhere to the highest construction standards. This is not reimbursed in trade line items and is accounted for within O&P."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Starter",
+    "xact_description": "Asphalt starter - laminated double layer starter",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Starter. \n\nWe are requesting X LF of Laminate Double Layer Starter. Please see attached EagleView Report for confirmation of the measurements.\n\n1. Per Xactimate pricing, this costs an additional $XX.xx.\n\na. This house currently has Laminate Double Layer Starter installed and it cannot be reused.\n\nb. For slate-look shingles, the starter course requires a double layer to match the thickness and durability of the main shingle. This is necessary to ensure that the first row of shingles stays secure, especially given the heavier weight of slate-look shingles compared to traditional asphalt shingles. The starter course needs to cover the exposed edges and provide a strong, secure base for the rest of the roof."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Starter",
+    "xact_description": "Asphalt starter - laminated double layer starter",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "\"Our line item 10 covers insurance line 7\n\nWe are requesting for an additional 87.35 LF for Asphalt Starter. \n\n1. The difference is $290.86. Per Xactimate pricing, this costs $896.91. While in Insurance report it cost $606.05\n\na. Please see Attachment 2 for the EagleView measurements for confirmation of the LF.\n\nb. Currently the insurance is paying for 272.65 LF while we are requesting 360 LF which is an additional 87.35 LF.\""
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Shingle",
+    "xact_description": "Laminated - comp. shingle rfg. - w/out felt",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "\"Our line item 6 covers insurance lines 6.\n\nWe are requesting an additional of XXxx SQ for Laminated - comp. shingle rfg. - w/out felt. \n\n1. The difference is $10,197.33. Per Xactimate pricing, the cost is 62,194.94. While in insurance report cost is $51,997.61.\n\na. Please see Attachment 2 for the EagleView showing the waste calculation of 16% for the shingles that will be put back on the roof.\n\nb. Currently the insurance is paying for 196.67 SQ while we are requesting 210 SQ which is an additional 13.33 SQ.\""
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Flat Roof",
+    "xact_description": "Remove Roll roofing - 50% overlap",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Roll roofing\n\nWe are requesting 2.4 SQ FT of Flat roll roofing to tear off.\n\n1. Per Xactimate pricing, this costs an additional $158.35.\n\na. Please see attached EagleView is suggesting 16% waste due to the complexity of the roof."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Flat Roof",
+    "xact_description": "Roll roofing - 50% overlap",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Roll roofing\n\nWe are requesting 3.84 SQ FT of Flat roll roofing to install.\n\n1. Per Xactimate pricing, this costs an additional $1,211.26.\n\na. Please see attached EagleView is suggesting 16% waste due to the complexity of the roof."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Shingle",
+    "xact_description": "Laminated - High grd - comp. shingle rfg. - w/out felt",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 2 covers insurance line 6.\n\nWe are requesting 68 SQ of High Grade Shingle.\n\n1. The difference is $10,213.91. Per Xactimate the costs is $26,783.24. While in insurance report it is $16,569.33.\n\na. ITEL shows it's a 35 year shingle. 35 year is discontinued, we are going back with a 40 year is a high grade. Please see attached ITEL report and EagleView report.\n\nb. The EagleView showing the waste calculation of 16% for the shingles that will be put back on the roof."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Starter",
+    "xact_description": "Asphalt starter - universal starter course",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Starter.\n\nWe are requesting XX LF of Starter.\n\n1. Per Xactimate pricing, this costs an additional $XX\n\na. Starter is a different material and is installed at a higher rate than field shingles, therefore it is inappropriate to bundle it into the waste and leads to inaccurate material estimates. Please see attached EagleView for measurements."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Starter",
+    "xact_description": "Asphalt starter - universal starter course",
+    "scenario": "Is INS including starter in the waste calculations?",
+    "f9": "The insurance report left out the Starter.\n\nWe are requesting 535.00 LF of Starter.\n\n1. Per Xactimate pricing, this costs an additional $1,238.73.\n\na. Starter is a distinct roofing component with a separate material profile and a higher associated labor rate compared to field shingles. As such, it should not be included within waste calculations for field shingles, as doing so results in inaccurate material and labor estimates. A review of the corresponding Xactimate line item details will confirm that starter installation is priced at a higher labor rate, reflecting the specialized nature of its application at roof edges.\n\nb. If this was standard practice to include start in the waste across the industry, then the separate line item in Xactimate would not exist.\n\nc. USAA is the outlier in this regard and is the only Insurance company that makes home owners pay out-of-pocket for starter. Most other Insurance companies pay to replace the starter on a customer's roof separately from the field shingle as the installation and labor associated is distinct from the field shingles in the same way installing ridge shingle is different from a field shingle.\n\nc. Please see attached EagleView for measurements."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "3 Tab",
+    "xact_description": "Remove 3 tab - 25 yr. - composition shingle roofing - incl. felt",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 1 covers insurance line 1.\n\nWe are requesting an additional of 0.95 SQ of 3 tab composition shingle. \n\n1. The difference is $581.32. Currently line item 1 cost $2,530.78. While in Xactimate the total is $3,112.10.\n\na. Please see attached EagleView for measurement. EagleView is suggesting 21% waste due to the complexity of the roof. Current USAA waste is at 8%, asking for additional 0.95 SQ of field shingle for all the cuts in the roof."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Drip Edge",
+    "xact_description": "R&R Drip edge",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Drip Edge.\n\nWe are requesting 46 LF.\n\n1. Per Xactimate pricing, this costs an additional $167.24.\n\na. The Insurance report it only has 170 LF, but there is 499 LF on this house across all Rakes and Eaves. Please see attached EagleView for measurements.\n\nb. Please see Photo Report showing the roofing felt running under the drip edge."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Drip Edge",
+    "xact_description": "R&R Drip edge",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 2 covers insurance lines 2.\n\nWe are requesting for additional 329 LF of Drip Edge.\n\n1. The difference is $1,061.25. Per Xactimate pricing costs $1,609.62 while Insurance report is $548.37.\n\na. In Insurance report it only has 170 LF, but there is 499 LF on this house across all the Rakes and Eaves. Please see attached EagleView confirming the measurements."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Shingle",
+    "xact_description": "35 Year Shingle",
+    "scenario": "Did INS get the QUALITY wrong?",
+    "f9": "The Insurance report shingle does not meet like kind and quality requirement of the insured policy.\n\nWe are requesting approval of a 49 Year (High Grade) shingle.\n\n1. The difference is $XX.xx. Currently Line item X totals $XX.xx for a 30 year shingle, we are requesting $XX.xx for pay for 40 year (high Grade shingle\n\na. ITEL shows it's a 35 year shingle. All 35 year shingles were discontinued in 2010. To meet the like kind and quality requirement we need to go back with a 40 year shingle. 40 year is a high grade shingle in Xactimate.\n\nb. The EagleView showing the waste calculation of 16% for the shingles that will be put back on the roof. The Insurance estimate only has 10.4% waste"
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Underlayment",
+    "xact_description": "Roofing Felt 15 lb",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "Insurance left out the waste on the felt\n\nWe are requesting an additional X SQ of roofing felt. Currently the Insurance report has X SQ. While our measurements with waste total X SQ.\n\n1. \n\na. Please see attached EagleView Report for confirmation of the measurements"
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "3 Tab",
+    "xact_description": "3 tab - 25 yr. - comp. shingle roofing - w/out felt",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 3 covers insurance line 2.\n\nWe are requesting an additional of 0.95 SQ of 3 tab composition shingle. \n\n1. The difference is $5,096.63 . Currently line item 2 cost $10,943.57. While in xactimate the total is $16,040.20.\n\na. Please see attached EagleView for measurement. EagleView is suggesting 21% waste due to the complexity of the roof. Current USAA waste is at 8%, asking for additional 0.95 SQ of field\nshingle for all the cuts in the roof."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Shingle Deluxe Grade",
+    "xact_description": "Laminated - Deluxe grd - comp. shingle rfg. - w/out felt",
+    "scenario": "Did INS get the QUALITY wrong?",
+    "f9": "Our line item 7 covers insurance line 7\n   \nWe are requesting an addition 4.68 SQ for Additional of Laminated Deluxe grd.\n   \n1. The difference is $19,218.19. Per Xactimate pricing, this cost $46,796.13. While in insurance report the cost is $27,577.94. \n  \na. This is a deluxe grade shingle Atlas Roofing Storm Master LM, please see ITEL report showing the 50 year shingle grade. The like kind a quality for a Atlas Roofing Storm Master LM is a deluxe grade shingle in Xactimate.\n\nb. Currently the insurance is paying for 97.82 SQ while we are requesting 102.5 SQ which is an additional 4.68 SQ. EagleView is suggesting 20% waste due to the complexity of the roof."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Extra Layers of Felt",
+    "xact_description": "Add. layer of felt/underlayment, remove & disp.",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance is missing the additional layers of felt on this property.\n\nWe are requesting 57.73 SQ.\n\n1. Per Xactimate pricing, this costs an additional $503.98.\n\na. Please see attached Photo Report showing extra layers of felt.\n\nb. Includes: Dump fees, hauling, disposal, and labor to remove additional layers of felt/underlayment."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Extra Layers of Felt",
+    "xact_description": "Add. layer of felt/underlayment, remove & disp.",
+    "scenario": "Is INS asking for evidence of additional layers of Felt?",
+    "f9": "The insurance report left out the line item 6 for Add. layer of felt/underlayment, remove & disp.\n\nWe are requesting 47.99 SQ. \n\n1. Per Xactimate pricing, this costs an additional $416.07.\n\na. Please see attached Photo Report showing the extra layers of felt."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Extra Layers of Felt",
+    "xact_description": "Add. layer of felt/underlayment, remove & disp.",
+    "scenario": "Is INS saying they dont include waste on Felt?",
+    "f9": "Our line item 7 covers insurance line 7.\n\nWe are requesting an additional of 6.16 SQ for Roofing Felt.\n\n1. The difference is $1,062.96. Per Xactimate pricing, the cost is $7,469.86. While in insurance report cost is $6,406.90.\n\na. Roofing felt, like shingles, must be installed in a staggered and overlapping pattern to ensure proper water shedding and code compliance. During this process, cuts are required at eaves, valleys, hips, ridges, and roof penetrations, which inevitably generates material waste. This waste is a necessary part of achieving a watertight underlayment system. Applying a waste percentage to roofing felt is both customary and essential to complete the work properly and bring the property back to its pre-loss condition.\n\nb. Please see attached EagleView showing the waste calculation of 16% for the shingles. It also show the exact squares for the Felt.\n\nc. Currently the insurance is paying for 174.84 SQ while we are requesting 181 SQ which is an additional 6.16 SQ."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Hip & Ridge - 3 Tab",
+    "xact_description": "Hip / Ridge cap - cut from 3 tab - composition shingles",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 4 covers insurance line 7.\n  \nWe are requesting an additional of 84 LF.\n  \n1. The difference is $408.82. Currently line item 2 cost $823.05. While in Xactimate the total is $1,231.87 .\n  \na. Please see attached EagleView for measurement.\n\nb. Currently the insurance is paying for 144.00 LF while we are requesting 228 LF which is an additional 84 LF."
+  },
+  {
+    "category": "Dry-in & Shingles",
+    "line_item": "Underlayment",
+    "xact_description": "Roofing Felt 30 lb",
+    "scenario": "Did INS get the QUALITY wrong?",
+    "f9": "Our Line Item 2 corresponds with insurance line item 2.\n\nWe are requesting 30 lb. roofing felt\n\n1. this cost an additional $1,499.14.\n\na. Please see attached Manufacturers Installation Guidelines attached denoting the recommend use of shingle underlayment meeting ASTM D226, D4869 or D6757 specs. \n\nb. 30 lb felt is being specified for this project due to the use of a premium-grade asphalt shingle. Heavier-weight shingles require a more robust underlayment to provide adequate support and protection during installation and over the life of the roof."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Steep Roof Install",
+    "xact_description": "Additional charge for steep roof - 7/12 to 9/12 slope",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 17 covers insurance line 13.\n\nWe are requesting an additional of 8.06 SQ of charge for steepness.\n\n1. The difference is $ 960.22 . Currently line item 13 cost $2,124.33. While in xactimate the total is $ 3,084.55\n\na. Eagle view is suggesting 21% waste due to the complexity of the roof. Please see attached EagleView for measurements."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Steep Roof Install",
+    "xact_description": "Additional charge for steep roof - 7/12 to 9/12 slope",
+    "scenario": "Did INS get the PRICE wrong?",
+    "f9": "Our line item 15 covers insurance line 12.\n\nWe are requesting an additional of 20.54 unit price for 7/12-9/12 Steepness of the roof.\n\n1. The difference is $661.59. Per Xactimate pricing, this cost $1,782.82. While in Insurance report it cost $1,121.23.\n\na. See attached EagleView is for the measurement"
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Steep Roof Install",
+    "xact_description": "Additional charge for steep roof - 7/12 to 9/12 slope",
+    "scenario": "INS did not include waste calculations?",
+    "f9": "Our line item 3 covers insurance line 3\n\nWe understand steep charges are calculated per square and separate from waste. However, in this case, the waste is installed on steep slopes and should be included in the total steep charge calculation.\n\nEagleView shows 13% waste due to the roof\u2019s complexity. That waste material is not discarded\u2014it is cut, lifted, and installed on the steep slope, requiring the same labor and safety measures.\n\nThe request to increase from 23.31 SQ to 25.18 SQ reflects actual material installed on steep surfaces, not a markup."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Steep Roof Removal",
+    "xact_description": "Remove Additional charge for steep roof - 10/12 - 12/12 slope",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out Additional charge for steep roof removal.\n\nWe are requesting 1.03 SQ.\n\n1. Per Xactimate pricing, this costs an additional $27.75.\n\na. Please see attached EagleView for measurement."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Steep Roof Removal",
+    "xact_description": "Remove Additional charge for steep roof - 10/12 - 12/12 slope",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 14 corresponds to insurance line item 12\n\nWe are requesting an additional 1.36 SQ. The Insurance report shows 7.64 SQ and we are requesting 9 SQ. Please see Attachment 1 for the EagleView confirming the measurements.\n\n1. Using Xactimate pricing, this costs an additional $104.61. Insurance is paying $290.41, while Xactimate shows $185.80."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Steep Roof Removal",
+    "xact_description": "Remove Additional charge for steep roof - 10/12 - 12/12 slope",
+    "scenario": "Did INS get the PRICE wrong?",
+    "f9": "Our line item 16 covers insurance line 13.\n\nWe are requesting an additional of 5.23 unit price for 10/12-12/12 Steepness of the roof.\n\n1. The difference is $11.53. Per Xactimate pricing, this cost $70.58. While in Insurance report it cost $59.05.\n\na. See attached EagleView is for the measurement"
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Steep Roof Install",
+    "xact_description": "Additional charge for steep roof - 10/12 - 12/12 slope",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out Additional charge for steep roof install.\n\nWe are requesting 1.17 SQ.\n\n1. Per Xactimate pricing, this costs an additional $101.77.\n\na. Please see Attached EagleView suggesting 14% waste due to the complexity of the roof."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Steep Roof Install",
+    "xact_description": "Additional charge for steep roof - 10/12 - 12/12 slope",
+    "scenario": "Did INS get the PRICE wrong?",
+    "f9": "Our line item 17 covers insurance line 14.\n\nWe are requesting an additional of 45.21 unit price for 10/12-12/12 Steepness of the roof.\n\n1. The difference is $114.28. Per Xactimate pricing, this cost $227.89. While in Insurance report it cost $113.61.\n\na. See attached EagleView is for the measurement"
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Steep Roof Install",
+    "xact_description": "Additional charge for steep roof greater than 12/12 slope",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 2 covers insurance lines 2.\n\nWe are requesting an additional of 10.22 SQ for steep roof greater than 12/12 slope. \n\n1 The difference is $3,866.20. Per Xactimate pricing, the cost if $21,232.20. While in insurance report cost is $17,366.00.\n\na. Please see Attachment 2 for the EagleView is suggesting 16% waste due to the complexity of the roof.\n\nb. Currently the insurance is paying for 182.80 SQ while we are requesting 193.02 SQ which is an additional 10.22 SQ."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "2 Story Roof Removal",
+    "xact_description": "Remove Additional charge for high roof (2 stories or greater)",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 12 covers insurance line 9.\n\nWe are requesting an additional of 14.13 SQ for High Roof.\n\n1. The difference is $305.07. Per Xactimate pricing, this cost $785.23. While in Insurance report it cost $480.16.\n\na. See attached Photo Report. You will see a high roof greater than a one story roof. The labor has to climb the roof to be able to install it.\nTherefore it's a high roof.\n\nb. Currently the insurance is paying for 22.24 SQ while we are requesting 36.37 SQ which is an additional 14.13 SQ."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "2 Story Roof",
+    "xact_description": "Additional charge for high roof (2 stories or greater)",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "Our line item 4 covers insurance lines 4.\n\nWe are requesting an additional of 10.22 SQ for the charge for high roof.\n\n1. The difference is $856.67. Per Xactimate pricing, the cost is $4,717.41. While in insurance report cost is $3,860.74.\n\na. Please see attached Photo Report. You will see a high roof greater than a one story roof. The labor has to climb the roof to be able to install it.\n\nb. Currently the insurance is paying for 182.80 SQ while we are requesting 193.02 SQ which is an additional 10.22 SQ."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "2 Story Roof",
+    "xact_description": "Additional charge for high roof (2 stories or greater)",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 3 covers insurance line 3\n\nWe are requesting an additional 1.87 SQ for 7/12-9/12 Steepness of the roof. \n\n1. The difference is $382.24. Per Xactimate pricing, this cost $1,672.45. While in Insurance report the cost is $1,290.21.\n\na. Please see Attachment 2 for the EagleView is suggesting 13% waste due to the complexity of the roof.\n\nb. Currently the insurance is paying for 23.31 SQ while we are requesting 25.18 SQ which is an additional 1.87 SQ."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Underlayment",
+    "xact_description": "Roofing felt - 15 lb.",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 4 covers insurance lines 4.\n\nWe are requesting an additional of 10.22 SQ for the charge for high roof.\n\n1. The difference is $856.67. Per Xactimate pricing, the cost is $4,717.41. While in insurance report cost is $3,860.74.\n\na. Please see attached Photo Report. You will see a high roof greater than a one story roof. The labor has to climb the roof to be able to install it. Therefore it's a high roof.\n\nb. Currently the insurance is paying for 182.80 SQ while we are requesting 193.02 SQ which is an additional 10.22 SQ."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Underlayment",
+    "xact_description": "Roofing felt - 15 lb.",
+    "scenario": "Is only half the roof is 2-story",
+    "f9": "Our line item 4 covers insurance lines 4.\n\nWe are requesting an additional of 10.22 SQ for the charge for high roof.\n\n1. The difference is $856.67. Per Xactimate pricing, the cost is $4,717.41. While in insurance report cost is $3,860.74.\n\na. Please see attached Photo Report. You will see a high roof greater than a one story roof. The labor has to climb the roof to be able to install it. Therefore it's a high roof. We have agreed to our subcontractor to only pay for the half of the high roof.\n\nb. Currently the insurance is paying for 182.80 SQ while we are requesting 193.02 SQ which is an additional 10.22 SQ."
+  },
+  {
+    "category": "Roof Complexities",
+    "line_item": "Painting",
+    "xact_description": "Two ladders with jacks and plank (per day)",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "Insurance report left out the Two Ladders with Jack and Planks.\n\nWe are requesting 12 DA with the equipment.\n\n1. Per Xactimate pricing, this costs an additional $305.28.\n\na. We will need two days to complete the work, first day is to wash the siding and second day is to apply the stain, after allowing the siding to dry\ncompletely."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Drip Edge",
+    "xact_description": "R&R Drip edge",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Roll roofing.\n\nWe are requesting 80 LF of drip edge around the Flat roof.\n\n1. Per Xactimate pricing, this costs an additional $349.04\n\na. Please see attached EagleView for the measurement."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Satellite",
+    "xact_description": "Digital satellite system - Detach & reset",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "Insurance report left out the detach and reset of the satellite dish.\n\nWe are requesting 1 EA.\n\n1. Per Xactimate pricing, this costs an additional $65.40.\n\na. Please see attached Photo Report.\n\nb. The satellite dish must be removed to tear off the roof and reattached once the roof is completed to avoid compromising the roof integrity."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Satellite",
+    "xact_description": "Digital satellite system - alignment and calibration only",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "Insurance report left out the detach and reset of the satellite dish.\n\nWe are requesting 1 EA.\n\n1. Per Xactimate pricing, this costs an additional $65.40.\n\na. Please see attached Photo Report.\n\nb. Alignment and calibration required to correctly re-install dish to receive satellite signal."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Chimney Flashing",
+    "xact_description": "R&R Chimney flashing - large(32\" x 60\")",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Chimney Flashing.\n\nWe are requesting 1 EA.\n\n1. Per Xactimate pricing, this costs an additional $850.33.\n\na. Please see attached Photos Report.\n\nb. The chimney flashing will need to replaced as it will get damaged during the tear off."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Chimney Flashing",
+    "xact_description": "R&R Chimney flashing - large(32\" x 60\")",
+    "scenario": "Ins is saying that the Item is not damaged",
+    "f9": "The insurance report left out the Chimney Flashing.\n\nWe are requesting 1 EA.\n\n1. Per Xactimate pricing, this costs an additional $708.61.\n\na. During the tear off of the old roof the chimney flashing will be compromised and will not be able to be reused\n\nb. Please see attached Photo Report showing evidence of the existing Chimney Flashing"
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Pipe Jacks",
+    "xact_description": "Prime & paint roof jack",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Prime and Paint Roof Jack.\n\nWe are requesting 8 EA.\n\n1. Per Xactimate pricing, this costs an additional $465.20.\n\na. Please see attached photo report showing previously painted pipe jacks"
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Pipe Jacks",
+    "xact_description": "Prime & paint roof jack",
+    "scenario": "Ins is saying that Pipe jacks are not painted, that they are PVC?",
+    "f9": "The insurance report left out the Prime and Paint Roof Jack.\n\nWe are requesting 4 EA.\n\n1. Per Xactimate pricing, this costs an additional $193.83.\n\na. Repairs must restore the property to its pre-loss condition using like-kind and quality materials and finishes.\n\nb. Please see attached Photo Report showing roof jacks were previously painted."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Exhaust Vents",
+    "xact_description": "Prime & paint roof vent",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Prime and Paint Roof Vent.\n\nWe are requesting 3 EA.\n\n1. Per Xactimate pricing, this costs an additional $174.45.\n\na. Please see attached photo report showing how the vent had been painted previously."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Chimney Flashing",
+    "xact_description": "R&R Chimney flashing - average (32\" x 36\")",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Chimney Flashing.\n\nWe are requesting 1 EA.\n\n1. Per Xactimate pricing, this costs an additional $639.85.\n\na. Please see attached photos report.\n\nb. The chimney flashing will need to replace it will get damaged during the tear off."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Exhaust Vents",
+    "xact_description": "R&R Rain cap - 4\" to 5\"",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 9 covers insurance line 9.\n\nWe are requesting an additional of 1 EA Rain cap.\n\n1. The difference is $96.34. Currently line item 9 cost $110.38. While in xactimate the total is 206.72.\n\na. Please see attached Photo Report showing the 3 rain caps."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Power Vent",
+    "xact_description": "R&R Power attic vent cover only - metal",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Power Attic vent.\n\nWe are requesting 5 EA.\n\n1. Per Xactimate pricing, this costs an additional $780.85.\n\na. Please see Photo Report showing damage to the 5 power vents that need to be added."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Turbine",
+    "xact_description": "Roof vent - turbine type",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 9 covers insurance line item 8.\n\nWe are requesting an additional 1 EA for Roof vent - turbine.\n\n1. The difference is $175.03 Per Xactimate pricing costs $524.27 while Insurance report it is $349.24.\n\na. In Insurance report it only has 2 EA, but there is 3 EA on this house. Please see attached Photo report showing the hail damage of Turbine.\n\nb. Currently the insurance is paying for 2 EA while we are requesting 1 EA which is an additional 1 EA."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Chimney Flashing",
+    "xact_description": "Chimney flashing - average (32\" x 36\")",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Chimney Flashing.\n\nWe are requesting 1 EA.\n\n1. Per Xactimate pricing, this costs an additional $533.21.\n\na. Please see attached Photo Report of the existing flashing.\n\nb. The Chimney Flashing will need to replaced as it will get damaged during the tear off."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Step flashing",
+    "xact_description": "Step flashing",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Step Flashing\n \nWe are adding 116 LF of step flashing per hail damage.  \n      \n1. Per Xactimate pricing, this costs an additional $1,726.74.\n  \n a. Please see Photo Report showing the hail damage to the flashing."
+  },
+  {
+    "category": "Roof Components",
+    "line_item": "Apron Flashing",
+    "xact_description": "Counterflashing - Apron flashing",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Apron Flashing \n \nWe are adding 38 LF of Apron flashing per hail damage. \n      \n1. Per Xactimate pricing, this costs an additional $599.72.\n  \na. Please see Photo Report showing the hail damage to the flashing."
+  },
+  {
+    "category": "Gutters",
+    "line_item": "Gutters",
+    "xact_description": "R&R Gutter / downspout - aluminum - up to 6\"",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "\"Our line item 14 covers insurance lines 14.\n\nWe are requesting an additional of 204.51 LF Gutter and Downspout.\n\n1. The difference is $6,834.87 Per Xactimate pricing, the cost is $16,637.69. While in insurance report cost is $9,802.82.\n\na. In Insurance report it only shows 972.49 LF. While our hand measurements show 972.49 LF. Please see the attached gutter diagram to confirm measurements.\""
+  },
+  {
+    "category": "Gutters",
+    "line_item": "Downspouts",
+    "xact_description": "Prime & paint gutter/downspout",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "\"Our line item 15 covers insurance lines 15.\n\nWe are requesting an additional of 384.51 LF of Prime and Paint Gutter/Downspout.\n\n1. The difference is $938.11. Per Xactimate pricing, the cost is $2,673.50. While in insurance report cost is $1,735.39.\n\na. In Insurance report it only shows 972.49 LF. While our hand measurements show 1,177 LF. Please see the attached gutter diagram to confirm measurements.\""
+  },
+  {
+    "category": "Gutters",
+    "line_item": "Splashguard",
+    "xact_description": "Gutter splash guard",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "\"The insurance report left out the Gutter Splashguards.\n\nWe are requesting 49 LF of Gutter Splashguards.\n\n1. Per Xactimate pricing, this costs an additional $1,233.51. \n\na. After hand measuring the Gutters, the there is 49 LF of Splashguards on the house currently. Please see the attached Gutter Diagram to confirm measurements.\n\nb. Please see Photo Report for existing Splashguards on the house.\""
+  },
+  {
+    "category": "Gutters",
+    "line_item": "Gutters",
+    "xact_description": "R&R Gutter / downspout - aluminum - up to 5\"",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "\"Our line item 31 covers insurance line s 20, 23, 27 and 29.\n\nWe are requesting for additional 59 LF of Gutters/Downspout.\n\n1. The difference is $756.30. Per Xactimate pricing costs $1,603.02 while Insurance report it is $846.72.\n\na. In Insurance report it only shows 84 LF. While our hand measurements show 143 LF. Please see the attached gutter diagram to confirm\nmeasurements.\""
+  },
+  {
+    "category": "Gutters",
+    "line_item": "Gutters",
+    "xact_description": "R&R Gutter / downspout -aluminum - up to 5\"",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "\"Our line item 25 covers insurance line items 21,22 & 23.\n\nWe are requesting for an additional of 84LF of Gutter/Downspout.\n\n1. The difference is $750.07. Per Xactimate pricing costs $1,344.79 while Insurance report it is $594.72.\n\na. In Insurance report it only shows 59 LF. While our hand measurements show 143 LF. Please see the attached gutter diagram to confirm\nmeasurements.\n\nb. Please see photo report for damages to each gutter run.\""
+  },
+  {
+    "category": "Gutters",
+    "line_item": "LeafGuard Gutters",
+    "xact_description": "LeafGuard Gutter System (Bid Item)",
+    "scenario": "Does the home have specialty Gutters?",
+    "f9": "\"Our line item 17 covers insurance lines 14 and 15.\n\nWe are requesting approval of our full sub bid. Please see attachment 2 for LeafGuard bid\n\n1. The difference is $48,998.05. Insurance lines 14 and 15 total $20,253.15 while our sub bid totals $69,251.20\n\na. The property currently has a LeafGuard gutter system. This is a custom, lifetime gutter system, which can only be installed by the manufacturer. \n\nb. Xactimate does not take into account the complexities of this work or the bespoke nature of this high-end system. It only prices it on a square-footage basis. The market price bid prices in the complexities surrounding this trade.\""
+  },
+  {
+    "category": "Gutters",
+    "line_item": "Downspouts",
+    "xact_description": "R&R Downspout - aluminum - up to 5\"",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 4 covers insurance lines 3.\n\nWe are requesting an additional 59 LF of Downspout. \n\n1. Per Xactimate pricing, this costs an additional $1,670.19.\n\na. In Insurance report it only has 89 LF. but after hand measuring the gutters, the house has a total of 148 LF. Please see the attached gutter diagram to confirm measurements."
+  },
+  {
+    "category": "Gutters",
+    "line_item": "Gutter Screen",
+    "xact_description": "R&R Gutter guard/screen",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "\"Our line item 26 covers insurance line item 15 & 17.\n\nWe are requesting for an additional of 17.6 0 LF of Gutters Screen.\n\n1. The difference is $85.99. Per Xactimate pricing costs $242.63 while Insurance report it is $ 156.64.\n\na. In Insurance report it only shows 35.40 LF. While our hand measurements show 53 LF. Please see the attached gutter diagram to confirm\nmeasurements.\""
+  },
+  {
+    "category": "Gutters",
+    "line_item": "Gutters D&R",
+    "xact_description": "Gutter / downspout - Detach & reset",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "\"The insurance report left out the Gutter/Downspout Detach & reset.  \n   \nWe are requesting an additional 572 LF. \n         \n1. Per Xactimate pricing, this costs an additional $2,917.20.\n \na.  Please see attached photos showing how the gutters are drilled into the drip edge and the felt is under the drip edge. In order to properly replace the drip edge, the gutters will need to be detached and reset.\""
+  },
+  {
+    "category": "Gutters",
+    "line_item": "Half-round bracket Gutters",
+    "xact_description": "Gladiator Gutter (Bid Item)",
+    "scenario": "Does the home have specialty Gutters?",
+    "f9": "\"The insurance report left out the line item 25.\n\nWe are requesting approval of our full sub bid. \n\n1. Our sub bid totals $20,579.30.\n\na. These are custom gutters with half round brackets that have to be individually set and spaced by hand. Then the half round gutters are set into the brackets. Then the whole gutter system needs to be hand painted to match the current hand painted gutters. Xactimate cannot effectively capture the complexity of this bespoke, high-end gutter system. Please see attached Gladiator Gutter bid for prices and measurements.\n\nb. Please see attached Gutter Diagram for the correct measurements\n- Half Round Gutter 425 Lf\n- 4\u201d Round Down spouts 291 Lf\n- 4\u201d Round Offsets ( 3 ) 2\u201d Offsets\n- Splash guards , Corners, and Valley Shields 53Lf\n- External Bracket 179 Brackets\n\nc. Please see attached Photo Report showing the existence of damage to the splashguards and valley shields.\""
+  },
+  {
+    "category": "Metal Roof Features",
+    "line_item": "Copper Turret",
+    "xact_description": "Copper Master (Bid item)",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the 2 Turrets.\n\nWe are requesting approval of our sub bid to replace the Turrets.\n\n1. Our sub bid is of $33,936.50.\n\na. Please see attached Photo Report and Copper Masters Inc. bid."
+  },
+  {
+    "category": "Metal Roof Features",
+    "line_item": "Standing Seam",
+    "xact_description": "Standing seam metal roof (Bid Item)",
+    "scenario": "Are you REPLACING a Xactimate item with a bid item?",
+    "f9": "Our Line Item X covers Insurance Line Item X,\n\na. The line item is being used as if this is for an entire standing seam roofing system, but it is not, this is for a custom accent piece that ties into the walls of the home. Accent pieces are always higher in price due to complexity and difficulty when fabricating and installing.\n\nb. The amount of panels that are fabricated and seamed together by hand is significantly higher per SQFT than if you were doing an entire roof, where you can use a different type of panel without as much complexity.\n\nc. Additionally, because the sqft is left-to-right there are more panels, cuts and complexities than if the sqft was entirely top to bottom like on a full standing seam roofing system. Also roof's seam clamped and seamed by tool/machine as is is a mechanically fastened roof\n\nd. Xactimate cannot capture the complexity of this job so we have to go to the market and get a bid.\n\ne. If you would like us to get a second bid for both accent pieces we can, but from experience the subcontractor we are using is the most affordable."
+  },
+  {
+    "category": "Pool",
+    "line_item": "",
+    "xact_description": "R&R Tarp - poly - w/sandbags - per sq ft (lab & mat)",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Tarp for Pool.\n\nWe are requesting 400 SF.\n\n1. Per Xactimate pricing, this costs an additional $636.68.\n\na. Please see attached Photo Report.\n\nb. It is reasonable and customary to protect the pool as debris falls into the pool during a roof install and if we do not protect it we will have to do a lot of extra work to fish all the debris out of the pool.\n\nc. Because of the custom design and short distance between the pool and the roof we have to protect the pool or we will not be able to warrant our work against granules penetrating the filter system."
+  },
+  {
+    "category": "Pool",
+    "line_item": "",
+    "xact_description": "R&R Tarp - poly - w/sandbags - per sq ft (lab & mat)",
+    "scenario": "Is INS saying it is our responsibility for property protection?",
+    "f9": "The insurance report left out the Tarp for the Pool.\n\nWe are requesting 500 SF.\n\n1. Per Xactimate pricing, this costs an additional $663.20.\n\na. If Travelers is not willing to pay to protect the pool during install, we will have to charge the Homeowner to protect the pool.\n\nb. This line item exist in Xactimate as the tools and tarps needed to cover such a large area are not standard with basic roofing subcontractor protection.\n\nb. Please see attached Photo Report for reference."
+  },
+  {
+    "category": "Chimney Cap",
+    "line_item": "Chimney Chase Cover",
+    "xact_description": "Hitech (Bid Item)",
+    "scenario": "Are you REPLACING a Xactimate item with a bid item?",
+    "f9": "Our line item 19 covers insurance line item 19 \n \n We are requesting approval of our full sub bid. Please see attached HiTech bid.\n \n 1. The difference is $682.13. Currently line items 19 total $162.87 for the Flue cap only (w/o GC O&P), while our sub bid totals $845.00 for Chimney cap/ flue cap.\n \n a. Xactimate does not take into account the complexities of this work. It only prices it on a standard flue cap. The market price bid prices in the complexities surrounding this trade."
+  },
+  {
+    "category": "Chimney Cap",
+    "line_item": "Chimney Chase Cover",
+    "xact_description": "Hitech (Bid Item)",
+    "scenario": "Is INS only paying for Flue Cap and you want to get more?",
+    "f9": "Our line item 20 covers insurance line item 12.\n\nWe are requesting approval of our full sub bid.\n\n1. this cost an additional $930.00.\n\na. Given the complexity of this chimney, the removal and the replacement of the flue cap cannot be priced effectively by Xactimate.\n\nb. Please see our HiTech Metals bid for pricing."
+  },
+  {
+    "category": "Chimney Cap",
+    "line_item": "Copper Chimney Chase Cover",
+    "xact_description": "Copper Master (Bid item)",
+    "scenario": "Are you REPLACING a Xactimate item with a bid item?",
+    "f9": "Our line item 15 covers insurance line 1.\n\nWe are requesting approval of our sub bid to replace the chimney copper cap. Please see attached bid from HiTech.\n\n1. The difference is $619.17. Currently line item 17 total $1,655.83 to replace a standard copper cap. While our sub bid is $2,275.00 to replace the decorative copper chimney cap.\n\na. The insurance report is paying for a standard Xactimate copper chase cover, whereas the chimney chase cover we have to replace is a custom-made copper cover. Xactimate is not capable of taking into account the complexities involved in a custom design and so it needs to be bid in the market for pricing."
+  },
+  {
+    "category": "Chimney Cap",
+    "line_item": "",
+    "xact_description": "R&R Masonry chimney and flue",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Chimney and Flue Cap.\n\nWe are requesting 1 EA. Please see attached photos report.\n\n1. Per Xactimate pricing, this costs an additional $663.46.\n\na. Please see attached photo report showing the damage to the Chimney Cap and Flue Cap."
+  },
+  {
+    "category": "Fence (Wood)",
+    "line_item": "Picket Replacement",
+    "xact_description": "Grizzly Picket Replacement (Bid Item)",
+    "scenario": "Are you replacing a picket because it will not withstand the Powerwashing?",
+    "f9": "The insurance report left out the Picket Replacement. \n \n We are requesting approval of our full sub bid. \n \n 1. Our sub bid totals $32.04.\n \n a. When we powerwash this fence there are 3 pickets that are in such deteriorated condition that we will need to replace them or they will be destroyed.\n\nb. Please see attached Grizzly Bid for price."
+  },
+  {
+    "category": "Fence (Iron)",
+    "line_item": "Powerwash",
+    "xact_description": "Clean with pressure/chemical spray - Heavy",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "Insurance report left out the Clean with pressure/ chemical Spray.\n\nWe are requesting 1860 SF.\n\n1. Per Xactimate pricing, this costs an additional $1,608.87\n\na. Please see attached Photo Report of the hail damage to the iron fence."
+  },
+  {
+    "category": "Fence (Iron)",
+    "line_item": "Paint",
+    "xact_description": "Paint Iron fence - two coats",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "Insurance report left out the Paint Iron Fence\n\nWe are requesting 1860 SF.\n\n1. Per Xactimate pricing, this costs an additional $3,018.27\n\na. Please see attached Photo Report of the hail damage to the iron fence and Grizzly Bid. Left side, Left front, Right side, Right front."
+  },
+  {
+    "category": "Windows & Screens",
+    "line_item": "Screens",
+    "xact_description": "Windows - Aluminum (Bid Item)",
+    "scenario": "Did INS get the QUALITY wrong?",
+    "f9": "Our line item X covers insurance lines X.\n\nWe are requesting approval of our sub bid to replace the damaged screens.\n\n1. The difference is $X . Currently line items X total $X to replace X window screens. While our sub bid is $X to replace X\nwindow screens.\n\na. Please see attached FoGlass Bid.\n\nb. Please see attached Photo Report highlighting the damage to the window screens."
+  },
+  {
+    "category": "Windows & Screens",
+    "line_item": "Screens",
+    "xact_description": "Windows FoGlass BId",
+    "scenario": "Are you REPLACING a Xactimate item with a bid item?",
+    "f9": "The insurance report left out the Window Screens.\n\nWe are requesting to add the Window screen for Front, Right and Left Elevations.\n\n1. Per subcontractor bid, this item the costs $351.00.\n\na. We have attached the Photo Report showing the hail damage to the Window Screens and the sub bid for you to review."
+  },
+  {
+    "category": "Garage",
+    "line_item": "Garage Door",
+    "xact_description": "Southwest Garage Door Service (Bid Item)",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Garage Door. \n \nWe are requesting approval of our full sub bid. Please see attached Southwest Garage Door Service.\n \n1. Our sub bid totals $4,714.52.\n \na. Please see attached Photo Report for the hail damage.\n\nb. During our bidding process our subcontractor informed us that these doors are discontinued and they cannot replace individual panels"
+  },
+  {
+    "category": "Garage",
+    "line_item": "Garage Door",
+    "xact_description": "Southwest Garage Door Service (Bid Item)",
+    "scenario": "Is the Garage Door DISCONTINUED?",
+    "f9": "\"Our line item X covers insurance lines X\n\nWe are requesting approval of our sub bid to replace the whole door.\n\n1. The difference is $XX.xx. Currently line items X total $XX.xx to replace a single panel of the garage door. While our sub bid is $XX.xx to replace the whole door\n\na. The current garage door is discontinued and individual panels cannot be purchased.\n\nb. Please see attached Southwestern Garage Door Service bid.\""
+  },
+  {
+    "category": "Garage",
+    "line_item": "Painting Garage Door",
+    "xact_description": "Painting (Bid Item)",
+    "scenario": "",
+    "f9": "\"This house has hand-painted garage doors with a custom color that is not available from the manufacturer.\n\nPlease see attached photo report for the color this garage door is painted.\""
+  },
+  {
+    "category": "Stucco",
+    "line_item": "Stucco",
+    "xact_description": "Southern Royal Stucco (Bid Item)",
+    "scenario": "Did INS get the QUANTITY wrong?",
+    "f9": "Our line item 24 covers insurance lines X \n\nWe are requesting a total of X LF of stucco patching (which is an additional X LF from what is currently approved) and X SQFT of stucco refinish (which is an additional X SQFT from what is currently approved). Please see Southern Royal Stucco & Masonry bid attached.\n\n1. The difference is $XX.xx. Currently line items X total $XX.xx to patch XLF of flashing and refinish X SQFT of stucco. While our sub bid totals $XX.xx to patch XLF and refinish X SQFT \n\na. To access and replace the flashing behind the stucco, the lower 12 inches of stucco must first be removed along all XLF of approved flashing. Once the flashing is replaced and the roofing work is completed, the stucco will be re-applied to patch the removed section.\n\nb. After the patch is complete, entire affected stucco wall, extending beyond removed sections, will be refinished with an even coat to restore the wall to pre-storm condition"
+  },
+  {
+    "category": "Siding",
+    "line_item": "Siding",
+    "xact_description": "Siding Installer - per hour",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out Siding Installer.\n\nWe are requesting 4 HR.\n\n1. Per Xactimate pricing, this costs an additional $503.28.\n\na. Please see attached Photo report showing the damaged flashing.\n\nb. To replace the flashing, we will need to temporarily remove the siding, as accessing the flashing behind it is not otherwise possible. Once the flashing has been properly replaced, we will reattach the siding."
+  },
+  {
+    "category": "Interior",
+    "line_item": "",
+    "xact_description": "Grizzly Fence & Patio (Bid Item)",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Interior Painting Service. \n \n We are requesting approval of our full sub bid. Please see attached Grizzly Fence & Patio bid.\n \n 1. Our sub bid totals $1,100.00.\n \n a. The market price bid prices in the complexities surrounding this trade. Please see attached photo report for the water damage sustained because of a storm created opening."
+  },
+  {
+    "category": "Pergolas, Gazebos, Patios & Beams",
+    "line_item": "Beam Staining",
+    "xact_description": "Grizzly (Bid Item)*",
+    "scenario": "Did INS get the QUALITY wrong?",
+    "f9": "Our line item X covers insurance lines X\n\nWe are requesting approval of our full sub bid. Please see attached Grizzly bid.\n\n1. Currently line items X total $XX.xx for the staining of the wood beams on the property, while our sub bid totals $XX.xx.\n\na. Xactimate does not take into account the complexities of this work. It only prices it on a square-footage basis. The market price bid prices in the complexities surrounding this trade."
+  },
+  {
+    "category": "Pergolas, Gazebos, Patios & Beams",
+    "line_item": "Pergola Paint",
+    "xact_description": "Seal (1 coat) & paint (1 coat) trim",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Seal & paint for Pergola.\n\nWe are requesting 440 LF.\n\n1. Per Xactimate pricing, this costs an additional $898.65.\n\na. Please see attached Photo Report showing the hail damage of Pergola."
+  },
+  {
+    "category": "Pergolas, Gazebos, Patios & Beams",
+    "line_item": "Pergola Wash",
+    "xact_description": "Clean with pressure/chemical spray - Light",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Clean with pressure for Pergola.\n\nWe are requesting 440 LF.\n\n1. Per Xactimate pricing, this costs an additional $158.76.\n\na. Please see attached Photo Report showing the hail damage of Pergola."
+  },
+  {
+    "category": "Misc",
+    "line_item": "Building Permits",
+    "xact_description": "Building permits & fees",
+    "scenario": "Did INS FORGET the line item?",
+    "f9": "The insurance report left out the Building Permit Fee.\n\nWe are requesting reimbursement of the full Permit Fee\n\n1. The fee totals $XX.xx.\n\na. Please see attached paid permit invoice.\n\nb. Building permits are legally required for roofing and structural repairs in [CITY], Texas. As the contractor, we are obligated to comply with local building codes and permitting laws. The cost of obtaining a permit is therefore a necessary and non-optional expense to restore the property to pre-loss condition in a code-compliant manner. Per standard insurance policy language, all reasonable and required costs to complete covered repairs are eligible for reimbursement."
+  }
+]
