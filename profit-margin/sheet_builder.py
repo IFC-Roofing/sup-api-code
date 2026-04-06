@@ -25,7 +25,7 @@ SHARED_DRIVE_ID = "0ANY__SN6vAmeUk9PVA"
 def get_creds(scopes):
     from pathlib import Path
     creds_file = Path(__file__).parent.parent.parent / "google-drive-key.json"
-    return service_account.Credentials.from_service_account_file(str(creds_file).with_subject('sup@ifcroofing.com'), scopes=scopes)
+    return service_account.Credentials.from_service_account_file(str(creds_file), scopes=scopes).with_subject('sup@ifcroofing.com')
 
 
 def get_services():

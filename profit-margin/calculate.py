@@ -52,7 +52,8 @@ logger = logging.getLogger("profit-margin")
 
 def get_creds(scopes):
     return service_account.Credentials.from_service_account_file(
-        str(CREDS_FILE).with_subject('sup@ifcroofing.com'), scopes=scopes
+        str(CREDS_FILE), scopes=scopes
+    ).with_subject('sup@ifcroofing.com'
     )
 
 
