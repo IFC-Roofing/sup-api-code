@@ -1,0 +1,678 @@
+Insured: Carlson, Kathy
+E-mail:
+Property: 1104 Guthrie Ct
+Colleyville, TX 76034
+Estimator:
+Business: (817) 716-3523
+Business: 5115 Colleyville Blvd
+76034
+E-mail:
+Contractor:
+Business: (817) 706-6070
+Company: IFC Contracting Solutions
+Business: 5115 Colleyville Blvd
+Colleyville, TX 76034
+Claim Number: JFE5555001H      Policy Number: 0DPN44609674954633 1      Type of Loss: Wind/Hail 
+Date of Loss:
+5/27/2024
+Date Received:
+Date Inspected:
+Date Entered:
+2026-03-18
+Price List: TXDF8X_FEB26
+Restoration/Service/Remodel
+Estimate: CARLSON_KATHY
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 1
+
+CARLSON_KATHY
+DESCRIPTION
+QTY
+REMOVE
+REPLACE
+TAX
+O&P
+TOTAL
+Dwelling Roof
+1.  Tear off, haul and dispose of comp.
+shingles - Laminated 
+49.00 SQ
+0.00
+3,358.46
+0.00
+671.69
+4,030.15
+2.  Roofing felt - 15 lb. 
+55.33 SQ
+0.00
+2,244.74
+185.19
+448.95
+2,878.88
+Insurance left out the waste on the felt
+We are requesting an additional 6.33 SQ of roofing felt. Currently the Insurance report has 49.00 SQ. While our measurements
+with waste total 55.33 SQ.
+1.
+a. Please see attached EagleView Report for confirmation of the measurements
+3.  Lam. comp. shingle rfg. - w/out felt -
+per ind. material source 
+55.33 SQ
+0.00
+15,781.78
+1,302.00
+3,156.36
+20,240.14
+Our line item covers insurance line 6.
+We are requesting an additional of 2.33 SQ for Laminated - comp. shingle rfg. - w/out felt.
+1. The difference is $664.59. Per Xactimate pricing, the cost is $15,781.78. While in insurance report cost is $15,096.84.
+a. Please see attached EagleView showing the waste calculation of 13% for the shingles that will be put back on the roof.
+b. Currently the insurance is paying for 53.00 SQ while we are requesting 55.33 SQ which is an additional 2.33 SQ.
+4.  3 tab 25 yr comp shng. w/out felt -
+per ind material source 
+1.67 SQ
+0.00
+451.63
+37.26
+90.33
+579.22
+5.  3 tab 25 yr comp shng. w/out felt -
+per ind. material source 
+2.67 SQ
+0.00
+722.07
+59.57
+144.41
+926.05
+6.  Asphalt starter - universal starter
+course 
+224.00 LF
+0.00
+463.68
+38.25
+92.74
+594.67
+The insurance report left out the Starter.
+We are requesting 224 LF of Starter.
+1. Per Xactimate pricing, this costs an additional $463.68.
+a. Starter is a different material and is installed at a higher rate than field shingles, therefore it is inappropriate to bundle it into
+the waste and leads to inaccurate material estimates. Please see attached EagleView for measurements.
+7.  R&R Hip / Ridge cap - cut from 3 tab
+- composition shingles 
+229.00 LF
+496.93
+1,490.79
+122.99
+397.54
+2,508.25
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 2
+
+DESCRIPTION
+QTY
+REMOVE
+REPLACE
+TAX
+O&P
+TOTAL
+The insurance report left out the Hip and Ridge Cap.
+We are requesting 229 LF of Hip / Ridge cap.
+1. Per Xactimate pricing, this costs an additional $1,987.72.
+a. Please see attached EagleView Report for confirmation of the measurements.
+8.  R&R Valley metal 
+111.00 LF
+213.12
+638.25
+52.66
+170.27
+1,074.30
+The insurance report left out the Valley Metal.
+We are requesting 111 LF of Valley Metal.
+1. Per Xactimate pricing, this costs an additional $851.37.
+a. Please see attached EagleView Report for confirmation of the measurements.
+b. The valley metal must be replaced during the roof tear-off as it cannot be reused.
+9.  R&R Drip edge 
+341.64 LF
+307.48
+915.60
+75.54
+244.62
+1,543.24
+10.  Paint trim - one coat 
+341.64 LF
+0.00
+491.96
+0.00
+98.39
+590.35
+11.  Step flashing 
+29.00 LF
+0.00
+355.83
+29.36
+71.17
+456.36
+The insurance report left out the Step Flashing
+We are adding 29 LF of step flashing per hail damage.
+1. Per Xactimate pricing, this costs an additional $355.83.
+a. Please see Photo Report showing the hail damage to the flashing.
+12.  R&R Drip edge/gutter apron
+(Counter/Apron Flashing) 
+9.00 LF
+8.64
+26.01
+2.15
+6.93
+43.73
+The insurance report left out the Apron Flashing
+We are adding 9 LF of Apron flashing per hail damage.
+1. Per Xactimate pricing, this costs an additional $34.65.
+a. Please see Photo Report showing the hail damage to the flashing.
+13.  R&R Flashing - pipe jack - lead 
+5.00 EA
+126.80
+380.50
+31.39
+101.46
+640.15
+14.  Continuous ridge vent - shingle-over
+style 
+48.00 LF
+148.32
+444.96
+36.71
+118.66
+748.65
+15.  Roof vent - turtle type - Plastic 
+3.00 EA
+0.00
+204.09
+16.84
+40.82
+261.75
+16.  Exhaust cap - through roof - up to 4"
+1.00 EA
+0.00
+106.44
+8.78
+21.29
+136.51
+17.  Rain cap - up to 5" 
+2.00 EA
+0.00
+114.34
+9.43
+22.87
+146.64
+18.  Prime & paint roof vent 
+2.00 EA
+0.00
+97.66
+0.00
+19.53
+117.19
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 3
+
+DESCRIPTION
+QTY
+REMOVE
+REPLACE
+TAX
+O&P
+TOTAL
+19.  Digital satellite system - Detach &
+reset 
+1.00 EA
+0.00
+54.75
+0.00
+10.95
+65.70
+20.  Remove Additional charge for steep
+roof - 7/12 to 9/12 slope 
+16.41 SQ
+263.71
+0.00
+0.00
+52.74
+316.45
+21.  Additional charge for steep roof -
+7/12 to 9/12 slope 
+16.41 SQ
+0.00
+845.61
+0.00
+169.12
+1,014.73
+22.  Remove Additional charge for steep
+roof - 10/12 - 12/12 slope 
+1.28 SQ
+32.33
+0.00
+0.00
+6.47
+38.80
+23.  Additional charge for steep roof -
+10/12 - 12/12 slope 
+1.28 SQ
+0.00
+103.73
+0.00
+20.75
+124.48
+24.  Remove Additional charge for steep
+roof greater than 12/12 slope 
+31.31 SQ
+1,013.50
+0.00
+0.00
+202.70
+1,216.20
+25.  Additional charge for steep roof
+greater than 12/12 slope 
+31.31 SQ
+0.00
+3,310.09
+0.00
+662.02
+3,972.11
+26.  Remove Gable cornice return -
+laminated 
+3.00 EA
+46.38
+0.00
+0.00
+9.28
+55.66
+27.  Install Gable cornice return -
+laminated 
+3.00 EA
+0.00
+264.36
+21.81
+52.87
+339.04
+28.  Permit 
+1.00 EA
+0.00
+50.00
+0.00
+10.00
+60.00
+Totals:  Dwelling Roof
+2,657.21
+32,917.33
+2,029.93
+7,114.93
+44,719.40
+Gutters
+29.  1104 Guthrie Court_Gutter (Bid
+Item) (Bid Item) 
+1.00 EA
+0.00
+4,445.51
+0.00
+889.10
+5,334.61
+The Insurance report left out the Gutters and Downspouts.
+We are requesting for our sub bid.
+1. Our sub bid cost is $4,445.51.
+a. Please see attached Photo Report showing damage.
+b. Please see attached 1104 Guthrie Court bid for the confirmation of price.
+Totals:  Gutters
+0.00
+4,445.51
+0.00
+889.10
+5,334.61
+Windows
+30.  FoGlass Window LLC_Window
+Screens (Bid Item) (Bid Item) 
+1.00 EA
+0.00
+550.07
+0.00
+110.01
+660.08
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 4
+
+DESCRIPTION
+QTY
+REMOVE
+REPLACE
+TAX
+O&P
+TOTAL
+The insurance report left out the Window Screens.
+We are requesting to add the Window Screens.
+1. Per subcontractor bid, this item costs $550.07.
+a. We have attached the Photo Report showing the hail damage to the Window Screens and the sub bid for you to review.
+Totals:  Windows
+0.00
+550.07
+0.00
+110.01
+660.08
+Fence
+31.  Grizzly Fence & Patio_Fence (Bid
+Item) (Bid Item) 
+1.00 EA
+0.00
+1,846.80
+0.00
+369.36
+2,216.16
+The Insurance report left out the Fence.
+We are requesting for our sub bid.
+1. Our sub bid cost is $1,846.80.
+a. Please see attached Photo Report showing damage.
+b. Please see attached Grizzly Fence & Patio bid for the confirmation of price.
+Totals:  Fence
+0.00
+1,846.80
+0.00
+369.36
+2,216.16
+Pergola
+32.  Grizzly Fence & Patio_Pergola (Bid
+Item) (Bid Item) 
+1.00 EA
+0.00
+1,497.60
+0.00
+299.52
+1,797.12
+Our line item covers Insurance line items 27 and 28.
+We are requesting for our sub bid to cover the full scope of the Pergola.
+1. Our sub bid cost is $1,497.60.
+a. Please see attached Photo Report showing damage.
+b. Please see attached Grizzly Fence & Patio bid for the confirmation of price.
+Totals:  Pergola
+0.00
+1,497.60
+0.00
+299.52
+1,797.12
+Debris Removal
+33.  Dumpster load - Approx. 12 yards,
+1-3 tons of debris 
+1.00 EA
+0.00
+474.83
+0.00
+94.97
+569.80
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 5
+
+DESCRIPTION
+QTY
+REMOVE
+REPLACE
+TAX
+O&P
+TOTAL
+Our line item covers insurance line 29.
+We are requesting a Dumpster load instead of a Tandem axle dump trailer.
+1. The difference is $230.06. Per Xactimate pricing, this costs $474.83. While in Insurance report it cost $244.77.
+a. A dumpster is required for this project due to the size of the roof and volume of debris generated during tear-off. Please see
+attached EagleView for roof measurements.
+Totals:  Debris Removal
+0.00
+474.83
+0.00
+94.97
+569.80
+O&P
+34.  General Contractor Overhead &
+Profit 
+1.00 EA
+0.00
+0.00
+0.00
+0.00
+0.00
+For decades we have vetted, managed, trained and warrantied subcontractors for roofing, gutters, painting, fencing, siding etc.
+due to storm restoration in the DFW area.
+We charge a minimum 20% overhead and profit above the subcontractors cost as we act as the single point of contact for all
+subcontractors' trade complexities, plus cover all their liability and warranty for our clients.
+Project Requires General Contracting
+This project involves coordination of multiple trades—including roofing, gutter replacement, exterior painting, window screen
+repair, and possible stucco or interior restoration. Per industry standards and Xactimate guidelines, O&P is warranted whenever
+three or more trades are involved and coordinated by a general contractor.
+Complex Scheduling and Management
+Each trade must be scheduled in the correct sequence, managed for quality and timing, and supervised for code compliance and
+safety. This requires administrative staff, project managers, and dedicated personnel which all reside at our physical office —all
+part of our company's operational infrastructure.
+We Are Not a Single-Trade Contractor
+Unlike subcontractors, we do not perform only one scope of work. We maintain a physical office, estimators, coordinators,
+insurance claim specialists, and field supervisors. These are all actual employees of IFC Contracting Solutions— these
+employees are the overhead which is built into O&P. These costs are necessary to support project execution, client
+communication, and warranty management.
+Insurance Restoration Demands Administrative Oversight
+Insurance jobs require extra documentation, invoicing, inspection scheduling, supplemental negotiation, and warranty
+coordination, all of which involve personnel beyond the jobsite. These employees reside at our physical location and work to
+adhere to the highest construction standards. This is not reimbursed in trade line items and is accounted for within O&P.
+Totals:  O&P
+0.00
+0.00
+0.00
+0.00
+0.00
+Elevations
+35.  Comb and straighten a/c condenser
+fins - with trip charge 
+1.00 EA
+0.00
+175.97
+0.00
+35.19
+211.16
+36.  Services_HVAC (Bid Item) (Bid
+Item) 
+1.00 EA
+0.00
+390.00
+0.00
+78.00
+468.00
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 6
+
+DESCRIPTION
+QTY
+REMOVE
+REPLACE
+TAX
+O&P
+TOTAL
+Our line item covers Insurance line item 26.
+We are requesting for our sub bid to cover the full scope of the HVAC.
+1. Our sub bid cost is $390.00.
+a. Please see attached Photo Report showing damage.
+b. Please see attached Services bid for the confirmation of price.
+Totals:  Elevations
+0.00
+565.97
+0.00
+113.19
+679.16
+Line Item Totals:
+CARLSON_KATHY
+2,029.93
+8,991.08
+$55,976.33
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 7
+
+Summary for Dwelling
+Line Item Total
+$41,610.92
+Material Sales Tax
+$2,029.93
+Subtotal
+$43,640.85
+Overhead
+$4,161.10
+Profit
+$4,161.10
+Replacement Cost Value
+$51,963.05
+Net Claim
+$51,963.05
+IFC Contracting Solutions
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 8
+
+Summary for Other Structures
+Line Item Total
+$3,344.40
+Material Sales Tax
+$0.00
+Subtotal
+$3,344.40
+Overhead
+$334.44
+Profit
+$334.44
+Replacement Cost Value
+$4,013.28
+Net Claim
+$4,013.28
+IFC Contracting Solutions
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 9
+
+Recap of Taxes, Overhead and Profit
+Overhead (10%)
+Profit (10%)
+Material Sales Tax
+(8.25%)
+Manuf. Home Tax (5%)
+Line Items
+$4,495.54
+$4,495.54
+$2,029.93
+0.00
+Total
+$4,495.54
+$4,495.54
+$2,029.93
+0.00
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 10
+
+Recap by Room
+Estimate: CARLSON_KATHY
+Dwelling Roof
+$44,719.40
+79.89%
+Gutters
+$5,334.61
+9.53%
+Windows
+$660.08
+1.18%
+Fence
+$2,216.16
+3.96%
+Pergola
+$1,797.12
+3.21%
+Debris Removal
+$569.80
+1.02%
+O&P
+$0.00
+0.00%
+Elevations
+$679.16
+1.21%
+Subtotal of Areas
+$55,976.33
+100.00%
+Total
+$55,976.33
+100.00%
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 11
+
+Recap by Category
+O&P Items
+Total
+%
+ROOFING
+$43,608.65
+77.91%
+SOFFIT, FASCIA, & GUTTER
+$5,334.61
+9.53%
+FENCING
+$4,013.28
+7.17%
+GENERAL
+$1,199.56
+2.14%
+WINDOWS & DOORS
+$660.08
+1.18%
+PAINTING
+$590.35
+1.05%
+GENERAL DEMOLITION
+$569.80
+1.02%
+O&P Items Subtotal
+$53,946.40
+96.37%
+Material Sales Tax
+$2,029.93
+3.63%
+Overhead
+$4,495.54
+8.03%
+Profit
+$4,495.54
+8.03%
+Total
+$55,976.33
+100.00%
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+CARLSON_KATHY
+2026-03-18
+Page: 12

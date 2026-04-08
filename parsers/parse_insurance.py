@@ -659,29 +659,8 @@ def _postprocess(result):
 # Main parse function
 # ---------------------------------------------------------------------------
 
-def parse_insurance_estimate(pdf_path, provider=None, model=None, verbose=False,
-                              batch_size=3, skip_reconciliation=False):
-    """
-    Parse an insurance estimate PDF using AI vision.
-
-    Strategy:
-    - Convert PDF to images
-    - Extract in small batches (batch_size pages) for high accuracy
-    - Merge batch results
-    - Run a reconciliation pass to validate and auto-correct
-    - Return normalized dict
-
-    Args:
-        pdf_path: Path to PDF
-        provider: "anthropic" | "openai" | "gemini" (auto-detected if None)
-        model: Model override
-        verbose: Print progress to stderr
-        batch_size: Pages per extraction call (default 3 — quality over speed)
-        skip_reconciliation: Skip the QC pass (faster but less reliable)
-    """
-    if not os.path.isfile(pdf_path):
-        raise FileNotFoundError(f"PDF not found: {pdf_path}")
-
+def _parse_insurance_images_core(images_b64, page_count, provider=None, model=None, verbose=False,
+                                 batch_size=3, skip_reconciliation=False, pdf_path=None, source_label=None):
     if provider is None:
         provider = detect_provider()
     if provider is None:
@@ -692,18 +671,9 @@ def parse_insurance_estimate(pdf_path, provider=None, model=None, verbose=False,
         raise RuntimeError(f"{env_key} not set for provider '{provider}'")
 
     if verbose:
-        print(f"\n[parse_insurance] Provider: {provider} | PDF: {pdf_path}", file=sys.stderr)
+        label = source_label or pdf_path or "image set"
+        print(f"\n[parse_insurance] Provider: {provider} | Source: {label}", file=sys.stderr)
 
-    # Step 1 — PDF → images
-    if verbose:
-        print("[parse_insurance] Converting PDF to images...", file=sys.stderr)
-    images, page_count = pdf_to_images(pdf_path)
-    if verbose:
-        print(f"  {page_count} pages total, processing {len(images)}", file=sys.stderr)
-
-    images_b64 = [image_to_base64(img) for img in images]
-
-    # Step 2 — Extract in batches
     n_batches = (len(images_b64) + batch_size - 1) // batch_size
     if verbose:
         print(f"[parse_insurance] Extracting in {n_batches} batch(es) of ≤{batch_size} pages...", file=sys.stderr)
@@ -718,27 +688,21 @@ def parse_insurance_estimate(pdf_path, provider=None, model=None, verbose=False,
         result = _extract_batch(batch, provider_fn, model=model, verbose=verbose)
         batch_results.append(result)
         if i + batch_size < len(images_b64):
-            time.sleep(0.5)  # brief pause between calls
+            time.sleep(0.5)
 
     elapsed = time.time() - t0
     if verbose:
         print(f"[parse_insurance] Extraction done in {elapsed:.1f}s", file=sys.stderr)
 
-    # Step 3 — Merge batches
     extracted = _merge_batches(batch_results)
 
-    # Step 4 — Reconciliation pass (uses all page images)
     if not skip_reconciliation:
-        # For reconciliation: send first 6 pages (enough to see structure + headers)
         recon_pages = images_b64[:6]
         extracted = _reconcile(extracted, recon_pages, provider_fn, model=model, verbose=verbose)
 
-    # Step 5 — Post-process
     extracted = _postprocess(extracted)
-
-    # Finalize metadata
     extracted["page_count"] = page_count
-    extracted["_pdf_size"] = os.path.getsize(pdf_path)
+    extracted["_pdf_size"] = os.path.getsize(pdf_path) if pdf_path and os.path.isfile(pdf_path) else None
     for field in ("carrier", "claim_number", "policy_number", "date_of_loss",
                   "estimate_date", "insured_name", "insured_email", "property_address",
                   "type_of_loss", "date_inspected", "date_received", "adjuster",
@@ -750,6 +714,61 @@ def parse_insurance_estimate(pdf_path, provider=None, model=None, verbose=False,
     extracted.setdefault("overhead_and_profit", None)
 
     return extracted
+
+
+def parse_insurance_estimate(pdf_path, provider=None, model=None, verbose=False,
+                              batch_size=3, skip_reconciliation=False):
+    """Parse an insurance estimate PDF using AI vision."""
+    if not os.path.isfile(pdf_path):
+        raise FileNotFoundError(f"PDF not found: {pdf_path}")
+
+    if verbose:
+        print("[parse_insurance] Converting PDF to images...", file=sys.stderr)
+    images, page_count = pdf_to_images(pdf_path)
+    if verbose:
+        print(f"  {page_count} pages total, processing {len(images)}", file=sys.stderr)
+
+    images_b64 = [image_to_base64(img) for img in images]
+    return _parse_insurance_images_core(
+        images_b64,
+        page_count,
+        provider=provider,
+        model=model,
+        verbose=verbose,
+        batch_size=batch_size,
+        skip_reconciliation=skip_reconciliation,
+        pdf_path=pdf_path,
+        source_label=f"PDF: {pdf_path}",
+    )
+
+
+def parse_insurance_images(image_paths, provider=None, model=None, verbose=False,
+                           batch_size=3, skip_reconciliation=False):
+    """Parse an insurance estimate from ordered image files."""
+    if not image_paths:
+        raise ValueError("No image paths provided")
+    missing = [p for p in image_paths if not os.path.isfile(p)]
+    if missing:
+        raise FileNotFoundError(f"INS image(s) not found: {missing}")
+
+    if verbose:
+        print(f"[parse_insurance] Loading {len(image_paths)} INS image(s)...", file=sys.stderr)
+
+    images_b64 = []
+    for path in image_paths:
+        with open(path, "rb") as f:
+            images_b64.append(base64.b64encode(f.read()).decode("utf-8"))
+
+    return _parse_insurance_images_core(
+        images_b64,
+        len(image_paths),
+        provider=provider,
+        model=model,
+        verbose=verbose,
+        batch_size=batch_size,
+        skip_reconciliation=skip_reconciliation,
+        source_label=f"INS_IMAGES ({len(image_paths)} files)",
+    )
 
 
 # ---------------------------------------------------------------------------

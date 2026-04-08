@@ -207,42 +207,41 @@ def extract_tagged_notes(posts: list[dict]) -> dict:
 
 # ─── Google Drive ──────────────────────────────────────────────────────────────
 
-def search_drive_file(filename_pattern: str, drive_folder_id: str = None) -> Optional[str]:
-    """
-    Search Drive for a file matching pattern. Returns file ID.
-    If drive_folder_id given, searches that folder AND all its subfolders.
-    """
+def _build_drive_service():
     from googleapiclient.discovery import build
     creds = get_service_account()
-    service = build("drive", "v3", credentials=creds)
+    return build("drive", "v3", credentials=creds)
 
-    def _search(q):
-        resp = service.files().list(
-            q=q,
-            supportsAllDrives=True,
-            includeItemsFromAllDrives=True,
-            fields="files(id, name, parents)",
-        ).execute()
-        return resp.get("files", [])
 
-    def _get_subfolders(folder_id):
-        resp = service.files().list(
-            q=f"'{folder_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
-            supportsAllDrives=True,
-            includeItemsFromAllDrives=True,
-            fields="files(id, name)"
-        ).execute()
-        return resp.get("files", [])
+def _drive_search(service, q, fields="files(id, name, parents)"):
+    resp = service.files().list(
+        q=q,
+        supportsAllDrives=True,
+        includeItemsFromAllDrives=True,
+        fields=fields,
+    ).execute()
+    return resp.get("files", [])
 
-    # Search folder and all subfolders recursively (up to 3 levels)
+
+def _drive_get_subfolders(service, folder_id):
+    return _drive_search(
+        service,
+        f"'{folder_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
+        fields="files(id, name)",
+    )
+
+
+def search_drive_file(filename_pattern: str, drive_folder_id: str = None) -> Optional[str]:
+    """Search Drive for a file matching pattern. Returns file ID."""
+    service = _build_drive_service()
+
     if drive_folder_id:
         folders_to_search = [drive_folder_id]
-        # BFS: collect subfolders up to 3 levels deep
         current_level = [drive_folder_id]
         for _depth in range(3):
             next_level = []
             for fid in current_level:
-                next_level.extend(sf["id"] for sf in _get_subfolders(fid))
+                next_level.extend(sf["id"] for sf in _drive_get_subfolders(service, fid))
             if not next_level:
                 break
             folders_to_search.extend(next_level)
@@ -250,16 +249,43 @@ def search_drive_file(filename_pattern: str, drive_folder_id: str = None) -> Opt
 
         for fid in folders_to_search:
             q = f"name contains '{filename_pattern}' and '{fid}' in parents and trashed=false and mimeType != 'application/vnd.google-apps.folder'"
-            files = _search(q)
+            files = _drive_search(service, q)
             if files:
                 return files[0]["id"]
 
-    # Fallback: search all drives
     q = f"name contains '{filename_pattern}' and trashed=false and mimeType != 'application/vnd.google-apps.folder'"
-    files = _search(q)
+    files = _drive_search(service, q)
     if files:
         return files[0]["id"]
     return None
+
+
+def find_drive_subfolder(folder_name: str, parent_folder_id: str) -> Optional[str]:
+    """Find an immediate subfolder by exact name under a parent folder."""
+    service = _build_drive_service()
+    q = (
+        f"name = '{folder_name}' and '{parent_folder_id}' in parents and "
+        f"mimeType='application/vnd.google-apps.folder' and trashed=false"
+    )
+    folders = _drive_search(service, q, fields="files(id, name)")
+    return folders[0]["id"] if folders else None
+
+
+def list_drive_images(folder_id: str) -> List[dict]:
+    """List ordered image files in a Drive folder."""
+    service = _build_drive_service()
+    q = (
+        f"'{folder_id}' in parents and trashed=false and "
+        f"mimeType contains 'image/'"
+    )
+    resp = service.files().list(
+        q=q,
+        supportsAllDrives=True,
+        includeItemsFromAllDrives=True,
+        fields="files(id, name, mimeType)",
+        orderBy="name_natural",
+    ).execute()
+    return resp.get("files", [])
 
 
 def download_drive_file(file_id: str, dest_path: str):
@@ -538,13 +564,8 @@ def load_pricelist() -> dict[str, dict]:
     if _pricelist_cache is not None:
         return _pricelist_cache
 
-    try:
-        from googleapiclient.discovery import build
-        creds = get_service_account()
-    except Exception as e:
-        print(f"[pipeline] ⚠️  Cannot load pricelist (no credentials): {e}")
-        _pricelist_cache = {}
-        return _pricelist_cache
+    from googleapiclient.discovery import build
+    creds = get_service_account()
     service = build("sheets", "v4", credentials=creds)
 
     result = service.spreadsheets().values().get(
@@ -1837,6 +1858,7 @@ def run(project_name: str, temp_dir: str = None) -> dict:
     # Naming convention: {LASTNAME}_INS X.0.pdf or similar
     lastname = _extract_lastname(project_name, project)
     ins_pdf_path = None
+    ins_image_paths = []
     ins_data = {}
 
     ins_by_tag = {}
@@ -1857,8 +1879,29 @@ def run(project_name: str, temp_dir: str = None) -> dict:
         ins_by_tag = attribute_ins_to_tags(ins_data)
         print(f"[pipeline] INS attributed: {list(ins_by_tag.keys())}")
     else:
-        print(f"[pipeline] WARNING: No INS estimate found in Drive for {lastname}")
-        ins_by_tag = {}
+        supplement_folder_id = find_drive_subfolder("Supplement", project_folder_id) if project_folder_id else None
+        ins_images_folder_id = find_drive_subfolder("INS_IMAGES", supplement_folder_id) if supplement_folder_id else None
+        if ins_images_folder_id:
+            ins_images = list_drive_images(ins_images_folder_id)
+            if ins_images:
+                print(f"[pipeline] No INS PDF found. Using explicit Supplement/INS_IMAGES fallback ({len(ins_images)} images)")
+                for idx, img in enumerate(ins_images, start=1):
+                    local_path = os.path.join(td, f"ins_image_{idx:02d}_{img['name']}")
+                    download_drive_file(img["id"], local_path)
+                    ins_image_paths.append(local_path)
+                print(f"[pipeline] Parsing INS images...")
+                from parse_insurance import parse_insurance_images
+                ins_data = parse_insurance_images(ins_image_paths, verbose=False, batch_size=3)
+                print(f"[pipeline] INS items parsed from images: {len(ins_data.get('items', []))}")
+                print("[pipeline] Attributing INS totals to @tags...")
+                ins_by_tag = attribute_ins_to_tags(ins_data)
+                print(f"[pipeline] INS attributed: {list(ins_by_tag.keys())}")
+            else:
+                print(f"[pipeline] WARNING: Supplement/INS_IMAGES exists but contains no images for {lastname}")
+                ins_by_tag = {}
+        else:
+            print(f"[pipeline] WARNING: No INS estimate found in Drive for {lastname}")
+            ins_by_tag = {}
 
     # 5. Download EagleView
     ev_pdf_path = None

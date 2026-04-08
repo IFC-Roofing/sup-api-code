@@ -1,0 +1,540 @@
+Insured: Braswell, Becky
+E-mail:
+Property: 1129 Livingston Dr
+Hurst, TX 76053
+Estimator:
+Business: (817) 716-3523
+Business: 5115 Colleyville Blvd
+76034
+E-mail:
+Contractor:
+Business: (817) 706-6070
+Company: IFC Contracting Solutions
+Business: 5115 Colleyville Blvd
+Colleyville, TX 76034
+Claim Number: 4397G111P      Policy Number: 93NU82652      Type of Loss: Wind/Hail 
+Date of Loss:
+5/20/2025
+Date Received:
+Date Inspected:
+Date Entered:
+3/26/2026
+Price List: TXDF8X_FEB26
+Restoration/Service/Remodel
+Estimate: BRASWELL_BECKY
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+BRASWELL_BECKY
+3/26/2026
+Page: 1
+
+BRASWELL_BECKY
+DESCRIPTION
+QTY
+REMOVE
+REPLACE
+TAX
+O&P
+TOTAL
+Dwelling Roof
+1.  3 tab - 25 yr. - comp. shingle roofing
+- w/out felt 
+28.00 SQ
+0.00
+7,572.88
+624.76
+1,514.58
+9,712.22
+2.  Tear off, haul and dispose of comp.
+shingles - 3 tab 
+25.29 SQ
+0.00
+1,673.19
+0.00
+334.64
+2,007.83
+Our line item covers insurance line item We are requesting 25.29 SQ for tear-off. Currently the insurance report has 25.28 SQ
+while EagleView measured area is 25.29 SQ.
+a. Please see attached EagleView Report for confirmation of the measurements.
+3.  Roofing felt - 15 lb. 
+25.29 SQ
+0.00
+1,026.27
+84.67
+205.25
+1,316.19
+4.  Hip / Ridge cap - Standard profile -
+composition shingles 
+86.00 LF
+144.48
+434.30
+35.83
+115.76
+730.37
+5.  Flashing - pipe jack 
+4.00 EA
+0.00
+239.76
+19.78
+47.95
+307.49
+6.  Roof vent - turbine type 
+2.00 EA
+0.00
+349.54
+28.84
+69.91
+448.29
+7.  Drip edge 
+252.11 LF
+0.00
+600.02
+49.50
+120.00
+769.52
+8.  Seal (1 coat) & paint (1 coat) trim 
+252.11 LF
+0.00
+514.30
+0.00
+102.86
+617.16
+9.  R&R Fireplace - chimney chase
+cover - sheet metal 
+1.00 EA
+0.00
+449.35
+37.07
+89.87
+576.29
+10.  Flashing - rain diverter 
+1.00 EA
+0.00
+52.97
+4.37
+10.59
+67.93
+11.  R&R Exhaust cap - through roof - 6"
+to 8" 
+3.00 EA
+0.00
+390.12
+32.18
+78.02
+500.32
+12.  Asphalt starter - universal starter
+course 
+251.00 LF
+0.00
+519.57
+42.86
+103.91
+666.34
+The insurance report included starter within the shingle waste calculation per the carrier note on line item We are requesting 251
+LF of Asphalt starter - universal starter course as a separate line item.
+1. Starter is a distinct roofing component with a separate material profile and a higher associated labor rate compared to field
+shingles. Bundling starter into waste calculations for field shingles results in inaccurate material and labor estimates. Xactimate
+prices starter installation at a higher labor rate, reflecting the specialized nature of its application at roof edges.
+a. Starter is a separate line item in Xactimate because it is a different product installed using a different method than field
+shingles — similar to how ridge cap is a separate line item from field shingles.
+b. Please see attached EagleView for measurements showing 121.08 LF of eaves and 130.83 LF of rakes totaling 251 LF.
+13.  R&R Valley metal 
+45.00 LF
+78.30
+234.00
+19.30
+62.46
+394.06
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+BRASWELL_BECKY
+3/26/2026
+Page: 2
+
+DESCRIPTION
+QTY
+REMOVE
+REPLACE
+TAX
+O&P
+TOTAL
+The insurance report left out the Valley Metal.
+We are requesting 45 LF of valley metal.
+1. During the roof tear-off process, the existing valley metal is disturbed and cannot be reused. New valley metal must be
+installed to maintain a proper weather-tight seal.
+a. Please see attached EagleView Report for confirmation of the measurements showing 45 LF of valleys.
+14.  Step flashing 
+12.00 LF
+0.00
+147.24
+12.15
+29.45
+188.84
+The insurance report left out the Step Flashing.
+We are adding 12 LF of step flashing.
+1. During the roof tear-off process, the existing step flashing is disturbed and cannot be reused. New step flashing must be
+installed to maintain a proper weather-tight seal between the roof deck and the adjacent wall.
+a. Please see attached EagleView Report for confirmation of the measurements showing 12.5 LF of counter/apron flashing at
+wall-to-roof transitions.
+Totals:  Dwelling Roof
+222.78
+14,203.51
+991.31
+2,885.25
+18,302.85
+Gutters
+15.  R&R Gutter / downspout -
+aluminum - up to 5" 
+252.11 LF
+577.33
+1,726.95
+142.47
+460.86
+2,907.61
+16.  Prime & paint gutter / downspout 
+252.11 LF
+0.00
+572.29
+0.00
+114.46
+686.75
+Totals:  Gutters
+577.33
+2,299.24
+142.47
+575.32
+3,594.36
+Arbor
+17.  Grizzly Fence & Patio (Bid Item)
+(Bid Item) 
+1.00 EA
+0.00
+845.00
+0.00
+169.00
+1,014.00
+The Insurance report left out the Arbor.
+We are requesting for our sub bid.
+1. Our sub bid cost is $845.a. Please see attached Photo Report showing damage.
+b. Please see attached Grizzly Fence & Patio bid for the confirmation of price.
+Totals:  Arbor
+0.00
+845.00
+0.00
+169.00
+1,014.00
+Rear Elevation
+18.  R&R Gutter / downspout -
+aluminum - up to 5" 
+30.00 LF
+68.70
+205.50
+16.95
+54.84
+345.99
+19.  Prime & paint gutter / downspout 
+30.00 LF
+0.00
+68.10
+0.00
+13.62
+81.72
+Totals:  Rear Elevation
+68.70
+273.60
+16.95
+68.46
+427.71
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+BRASWELL_BECKY
+3/26/2026
+Page: 3
+
+DESCRIPTION
+QTY
+REMOVE
+REPLACE
+TAX
+O&P
+TOTAL
+Front Elevation
+20.  R&R Window screen, 10 - 16 SF 
+4.00 EA
+0.00
+265.92
+21.94
+53.18
+341.04
+Totals:  Front Elevation
+0.00
+265.92
+21.94
+53.18
+341.04
+Left Elevation
+21.  R&R Gutter / downspout -
+aluminum - up to 5" 
+10.00 LF
+22.90
+68.50
+5.65
+18.28
+115.33
+22.  Prime & paint gutter / downspout 
+10.00 LF
+0.00
+22.70
+0.00
+4.54
+27.24
+Totals:  Left Elevation
+22.90
+91.20
+5.65
+22.82
+142.57
+Overhead and Profit
+23.  General Contractor Overhead and
+Profit 
+1.00 EA
+0.00
+0.00
+0.00
+0.00
+0.00
+For decades we have vetted, managed, trained and warrantied subcontractors for roofing, gutters, painting, fencing, siding etc.
+due to storm restoration in the DFW area.
+We charge a minimum 20% overhead and profit above the subcontractors cost as we act as the single point of contact for all
+subcontractors' trade complexities, plus cover all their liability and warranty for our clients.
+Project Requires General Contracting
+This project involves coordination of multiple trades—including roofing, gutter replacement, exterior painting, window screen
+repair, and possible stucco or interior restoration. Per industry standards and Xactimate guidelines, O&P is warranted whenever
+three or more trades are involved and coordinated by a general contractor.
+Complex Scheduling and Management
+Each trade must be scheduled in the correct sequence, managed for quality and timing, and supervised for code compliance and
+safety. This requires administrative staff, project managers, and dedicated personnel which all reside at our physical office —all
+part of our company's operational infrastructure.
+We Are Not a Single-Trade Contractor
+Unlike subcontractors, we do not perform only one scope of work. We maintain a physical office, estimators, coordinators,
+insurance claim specialists, and field supervisors. These are all actual employees of IFC Contracting Solutions— these
+employees are the overhead which is built into O&P. These costs are necessary to support project execution, client
+communication, and warranty management.
+Insurance Restoration Demands Administrative Oversight
+Insurance jobs require extra documentation, invoicing, inspection scheduling, supplemental negotiation, and warranty
+coordination, all of which involve personnel beyond the jobsite. These employees reside at our physical location and work to
+adhere to the highest construction standards. This is not reimbursed in trade line items and is accounted for within O&P.
+Totals:  Overhead and Profit
+0.00
+0.00
+0.00
+0.00
+0.00
+Debris Removal
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+BRASWELL_BECKY
+3/26/2026
+Page: 4
+
+DESCRIPTION
+QTY
+REMOVE
+REPLACE
+TAX
+O&P
+TOTAL
+24.  Dumpster load - Approx. 12 yards,
+1-3 tons of debris 
+1.00 EA
+0.00
+385.50
+0.00
+77.10
+462.60
+Totals:  Debris Removal
+0.00
+385.50
+0.00
+77.10
+462.60
+Labor Minimums Applied
+25.  Window labor minimum 
+1.00 EA
+0.00
+215.88
+0.00
+43.18
+259.06
+Totals:  Labor Minimums Applied
+0.00
+215.88
+0.00
+43.18
+259.06
+Line Item Totals:
+BRASWELL_BECKY
+1,178.32
+3,894.31
+$24,544.19
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+BRASWELL_BECKY
+3/26/2026
+Page: 5
+
+Summary for Dwelling
+Line Item Total
+$18,626.56
+Material Sales Tax
+$1,178.32
+Subtotal
+$19,804.88
+Overhead
+$1,862.65
+Profit
+$1,862.65
+Replacement Cost Value
+$23,530.19
+Net Claim
+$23,530.19
+IFC Contracting Solutions
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+BRASWELL_BECKY
+3/26/2026
+Page: 6
+
+Summary for Other Structures
+Line Item Total
+$845.00
+Material Sales Tax
+$0.00
+Subtotal
+$845.00
+Overhead
+$84.50
+Profit
+$84.50
+Replacement Cost Value
+$1,014.00
+Net Claim
+$1,014.00
+IFC Contracting Solutions
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+BRASWELL_BECKY
+3/26/2026
+Page: 7
+
+Recap of Taxes, Overhead and Profit
+Overhead (10%)
+Profit (10%)
+Material Sales Tax
+(8.25%)
+Manuf. Home Tax (5%)
+Line Items
+$1,947.15
+$1,947.15
+$1,178.32
+0.00
+Total
+$1,947.15
+$1,947.15
+$1,178.32
+0.00
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+BRASWELL_BECKY
+3/26/2026
+Page: 8
+
+Recap by Room
+Estimate: BRASWELL_BECKY
+Dwelling Roof
+$18,302.85
+74.57%
+Gutters
+$3,594.36
+14.64%
+Arbor
+$1,014.00
+4.13%
+Rear Elevation
+$427.71
+1.74%
+Front Elevation
+$341.04
+1.39%
+Left Elevation
+$142.57
+0.58%
+Overhead and Profit
+$0.00
+0.00%
+Debris Removal
+$462.60
+1.88%
+Labor Minimums Applied
+$259.06
+1.06%
+Subtotal of Areas
+$24,544.19
+100.00%
+Total
+$24,544.19
+100.00%
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+BRASWELL_BECKY
+3/26/2026
+Page: 9
+
+Recap by Category
+O&P Items
+Total
+%
+ROOFING
+$17,109.40
+69.71%
+SOFFIT, FASCIA, & GUTTER
+$4,164.64
+16.97%
+FENCING
+$1,014.00
+4.13%
+PAINTING
+$617.16
+2.51%
+SPECIALTY ITEMS
+$576.29
+2.35%
+GENERAL DEMOLITION
+$462.60
+1.88%
+WINDOWS & DOORS
+$341.04
+1.39%
+LABOR MINIMUMS
+$259.06
+1.06%
+O&P Items Subtotal
+$23,365.87
+95.20%
+Material Sales Tax
+$1,178.32
+4.80%
+Overhead
+$1,947.15
+7.93%
+Profit
+$1,947.15
+7.93%
+Total
+$24,544.19
+100.00%
+IFC Roofing & Construction
+IFC Roofing & Construction serving the DFW area 20+ years.
+BRASWELL_BECKY
+3/26/2026
+Page: 10

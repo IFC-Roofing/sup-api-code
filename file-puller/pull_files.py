@@ -29,7 +29,7 @@ DRIVE_KEY = os.path.join(WORKSPACE, 'google-drive-key.json')
 IFC_BASE = 'https://omni.ifc.shibui.ar'
 IFC_TOKEN = 'ea6d402f02e42090a8ab9b34d06d0864f00e9b252719ca244f9963b1334bb226'
 
-SCOPES = ['https://www.googleapis.com/auth/drive']
+SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
 # File classification patterns
 # Order matters — first match wins

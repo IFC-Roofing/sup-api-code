@@ -64,9 +64,25 @@ def _recalc_item(item: dict):
     item["total"] = math["total"]
 
 
-def _update_item_from_pricelist(item: dict, description: str = None):
-    """Look up pricelist for a description and update item rates/unit/is_material."""
+def _update_item_from_pricelist(item: dict, description: str = None, skip_pricelist: bool = False):
+    """Look up pricelist for a description and update item rates/unit/is_material.
+    
+    Skips lookup for bid items, O&P, agreed-price items, and when explicitly told to skip.
+    """
+    # Skip pricelist lookup for items that don't belong in Xactimate
+    if skip_pricelist:
+        return False
+    if item.get("is_bid"):
+        return False
+    if item.get("source") == "bid":
+        return False
     desc = description or item.get("description", "")
+    desc_lower = desc.lower()
+    if any(tag in desc_lower for tag in ["(bid item)", "(agreed price)", "(paid bill)"]):
+        return False
+    if desc_lower.strip() == "overhead and profit":
+        return False
+    
     pricing = lookup_price(desc)
     if pricing:
         item["remove_rate"] = pricing["remove"]
@@ -155,7 +171,7 @@ def apply_edit(estimate: dict, edit: dict) -> str:
             # Description change triggers pricelist lookup
             if edit.get("new_description"):
                 old_desc = item["description"]
-                found = _update_item_from_pricelist(item, edit["new_description"])
+                found = _update_item_from_pricelist(item, edit["new_description"], skip_pricelist=edit.get("skip_pricelist", False))
                 if found:
                     changes.append(f"desc '{old_desc}' → '{item['description']}' (rates from pricelist)")
                 else:
@@ -362,8 +378,8 @@ def smart_edit(estimate: dict, instruction: str) -> dict:
 
 ## AVAILABLE EDIT ACTIONS
 - {{"action": "update_qty", "section": "...", "description_contains": "...", "new_qty": X}}
-- {{"action": "update_item", "section": "...", "description_contains": "...", "new_description": "...", "new_qty": X, "new_f9": "..."}}
-  (update_item can change any combination: description, qty, rates, F9. Pricelist is auto-looked up for new descriptions.)
+- {{"action": "update_item", "section": "...", "description_contains": "...", "new_description": "...", "new_qty": X, "new_f9": "...", "skip_pricelist": true}}
+  (update_item can change any combination: description, qty, rates, F9. Pricelist is auto-looked up for new descriptions UNLESS skip_pricelist is true.)
 - {{"action": "remove_item", "section": "...", "description_contains": "..."}}
 - {{"action": "remove_section", "section": "..."}}
 - {{"action": "add_item", "section": "...", "description": "...", "qty": X}}
@@ -377,6 +393,7 @@ def smart_edit(estimate: dict, instruction: str) -> dict:
 - When changing qty: the system will auto-recalculate all prices. Just set new_qty.
 - description_contains should be a unique substring that matches ONE item. Be specific.
 - If the instruction implies F9 should change too, include new_f9 in update_item.
+- For bid items, O&P, agreed-price items, or any non-Xactimate description: set "skip_pricelist": true in update_item to prevent rate corruption. Only Xactimate line items should trigger pricelist lookup.
 
 Return a JSON array of edit commands. No markdown, no explanation."""
 

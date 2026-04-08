@@ -419,6 +419,10 @@ def _apply_corrections(estimate: dict, corrections: list, pipeline_data: dict) -
             _handle_missing_item(estimate, fix, pricelist)
             continue
         
+        if line_num is None:
+            print(f"[qa_agent] ⚠️  Correction has no line_num ({issue_type}: {error_desc[:80]}), skipping")
+            continue
+        
         if line_num not in item_map:
             print(f"[qa_agent] ⚠️  Line {line_num} not found in estimate, skipping correction")
             continue
@@ -612,6 +616,12 @@ def _handle_missing_item(estimate: dict, fix: dict, pricelist: dict):
         "photo_anchor": canonical_desc.lower().replace(" ", "-").replace("/", "-")[:40],
         "sub_name": "",
     }
+    
+    # Duplicate check — skip if same description already exists in target section
+    existing_descs = [item.get("description", "").lower().strip() for item in target.get("line_items", [])]
+    if canonical_desc.lower().strip() in existing_descs:
+        print(f"[qa_agent] ⚠️  Duplicate skip: '{canonical_desc}' already exists in '{section_name}'")
+        return
     
     target["line_items"].append(new_item)
     print(f"[qa_agent] Added missing item: '{canonical_desc}' {qty} {unit} → ${math['total']:,.2f} in '{section_name}'")

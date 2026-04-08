@@ -9,7 +9,6 @@ Deployable on: local dev, VPS, Docker, Railway, Fly.io — anywhere Python runs.
 
 Endpoints:
     POST /v1/estimate      → Generate supplement PDF (with learning integration)
-    POST /v1/estimate-from-payload → Generate PDF from IFC platform data (no API fetch)
     POST /v1/markup        → Run bid markup analysis
     POST /v1/precall       → Generate pre-call script data
     POST /v1/calling       → Generate carrier call script data
@@ -42,9 +41,6 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Optional, List
 from collections import defaultdict
-from dotenv import load_dotenv
-
-load_dotenv(Path(__file__).parent.parent / ".env")
 
 from fastapi import FastAPI, HTTPException, Depends, Header, Request, Query
 from fastapi.responses import JSONResponse
@@ -78,7 +74,6 @@ IS_PRODUCTION = os.environ.get("SUP_ENV", "development") == "production"
 # ── Rate Limiting ──────────────────────────────────────────────
 RATE_LIMITS = {
     "/v1/estimate": 3,
-    "/v1/estimate-from-payload": 3,
     "/v1/markup": 10,
     "/v1/precall": 10,
     "/v1/calling": 10,
@@ -177,21 +172,6 @@ class EstimateResponse(BaseModel):
     event_id: Optional[int] = None
     error: Optional[str] = None
     request_id: Optional[str] = None
-
-class EstimateFromPayloadRequest(BaseModel):
-    """Full project data payload from IFC platform — bypasses IFC API fetch."""
-    project: dict = Field(..., description="Project details (id, name, address, status, drive_folder_id)")
-    claim: dict = Field(default_factory=dict, description="Claim info (number, carrier, adjuster)")
-    flow_cards: List[dict] = Field(default_factory=list, description="Flow card / action tracker data")
-    op_tracker: dict = Field(default_factory=dict, description="O&P tracker data")
-    pricelist_tracker: dict = Field(default_factory=dict, description="Pricelist tracker data")
-    insurance_estimate: dict = Field(default_factory=dict, description="Parsed insurance estimate content")
-    eagleview_report: dict = Field(default_factory=dict, description="Parsed EagleView report content")
-    bid_pdfs: dict = Field(default_factory=dict, description="Extracted bid PDF text per trade tag")
-    existing_supplements: dict = Field(default_factory=dict, description="Previous supplement versions")
-    version: Optional[str] = Field(None, description="Supplement version (e.g. '1.0')")
-    skip_upload: bool = Field(False, description="Skip Google Drive upload")
-    pricelist_override: Optional[str] = Field(None, description="Manual pricelist override code")
 
 class EditRequest(BaseModel):
     project_name: str = Field(..., description="Project name (e.g. 'Rose Brock')")
@@ -479,7 +459,7 @@ async def generate_estimate(req: EstimateRequest, request: Request):
         result = await run_script(cmd, cwd=str(PDF_GENERATOR), timeout=900, env_extra=env_extra)
 
         if not result["success"]:
-            logger.error(f"[{request_id}] Pipeline failed (exit {result['exit_code']})\nSTDERR: {result['stderr'][-2000:]}\nSTDOUT tail: {result['stdout'][-500:]}")
+            logger.error(f"[{request_id}] Pipeline failed (exit {result['exit_code']}): {result['stderr'][:200]}")
             return EstimateResponse(
                 success=False,
                 error=f"Pipeline failed (exit {result['exit_code']}): {result['stderr'][:500]}",
@@ -540,249 +520,6 @@ async def generate_estimate(req: EstimateRequest, request: Request):
         event = _active_requests.pop(request_id, None)
         if event:
             event.set()
-
-
-@app.post("/v1/estimate-from-payload", response_model=EstimateResponse, dependencies=[Depends(verify_api_key)])
-async def estimate_from_payload(req: EstimateFromPayloadRequest, request: Request):
-    """
-    Generate a supplement PDF from pre-assembled project data.
-
-    The IFC platform pushes all project data (insurance estimate, EagleView,
-    bids, claims, flow cards) as a JSON payload — the pipeline skips IFC API
-    fetching and goes straight to estimate building.
-
-    This is the hybrid approach: IFC owns the data, Sup API owns the rendering.
-    """
-    check_rate_limit("/v1/estimate-from-payload")
-
-    project_name = req.project.get("name", "UNKNOWN")
-    project_id = req.project.get("id")
-    carrier = req.claim.get("carrier", "Unknown")
-    version = req.version or "1.0"
-
-    request_id = make_request_id("/v1/estimate-from-payload", project_name)
-    logger.info(f"[{request_id}] Estimate-from-payload: '{project_name}' (carrier={carrier}, version={version})")
-
-    # Dedup
-    if request_id in _active_requests:
-        logger.warning(f"[{request_id}] Duplicate request — already in progress, waiting...")
-        try:
-            await asyncio.wait_for(_active_requests[request_id].wait(), timeout=620)
-        except asyncio.TimeoutError:
-            pass
-        return EstimateResponse(
-            success=False,
-            error="A generation for this project was already in progress. Check Drive for results.",
-            request_id=request_id,
-        )
-
-    _active_requests[request_id] = asyncio.Event()
-
-    try:
-        # ── LEARNING: Pre-generation intelligence ──────────
-        strategies = ["steep_on_waste", "full_fence_scope", "O&P"]
-        learned_intelligence = {}
-        if carrier != "Unknown":
-            learned_intelligence = learning_service.get_learned_patterns(carrier, strategies)
-            logger.info(f"[{request_id}] Providing {len(learned_intelligence)} learned insights for {carrier}")
-
-        # ── PRICELIST ──────────────────────────────────────
-        selected_pricelist = req.pricelist_override or "Pricelist"
-        pricelist_reason = "override" if req.pricelist_override else "active sheet tab"
-
-        # ── Convert IFC payload → pipeline_data JSON ───────
-        pipeline_data = _convert_payload_to_pipeline_data(req)
-        pipeline_json_path = PDF_GENERATOR / f"_payload_{request_id}.json"
-        with open(pipeline_json_path, "w") as f:
-            json.dump(pipeline_data, f, indent=2)
-
-        # ── Build command ──────────────────────────────────
-        cmd = [VENV_PYTHON, "-u", str(PDF_GENERATOR / "generate.py"),
-               "--from-pipeline", str(pipeline_json_path)]
-        if req.skip_upload:
-            cmd.append("--skip-upload")
-        cmd.extend(["--version", version])
-
-        env_extra = {
-            "SELECTED_PRICELIST": selected_pricelist or "",
-            "PRICELIST_REASON": pricelist_reason or "",
-        }
-        if learned_intelligence:
-            env_extra["LEARNED_INTELLIGENCE"] = json.dumps({
-                "type": "recommendations",
-                "carrier": carrier,
-                "insights": learned_intelligence,
-                "note": "These are suggestions based on historical data, not mandatory rules",
-            })
-            env_extra["CARRIER_CONTEXT"] = carrier
-
-        result = await run_script(cmd, cwd=str(PDF_GENERATOR), timeout=900, env_extra=env_extra)
-
-        # Keep temp file for debugging (remove in production)
-        logger.info(f"[{request_id}] Pipeline data saved at: {pipeline_json_path}")
-
-        if not result["success"]:
-            logger.error(f"[{request_id}] Pipeline failed (exit {result['exit_code']})\nSTDERR: {result['stderr'][-2000:]}\nSTDOUT tail: {result['stdout'][-500:]}")
-            return EstimateResponse(
-                success=False,
-                error=f"Pipeline failed (exit {result['exit_code']}): {result['stderr'][:500]}",
-                request_id=request_id,
-            )
-
-        parsed = parse_estimate_output(result["stdout"])
-        strategies_used = parse_strategies_from_output(result["stdout"])
-
-        # Load flow package
-        flow_package = None
-        try:
-            lastname = pipeline_data.get("lastname", "UNKNOWN")
-            flow_path = PDF_GENERATOR / f"{lastname}_flow_package.json"
-            if flow_path.exists():
-                with open(flow_path) as f:
-                    flow_package = json.load(f)
-        except Exception as e:
-            logger.warning(f"[{request_id}] Could not load flow package: {e}")
-
-        # ── LEARNING: Track generation event ───────────────
-        event_id = None
-        total_rcv_str = parsed.get("total_rcv") or (
-            f"${flow_package['rcv_total']:,.2f}" if flow_package and flow_package.get("rcv_total") else "0"
-        )
-        total_rcv = parse_amount(total_rcv_str)
-
-        if project_id:
-            event_id = learning_service.track_supplement_generation(
-                project_id=project_id,
-                project_name=project_name,
-                carrier=carrier,
-                strategies=strategies_used or strategies,
-                amount_requested=total_rcv,
-                adjuster_name=req.claim.get("adjuster_name"),
-                adjuster_id=None,
-            )
-
-        logger.info(f"[{request_id}] Estimate complete: RCV={total_rcv_str}, event_id={event_id}")
-
-        return EstimateResponse(
-            success=True,
-            pdf_url=parsed.get("pdf_url"),
-            total_rcv=total_rcv_str if total_rcv_str != "0" else None,
-            trade_count=parsed.get("trade_count") or (
-                len(flow_package.get("cards", [])) if flow_package else None
-            ),
-            f9_count=parsed.get("f9_count"),
-            flow_package=flow_package,
-            intelligence_provided=list(learned_intelligence.keys()) if learned_intelligence else None,
-            pricelist_used=selected_pricelist,
-            pricelist_reason=pricelist_reason,
-            event_id=event_id,
-            request_id=request_id,
-        )
-
-    finally:
-        event = _active_requests.pop(request_id, None)
-        if event:
-            event.set()
-
-
-def _convert_payload_to_pipeline_data(req: EstimateFromPayloadRequest) -> dict:
-    """
-    Convert IFC platform payload format → pipeline_data dict that
-    estimate_builder.build_estimate() expects.
-
-    The IFC payload has structured data from GatherSupplementContextTool.
-    The pipeline_data format was designed for data_pipeline.run() output.
-    This bridges the two.
-    """
-    project = req.project
-    claim = req.claim
-    project_name = project.get("name", "UNKNOWN")
-    lastname = project_name.strip().split()[-1].upper() if project_name else "UNKNOWN"
-
-    # Convert insurance estimate content → ins_data format
-    # The platform sends pre-parsed markdown. estimate_builder's _format_ins_items
-    # will detect raw_markdown and pass it to Claude for inline parsing.
-    ins_data = {}
-    ins_content = req.insurance_estimate.get("content", "")
-    if ins_content:
-        ins_data = {"raw_markdown": ins_content, "items": []}
-
-    # Convert EagleView content → ev_data format
-    ev_data = {}
-    ev_content = req.eagleview_report.get("content", "")
-    if ev_content:
-        ev_data = {"raw_markdown": ev_content}
-
-    # Convert flow_cards → action_trackers format
-    action_trackers = []
-    for card in req.flow_cards:
-        action_trackers.append({
-            "id": card.get("id"),
-            "tag": card.get("tag", ""),
-            "original_sub_bid_price": card.get("original_sub_bid"),
-            "retail_exactimate_bid": card.get("retail_exactimate_bid"),
-            "latest_rcv_rcv": card.get("latest_rcv_rcv"),
-            "latest_rcv_op": card.get("latest_rcv_op"),
-            "doing_the_work_status": card.get("doing_the_work"),
-            "production_status": card.get("production_status"),
-            "trade_status": card.get("trade_status"),
-            "supplement_notes": card.get("supplement_notes"),
-            "subcontractor": card.get("subcontractor"),
-        })
-
-    # Convert bid_pdfs → bids format
-    bids = []
-    for tag, content in req.bid_pdfs.items():
-        if isinstance(content, dict):
-            bid_text = content.get("content", "")
-        else:
-            bid_text = str(content)
-        if bid_text:
-            # Find matching flow card for pricing
-            matching_card = next((c for c in req.flow_cards if c.get("tag") == tag), {})
-            bids.append({
-                "tag": tag,
-                "wholesale": matching_card.get("original_sub_bid", 0),
-                "retail": matching_card.get("retail_exactimate_bid", 0),
-                "text": bid_text,
-                "source": "payload",
-            })
-
-    # Build claims structure
-    claims = {
-        "claim_number": claim.get("claim_number") or claim.get("number", ""),
-        "insurance_company": claim.get("carrier") or claim.get("company", ""),
-        "date_of_loss": claim.get("date_of_loss", ""),
-        "adjuster_name": claim.get("adjuster_name", ""),
-    }
-
-    # Build address structure
-    address_str = project.get("address", "")
-    address = {"full": address_str}
-
-    # Drive folder ID for uploads
-    drive_link = project.get("google_drive_link", "") or project.get("drive_folder_id", "")
-    project_folder_id = drive_link.split("/")[-1] if "/" in drive_link else drive_link
-
-    return {
-        "project": project,
-        "project_id": project.get("id"),
-        "project_folder_id": project_folder_id or None,
-        "lastname": lastname,
-        "firstname": project_name.split()[0] if project_name and " " in project_name else "",
-        "notes": {"ifc": [], "supplement": [], "momentum": [], "untagged": []},
-        "claims": claims,
-        "address": address,
-        "ins_data": ins_data,
-        "ins_by_tag": {},
-        "ev_data": ev_data,
-        "action_trackers": action_trackers,
-        "bids": bids,
-        "pricelist": {},  # Will be loaded by generate.py
-        "prior_corrections": [],
-        "itel_data": None,
-        "gutter_measurements": None,
-    }
 
 
 @app.post("/v1/edit", response_model=EditResponse, dependencies=[Depends(verify_api_key)])

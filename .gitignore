@@ -40,3 +40,18 @@ tools/
 node_modules/
 dist/
 build/
+
+# Project-specific outputs (client data — never push)
+*_clarity.json
+*_flow_package.json
+*_pipeline.json
+*_estimate.html
+*_estimate.json
+**/RADDAD_*
+**/GUIRGUIS_*
+**/BROCK_*
+**/DOYLE_*
+**/EIDSON_*
+**/ISBELL_*
+**/SHULTZ_*
+**/TEST_*
