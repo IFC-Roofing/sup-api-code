@@ -950,12 +950,8 @@ def fetch_bids_from_flow(project_id: int, temp_dir: str, project_folder_id: str 
             retail = round(float(flow_retail) / 1.2, 2)
             print(f"[pipeline]   [{trade}] Retail from Flow (O&P backed out): ${float(flow_retail):,.2f} ÷ 1.2 = ${retail:,.2f}")
         else:
-            continue
+            retail = 0.0
 
-        # Skip trades billed as Xactimate line items — not single bid items
-        if trade in XACTIMATE_TRADES:
-            print(f"[pipeline]   [{trade}] skipped — Xactimate line-item trade (retail ref: ${retail:,.2f})")
-            continue
         scope   = card.get("content") or ""
         folder_link = card.get("folder_link") or ""
 
@@ -963,13 +959,34 @@ def fetch_bids_from_flow(project_id: int, temp_dir: str, project_folder_id: str 
         bid_scope = ""
         bid_line_items_text = ""
 
-        # Fallback: try Original Bids folder for sub name + scope
-        if not sub_name and trade not in XACTIMATE_TRADES and health_folder_ids and health_folder_ids.get("original_bids"):
+        # Always try Original Bids folder for sub name + scope + bid amounts
+        # Bids from PDFs are the source of truth — Flow card amounts are secondary
+        if health_folder_ids and health_folder_ids.get("original_bids"):
             bid_info = _get_bid_info_from_original_bids(health_folder_ids["original_bids"], trade, temp_dir)
             if bid_info:
-                sub_name = bid_info.get("sub_name", "")
+                if not sub_name:
+                    sub_name = bid_info.get("sub_name", "")
                 bid_scope = bid_info.get("scope", "")
                 bid_line_items_text = bid_info.get("line_items_text", "")
+                # If Flow had no price but bid PDF has an amount, use it
+                bid_amount = bid_info.get("amount", 0.0)
+                if retail == 0.0 and bid_amount > 0:
+                    wholesale = bid_amount
+                    retail = round(bid_amount * 1.3, 2)
+                    print(f"[pipeline]   [{trade}] Retail from bid PDF: ${bid_amount:,.2f} × 1.3 = ${retail:,.2f}")
+
+        # Now decide: skip if no bid data at all
+        has_bid = retail > 0
+        if not has_bid:
+            print(f"[pipeline]   [{trade}] skipped — no bid amount from Flow or PDF")
+            continue
+
+        # Skip Xactimate trades that have no actual bid (just reference totals)
+        if trade in XACTIMATE_TRADES and not has_bid:
+            print(f"[pipeline]   [{trade}] skipped — Xactimate line-item trade, no bid")
+            continue
+        if trade in XACTIMATE_TRADES and has_bid:
+            print(f"[pipeline]   [{trade}] has bid despite being Xactimate trade — treating as bid item (${retail:,.2f})")
 
         if not sub_name:
             sub_name = _tag_to_trade_label(trade)
@@ -1017,6 +1034,8 @@ def _get_bid_info_from_original_bids(original_bids_folder_id: str, trade_tag: st
         "@gazebo/pergola": ["pergola", "gazebo", "porch", "grizzly"],
         "@skylight": ["skylight", "velux"],
         "@pool": ["pool"],
+        "@garage": ["garage", "garage door", "overhead door"],
+        "@garage_door": ["garage", "garage door", "overhead door"],
         "@siding": ["siding"],
         "@paint": ["paint"],
         "@interior": ["interior", "drywall", "paint"],
@@ -1100,8 +1119,10 @@ def _get_bid_info_from_original_bids(original_bids_folder_id: str, trade_tag: st
                     line_items = _extract_bid_line_items(text)
                     line_items_text = "; ".join(f"{li['description']} (${li['amount']:,.2f})" for li in line_items) if line_items else ""
                     if name:
-                        print(f"[pipeline]   Bid info from Original Bids: '{name}' | scope: '{scope}' (file: {pdf_file['name']})")
-                        return {"sub_name": name, "scope": scope, "line_items_text": line_items_text}
+                        # Sum line items to get total bid amount
+                        bid_total = sum(li.get("amount", 0.0) for li in line_items) if line_items else 0.0
+                        print(f"[pipeline]   Bid info from Original Bids: '{name}' | scope: '{scope}' | amount: ${bid_total:,.2f} (file: {pdf_file['name']})")
+                        return {"sub_name": name, "scope": scope, "line_items_text": line_items_text, "amount": bid_total}
             finally:
                 try:
                     os.unlink(tmp_path)

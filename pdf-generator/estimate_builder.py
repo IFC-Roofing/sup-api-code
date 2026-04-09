@@ -39,7 +39,7 @@ def _load_f9_matrix() -> list[dict]:
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 TX_TAX_RATE = 0.0825
 OP_RATE = 0.20
-PRICE_LIST_CODE = "TXDF8X_MAR26"
+PRICE_LIST_CODE = "TXDF8X_APR26"
 
 
 # ─── Math Helpers ──────────────────────────────────────────────────────────────
@@ -384,7 +384,7 @@ Lines marked with "⚠️ CARRIER NOTE:" contain critical information about what
    - HIGH ROOF CHARGE (add/install, NOT remove): same as steep — apply only to applicable portion. Remove = measured SQ. Add = suggested SQ (with waste).
    - ALL OTHER material items (hip/ridge, valley, etc.) = use EV measurements as given.
    - ROUND all EV linear measurements DOWN to nearest whole number for insurance presentation (e.g., 11.5 LF → 11 LF, 3.17 LF → 3 LF, 297.25 LF → 297 LF). Do NOT round SQ values — keep those at EV precision.
-6. O&P = 20% per line (10% overhead + 10% profit). When 3+ trades are involved, add an explicit "O&P" section at the end with a $0 placeholder line item (qty=1, replace=0, total=0) — this signals to insurance that O&P is warranted and applied per-line. The actual O&P is already baked into each line item's O&P column. The O&P line item description must be EXACTLY "Overhead and Profit" — nothing else. Do NOT put trade justifications or explanations in the description. That information belongs in the F9 note only.
+6. O&P = 20% per line (10% overhead + 10% profit). When 3+ trades are involved, add an explicit "O&P" section at the end with a $0 placeholder line item (qty=1, replace_rate=0, remove_rate=0, replace=0, remove=0, tax=0, op=0, total=0) — this is a SIGNAL LINE ONLY, not an actual charge. ALL O&P is already baked into each line item's O&P column. The O&P line item must have ALL monetary values set to ZERO. The description must be EXACTLY "Overhead and Profit" — nothing else. Justification belongs in the F9 note only.
 7. Tax = 8.25% on materials only. Labor items: tax = 0.
 8. Bid items: remove=0, tax=0, replace=bid retail_total, qty=1 EA, is_bid=true.
    CRITICAL: The sub_name field must be the REAL contractor/company name (e.g. "Grizzly Fence & Patio", "Seamless Gutter Co"). NEVER use the property address, a generic trade label, or placeholder text as the sub_name. If the real sub name is unknown, use just the trade name (e.g. "Gutters", "HVAC", "Chimney") — do NOT combine it with the address or use "ADDRESS" as a prefix.
@@ -399,7 +399,7 @@ Lines marked with "⚠️ CARRIER NOTE:" contain critical information about what
    Focus entirely on correct structure, quantities, sources, and pricing.
 10. Sort sections: Roof first, then Gutters, then remaining trades by total (highest first), then Debris/General/O&P last.
 11. Group "Labor Minimums Applied" items in their own section.
-12. If 3+ trades: add O&P line item at end with $0 amounts and boilerplate F9.
+12. If 3+ trades: add O&P line item at end with ALL amounts = $0 (replace_rate=0, remove_rate=0, replace=0, remove=0, tax=0, op=0, total=0) and boilerplate F9. This is a signal line — never put actual dollar amounts on it.
 13. retail_total in SUB BIDS is the price to request from insurance — use it directly as the replace value.
 14. Include photo_anchor slug for every item (lowercase, hyphen-separated).
 15. Multiple bids with the same @trade tag = different scopes, include ALL of them as separate bid items.
@@ -553,6 +553,9 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
             item["num"] = num
             num += 1
 
+    # Post-process: zero out O&P signal line (AI sometimes puts amounts on it)
+    _fix_op_signal_line(sections)
+
     # Post-process: fix known description mistakes
     _fix_descriptions(sections)
 
@@ -596,6 +599,20 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
                 print(f"[estimate_builder] Stripped F9 from INS item: {item.get('description', '')}")
                 item["f9"] = ""
 
+    # Recalculate section + grand totals after all post-processing
+    grand = {"remove": 0.0, "replace": 0.0, "tax": 0.0, "op": 0.0, "total": 0.0}
+    coverage_totals = {"Dwelling": 0.0, "Other Structures": 0.0, "Contents": 0.0}
+    for s in sections:
+        s_totals = {"remove": 0.0, "replace": 0.0, "tax": 0.0, "op": 0.0, "total": 0.0}
+        for item in s["line_items"]:
+            for k in s_totals:
+                s_totals[k] = round(s_totals[k] + item.get(k, 0.0), 2)
+        s["totals"] = s_totals
+        for k in grand:
+            grand[k] = round(grand[k] + s_totals[k], 2)
+        cov = s.get("coverage", "Dwelling")
+        coverage_totals[cov] = round(coverage_totals.get(cov, 0.0) + s_totals["total"], 2)
+
     estimate = {
         **meta,
         "sections": sections,
@@ -612,6 +629,34 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
 
 
 # ─── Helpers ───────────────────────────────────────────────────────────────────
+
+def _fix_op_signal_line(sections: list):
+    """
+    Post-process: force the O&P signal line to $0 across the board.
+    AI sometimes puts actual dollar amounts on it despite being told not to.
+    O&P is already baked into each line item's O&P column — the O&P section
+    line is just a signal to insurance that O&P is warranted.
+    """
+    for section in sections:
+        if section["name"].lower() not in ("o&p", "overhead", "overhead & profit", "overhead and profit"):
+            continue
+        for item in section["line_items"]:
+            desc = item.get("description", "").lower().strip()
+            if desc == "overhead and profit":
+                had_amounts = item.get("replace_rate", 0) != 0 or item.get("replace", 0) != 0 or item.get("total", 0) != 0
+                item["qty"] = 1.0
+                item["remove_rate"] = 0.0
+                item["replace_rate"] = 0.0
+                item["remove"] = 0.0
+                item["replace"] = 0.0
+                item["tax"] = 0.0
+                item["op"] = 0.0
+                item["total"] = 0.0
+                item["is_material"] = False
+                item["is_bid"] = False
+                if had_amounts:
+                    print(f"[estimate_builder] ⚠️  Zeroed O&P signal line — AI had put amounts on it")
+
 
 def _fix_descriptions(sections: list):
     """
