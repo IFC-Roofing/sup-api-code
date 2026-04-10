@@ -412,7 +412,7 @@ async def generate_estimate(req: EstimateRequest, request: Request):
     request_id = make_request_id("/v1/estimate", project_name)
     carrier = req.carrier or (req.claim.get("carrier") if req.claim else None) or "Unknown"
     version = req.version or "1.0"
-    has_payload = req.flow_cards is not None  # Payload mode if flow_cards present
+    has_payload = req.project is not None  # Payload mode if project data present
     mode = "payload" if has_payload else "api-fetch"
 
     logger.info(f"[{request_id}] Estimate requested: '{project_name}' (carrier={carrier}, version={version}, mode={mode})")
