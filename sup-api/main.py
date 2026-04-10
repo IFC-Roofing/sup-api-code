@@ -132,6 +132,8 @@ class EstimateRequest(BaseModel):
     insurance_estimate: Optional[dict] = Field(None, description="Parsed insurance estimate content")
     eagleview_report: Optional[dict] = Field(None, description="Parsed EagleView report content")
     bid_pdfs: Optional[dict] = Field(None, description="Extracted bid PDF text per trade tag")
+    bid_pdf_content: Optional[dict] = Field(None, description="Alias for bid_pdfs (IFC app field name)")
+    file_readiness: Optional[dict] = Field(None, description="File readiness status from IFC app")
 
 class MarkupRequest(BaseModel):
     project_name: str = Field(..., description="Project name")
@@ -564,46 +566,53 @@ def _convert_payload_to_pipeline_data(req) -> dict:
 
     # Insurance estimate → ins_data
     ins_data = {}
-    ins_content = req.insurance_estimate.get("content", "")
+    ins_est = getattr(req, "insurance_estimate", None) or {}
+    ins_content = ins_est.get("content", "") if isinstance(ins_est, dict) else ""
     if ins_content:
         ins_data = {"raw_markdown": ins_content, "items": []}
 
     # EagleView → ev_data
     ev_data = {}
-    ev_content = req.eagleview_report.get("content", "")
+    ev_report = getattr(req, "eagleview_report", None) or {}
+    ev_content = ev_report.get("content", "") if isinstance(ev_report, dict) else ""
     if ev_content:
         ev_data = {"raw_markdown": ev_content}
 
     # Flow cards → action_trackers
+    # Map IFC payload field names → pipeline field names
     action_trackers = []
-    for card in req.flow_cards:
+    flow_cards = getattr(req, "flow_cards", None) or []
+    for card in flow_cards:
         action_trackers.append({
             "id": card.get("id"),
             "tag": card.get("tag", ""),
-            "original_sub_bid_price": card.get("original_sub_bid"),
+            "original_sub_bid_price": card.get("original_sub_bid") or card.get("original_sub_bid_price"),
             "retail_exactimate_bid": card.get("retail_exactimate_bid"),
             "latest_rcv_rcv": card.get("latest_rcv_rcv"),
             "latest_rcv_op": card.get("latest_rcv_op"),
-            "doing_the_work_status": card.get("doing_the_work"),
+            "doing_the_work_status": card.get("doing_the_work") or card.get("doing_the_work_status"),
             "production_status": card.get("production_status"),
-            "trade_status": card.get("trade_status"),
+            "trade_status": card.get("trade_status") or card.get("supplement_status"),
             "supplement_notes": card.get("supplement_notes"),
             "subcontractor": card.get("subcontractor"),
         })
 
-    # Bid PDFs → bids
+    # Bids — payload typically skips these (bid_pdf_content: {skipped: true})
+    # Pipeline fetches bids from Drive in generate.py payload enrichment step
     bids = []
-    for tag, content in req.bid_pdfs.items():
-        bid_text = content.get("content", "") if isinstance(content, dict) else str(content)
-        if bid_text:
-            matching_card = next((c for c in req.flow_cards if c.get("tag") == tag), {})
-            bids.append({
-                "tag": tag,
-                "wholesale": matching_card.get("original_sub_bid", 0),
-                "retail": matching_card.get("retail_exactimate_bid", 0),
-                "text": bid_text,
-                "source": "payload",
-            })
+    bid_pdfs = getattr(req, "bid_pdfs", None) or getattr(req, "bid_pdf_content", None) or {}
+    if isinstance(bid_pdfs, dict) and not bid_pdfs.get("skipped"):
+        for tag, content in bid_pdfs.items():
+            bid_text = content.get("content", "") if isinstance(content, dict) else str(content)
+            if bid_text:
+                matching_card = next((c for c in flow_cards if c.get("tag") == tag), {})
+                bids.append({
+                    "tag": tag,
+                    "wholesale": matching_card.get("original_sub_bid", 0),
+                    "retail": matching_card.get("retail_exactimate_bid", 0),
+                    "text": bid_text,
+                    "source": "payload",
+                })
 
     # Claims
     claims = {

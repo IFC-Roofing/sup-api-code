@@ -88,13 +88,81 @@ def main():
         project_name = project_name or f"{pipeline_data.get('firstname', '')} {pipeline_data.get('lastname', 'UNKNOWN')}".strip()
         project_folder_id = pipeline_data.get("project_folder_id")
         print(f"[generate] Project: {project_name} (from payload, skipping IFC API)")
+
+        # Payload has project/claim/flow/INS/EV — but we still need to pull
+        # bids from Drive, load pricelist, and fetch gutter measurements
+        import tempfile
+        td = tempfile.mkdtemp(prefix="sup_payload_")
+
+        if project_folder_id:
+            from data_pipeline import (
+                fetch_bids_from_flow, fetch_bids_from_drive,
+                _split_multi_scope_bids, load_pricelist,
+                parse_gutter_bid, fetch_itel_report,
+                find_previous_estimate, read_pdf_comments,
+                _check_project_health,
+            )
+
+            # Bids from Drive
+            project_id = pipeline_data.get("project_id")
+            print("[generate/payload] Fetching bids from Drive...")
+            health = _check_project_health(project_folder_id)
+            bids = []
+            if project_id:
+                bids = fetch_bids_from_flow(project_id, td, project_folder_id=project_folder_id,
+                                           health_folder_ids=health.get("folder_ids"))
+                print(f"[generate/payload] Flow bids: {len(bids)}")
+            if not bids:
+                bids = fetch_bids_from_drive(project_folder_id, td)
+                print(f"[generate/payload] Drive bids: {len(bids)}")
+
+            # Multi-scope split
+            if bids and health.get("folder_ids", {}).get("original_bids"):
+                bids = _split_multi_scope_bids(bids, health["folder_ids"]["original_bids"], td)
+                print(f"[generate/payload] Bids after scope split: {len(bids)}")
+
+            pipeline_data["bids"] = bids
+
+            # Pricelist
+            print("[generate/payload] Loading pricelist...")
+            pipeline_data["pricelist"] = load_pricelist()
+
+            # Gutter measurements
+            if health.get("folder_ids", {}).get("original_bids"):
+                gutter = parse_gutter_bid(health["folder_ids"]["original_bids"], td)
+                if gutter:
+                    pipeline_data["gutter_measurements"] = gutter
+                    print(f"[generate/payload] Gutter measurements: {gutter}")
+
+            # ITEL
+            itel = fetch_itel_report(project_folder_id, td)
+            if itel:
+                pipeline_data["itel_data"] = itel
+                print("[generate/payload] ITEL report found")
+
+            # Prior corrections
+            lastname = pipeline_data.get("lastname", "")
+            prev_id = find_previous_estimate(lastname)
+            if prev_id:
+                comments = read_pdf_comments(prev_id)
+                corrections = [c for c in comments if not c["resolved"] and c["comment"]]
+                if corrections:
+                    pipeline_data["prior_corrections"] = corrections
+                    print(f"[generate/payload] {len(corrections)} prior correction(s)")
+
+            print(f"[generate/payload] Payload enrichment complete — {len(bids)} bids, pricelist loaded")
+        else:
+            print("[generate/payload] ⚠️  No project_folder_id — can't fetch bids or Drive files")
+            pipeline_data["pricelist"] = {}
     else:
         print("[generate] Step 1/6: Running data pipeline...")
         from data_pipeline import run as pipeline_run
         pipeline_data = pipeline_run(project_name)
         project_folder_id = pipeline_data.get("project_folder_id")
 
-        # ── Step 2: Estimate Builder (AI) ─────────────────────
+    # ── Step 2: Estimate Builder (AI) ─────────────────────
+    # Runs for both payload mode and api-fetch mode (skip for --from-json)
+    if not args.from_json:
         print("\n[generate] Step 2/6: Building estimate (AI)...")
         from estimate_builder import build_estimate
         estimate = build_estimate(pipeline_data)
@@ -107,7 +175,6 @@ def main():
         # Save pipeline data for standalone QA reruns
         pipeline_json_path = output_dir / f"{pipeline_data['lastname']}_pipeline.json"
         try:
-            # Save serializable subset of pipeline data
             _save_pipeline = {
                 "ev_data": pipeline_data.get("ev_data", {}),
                 "ins_data": pipeline_data.get("ins_data", {}),
