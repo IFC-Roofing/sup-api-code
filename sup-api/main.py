@@ -116,7 +116,7 @@ app.add_middleware(
 # ── Models ─────────────────────────────────────────────────────
 
 class EstimateRequest(BaseModel):
-    project_name: str = Field(..., description="Project name (e.g. 'Rose Brock')")
+    project_name: Optional[str] = Field(None, description="Project name — required for api-fetch, optional if project dict provided")
     project_id: Optional[int] = Field(None, description="IFC project ID for flow card updates")
     skip_upload: bool = Field(False, description="Skip Google Drive upload")
     version: Optional[str] = Field(None, description="Supplement version (e.g. '1.0')")
@@ -133,6 +133,9 @@ class EstimateRequest(BaseModel):
     eagleview_report: Optional[dict] = Field(None, description="Parsed EagleView report content")
     bid_pdfs: Optional[dict] = Field(None, description="Extracted bid PDF text per trade tag")
     bid_pdf_content: Optional[dict] = Field(None, description="Alias for bid_pdfs (IFC app field name)")
+    op_tracker: Optional[dict] = Field(None, description="O&P tracker data")
+    pricelist_tracker: Optional[dict] = Field(None, description="Pricelist tracker data")
+    existing_supplements: Optional[dict] = Field(None, description="Existing supplement versions")
     file_readiness: Optional[dict] = Field(None, description="File readiness status from IFC app")
 
 class MarkupRequest(BaseModel):
@@ -410,12 +413,16 @@ async def generate_estimate(req: EstimateRequest, request: Request):
     """
     check_rate_limit("/v1/estimate")
 
-    project_name = normalize_project_name(req.project_name)
+    # Resolve project_name: explicit field > project.name > error
+    has_payload = req.project is not None
+    mode = "payload" if has_payload else "api-fetch"
+    raw_name = req.project_name or (req.project.get("name") if req.project else None)
+    if not raw_name:
+        return EstimateResponse(success=False, error="project_name or project.name is required")
+    project_name = normalize_project_name(raw_name)
     request_id = make_request_id("/v1/estimate", project_name)
     carrier = req.carrier or (req.claim.get("carrier") if req.claim else None) or "Unknown"
-    version = req.version or "1.0"
-    has_payload = req.project is not None  # Payload mode if project data present
-    mode = "payload" if has_payload else "api-fetch"
+    version = req.version or (req.project.get("version") if req.project else None) or "1.0"
 
     logger.info(f"[{request_id}] Estimate requested: '{project_name}' (carrier={carrier}, version={version}, mode={mode})")
 
@@ -503,7 +510,7 @@ async def generate_estimate(req: EstimateRequest, request: Request):
         # Load flow package
         flow_package = None
         try:
-            prefix = get_project_prefix(req.project_name)
+            prefix = get_project_prefix(project_name)
             flow_path = PDF_GENERATOR / f"{prefix}_flow_package.json"
             if flow_path.exists():
                 with open(flow_path) as f:
@@ -648,6 +655,9 @@ def _convert_payload_to_pipeline_data(req) -> dict:
         "prior_corrections": [],
         "itel_data": None,
         "gutter_measurements": None,
+        "op_tracker": getattr(req, "op_tracker", None) or {},
+        "pricelist_tracker": getattr(req, "pricelist_tracker", None) or {},
+        "existing_supplements": getattr(req, "existing_supplements", None) or {},
     }
 
 
