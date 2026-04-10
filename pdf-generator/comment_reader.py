@@ -420,5 +420,8 @@ if __name__ == "__main__":
         dry_run=args.dry_run
     )
     
+    # Output JSON for API consumption
+    print(json.dumps(result))
+    
     if not result.get("success"):
         sys.exit(1)

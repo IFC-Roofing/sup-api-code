@@ -534,57 +534,52 @@ async def edit_estimate(req: EditRequest, request: Request):
         # Resolve project prefix (uppercase last name)
         prefix = get_project_prefix(project_name)
 
-        # Import edit functions
-        sys.path.insert(0, str(PDF_GENERATOR))
-        from edit_estimate import apply_edits, rerender
+        # Shell out to pdf-generator venv (has all pipeline deps)
+        cmd = [
+            VENV_PYTHON, "-u", str(PDF_GENERATOR / "edit_estimate.py"),
+            prefix, "--api", "--project-name", project_name,
+        ]
+        if req.skip_upload:
+            cmd.append("--skip-upload")
 
-        # Apply edits
-        edit_result = apply_edits(prefix, req.edits)
-        edit_results = edit_result.get("results", [])
+        # Pass edits via stdin
+        edits_json = json.dumps(req.edits)
+        env = {**os.environ}
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=str(PDF_GENERATOR),
+            env=env,
+        )
 
-        # Resolve project Drive folder for upload routing
-        project_folder_id = None
-        if not req.skip_upload:
-            try:
-                from data_pipeline import fetch_project, find_project_folder
-                project_data = fetch_project(project_name)
-                if project_data:
-                    project_folder_id = find_project_folder(project_data)
-            except Exception as e:
-                logger.warning(f"[{request_id}] Could not resolve project folder: {e}")
-
-        # Re-render and upload
-        render_result = rerender(prefix, skip_upload=req.skip_upload, project_folder_id=project_folder_id)
-
-        # Calculate new RCV from edited estimate
-        estimate_path = PDF_GENERATOR / f"{prefix}_estimate.json"
-        total_rcv = None
-        if estimate_path.exists():
-            with open(estimate_path) as f:
-                est = json.load(f)
-            total = sum(
-                item.get("qty", 0) * item.get("replace_rate", 0)
-                for section in est.get("sections", [])
-                for item in section.get("line_items", [])
+        try:
+            stdout, stderr = await asyncio.wait_for(
+                proc.communicate(input=edits_json.encode()), timeout=300
             )
-            total_rcv = f"${total:,.2f}"
+        except asyncio.TimeoutError:
+            proc.kill()
+            await proc.communicate()
+            return EditResponse(success=False, error="Edit timed out after 300s", request_id=request_id)
 
-        pdf_url = None
-        if isinstance(render_result, dict):
-            pdf_url = render_result.get("drive_link")
+        if proc.returncode != 0:
+            error_msg = stderr.decode("utf-8", errors="replace")[:500]
+            logger.error(f"[{request_id}] Edit failed (exit {proc.returncode}): {error_msg}")
+            return EditResponse(success=False, error=f"Edit failed: {error_msg}", request_id=request_id)
 
-        logger.info(f"[{request_id}] Edit complete: RCV={total_rcv}, edits={len(req.edits)}")
+        result = parse_skill_output(stdout.decode("utf-8", errors="replace"))
+
+        logger.info(f"[{request_id}] Edit complete: RCV={result.get('total_rcv')}, edits={len(req.edits)}")
 
         return EditResponse(
-            success=True,
-            pdf_url=pdf_url,
-            total_rcv=total_rcv,
-            edit_results=edit_results,
+            success=result.get("success", False),
+            pdf_url=result.get("pdf_url"),
+            total_rcv=result.get("total_rcv"),
+            edit_results=result.get("edit_results"),
             request_id=request_id,
         )
 
-    except FileNotFoundError as e:
-        return EditResponse(success=False, error=str(e), request_id=request_id)
     except Exception as e:
         logger.error(f"[{request_id}] Edit error: {e}")
         return EditResponse(success=False, error=str(e), request_id=request_id)
@@ -599,14 +594,24 @@ async def review_comments(req: ReviewCommentsRequest, request: Request):
     logger.info(f"[{request_id}] Review comments requested: '{project_name}' (dry_run={req.dry_run})")
 
     try:
-        sys.path.insert(0, str(PDF_GENERATOR))
-        from comment_reader import process_comments
+        # Shell out to pdf-generator venv (has google libs) instead of direct import
+        cmd = [VENV_PYTHON, "-u", str(PDF_GENERATOR / "comment_reader.py"), project_name]
+        if req.file_id:
+            cmd.extend(["--file-id", req.file_id])
+        if req.dry_run:
+            cmd.append("--dry-run")
 
-        result = process_comments(
-            project_name=project_name,
-            file_id=req.file_id,
-            dry_run=req.dry_run
-        )
+        script_result = await run_script(cmd, cwd=str(PDF_GENERATOR), timeout=300)
+
+        if not script_result["success"]:
+            logger.error(f"[{request_id}] Review comments failed: {script_result['stderr'][:200]}")
+            return ReviewCommentsResponse(
+                success=False,
+                error=f"Review comments failed: {script_result['stderr'][:500]}",
+                request_id=request_id,
+            )
+
+        result = parse_skill_output(script_result["stdout"])
 
         logger.info(f"[{request_id}] Comments processed: {result.get('comments_processed', 0)} → {result.get('edits_applied', 0)} edits")
 

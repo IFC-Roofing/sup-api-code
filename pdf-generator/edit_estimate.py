@@ -496,33 +496,106 @@ def rerender(project_prefix: str, skip_upload: bool = False, project_folder_id: 
     return {"pdf_path": str(pdf_path), "drive_link": None, "file_id": None}
 
 
+def run_full_edit(project_name: str, project_prefix: str, edits: list, skip_upload: bool = False) -> dict:
+    """Full edit flow for API: apply edits → resolve project folder → rerender → upload → return JSON."""
+    # Apply edits
+    edit_result = apply_edits(project_prefix, edits)
+    edit_results = edit_result.get("results", [])
+
+    # Resolve project Drive folder for upload routing
+    project_folder_id = None
+    if not skip_upload:
+        try:
+            from data_pipeline import fetch_project, find_project_folder
+            project_data = fetch_project(project_name)
+            if project_data:
+                project_folder_id = find_project_folder(project_data)
+        except Exception as e:
+            print(f"[edit_estimate] Could not resolve project folder: {e}", file=sys.stderr)
+
+    # Re-render and upload
+    render_result = rerender(project_prefix, skip_upload=skip_upload, project_folder_id=project_folder_id)
+
+    # Calculate new RCV from edited estimate
+    estimate_path = ROOT / f"{project_prefix}_estimate.json"
+    total_rcv = None
+    if estimate_path.exists():
+        with open(estimate_path) as f:
+            est = json.load(f)
+        total = sum(
+            item.get("qty", 0) * item.get("replace_rate", 0)
+            for section in est.get("sections", [])
+            for item in section.get("line_items", [])
+        )
+        total_rcv = f"${total:,.2f}"
+
+    pdf_url = None
+    if isinstance(render_result, dict):
+        pdf_url = render_result.get("drive_link")
+
+    return {
+        "success": True,
+        "pdf_url": pdf_url,
+        "total_rcv": total_rcv,
+        "edit_results": edit_results,
+    }
+
+
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: python edit_estimate.py <PROJECT_PREFIX> '<edits_json>'")
-        print("       python edit_estimate.py <PROJECT_PREFIX> --smart 'change line 11 to R&R'")
-        sys.exit(1)
-    
-    prefix = sys.argv[1]
-    
-    if sys.argv[2] == "--smart":
-        instruction = " ".join(sys.argv[3:])
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Edit an existing supplement estimate")
+    parser.add_argument("prefix_or_name", help="Project prefix (e.g. MERRIFIELD) or project name")
+    parser.add_argument("edits_or_flag", nargs="?", default=None, help="JSON edits array or --smart")
+    parser.add_argument("--smart", action="store_true", help="Smart edit mode (natural language)")
+    parser.add_argument("--api", action="store_true", help="API mode: full flow with JSON output")
+    parser.add_argument("--project-name", default=None, help="Full project name (for Drive folder resolution)")
+    parser.add_argument("--skip-upload", action="store_true", help="Skip Drive upload")
+    parser.add_argument("instruction", nargs="*", help="Smart edit instruction (with --smart)")
+
+    args, remaining = parser.parse_known_args()
+
+    if args.smart:
+        instruction = " ".join(args.instruction) if args.instruction else (" ".join(remaining) if remaining else "")
+        if not instruction:
+            print("Usage: python edit_estimate.py PREFIX --smart 'change line 11 to R&R'")
+            sys.exit(1)
+        prefix = args.prefix_or_name
         print(f"[edit_estimate] Smart edit: {instruction}")
         estimate, path = load_estimate(prefix)
         smart_edit(estimate, instruction)
-        
+
         estimate["sections"] = [s for s in estimate["sections"] if s.get("line_items")]
         with open(path, "w") as f:
             json.dump(estimate, f, indent=2)
         print(f"\n✅ Saved {path.name}")
-        
+
         print(f"\n[edit_estimate] Re-rendering...")
         rerender(prefix, skip_upload=True)
+        print("\nDone.")
+
+    elif args.api:
+        # API mode: read edits from stdin, output JSON
+        edits_json = sys.stdin.read().strip() if not args.edits_or_flag else args.edits_or_flag
+        edits = json.loads(edits_json)
+        prefix = args.prefix_or_name
+        project_name = args.project_name or prefix
+
+        result = run_full_edit(project_name, prefix, edits, skip_upload=args.skip_upload)
+        print(json.dumps(result))
+
     else:
-        edits = json.loads(sys.argv[2])
+        # Legacy CLI mode
+        if not args.edits_or_flag:
+            print("Usage: python edit_estimate.py <PREFIX> '<edits_json>'")
+            print("       python edit_estimate.py <PREFIX> --smart 'instruction'")
+            print("       python edit_estimate.py <PREFIX> --api --project-name 'Name' < edits.json")
+            sys.exit(1)
+        edits = json.loads(args.edits_or_flag)
+        prefix = args.prefix_or_name
         print(f"[edit_estimate] Applying {len(edits)} edit(s) to {prefix}...")
         apply_edits(prefix, edits)
-        
+
         print(f"\n[edit_estimate] Re-rendering...")
         rerender(prefix, skip_upload=True)
-    
-    print("\nDone.")
+        print("\nDone.")
