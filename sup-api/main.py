@@ -940,7 +940,7 @@ async def get_adjuster_patterns(adjuster_name: str, request: Request):
 # ENDPOINTS — Knowledge Base
 # ══════════════════════════════════════════════════════════════
 
-KNOWLEDGE_BASE_PATH = Path(__file__).parent.parent.parent / "tools" / "mission-control" / "workspace" / "knowledge-base.md"
+KNOWLEDGE_BASE_PATH = WORKSPACE / "mission-control" / "workspace" / "knowledge-base.md"
 
 # Parse knowledge base into searchable sections on startup
 _knowledge_sections: dict[str, dict] = {}
