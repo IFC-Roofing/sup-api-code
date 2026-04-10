@@ -42,6 +42,7 @@ def parse_args():
     parser.add_argument("--json-only", action="store_true", help="Stop after building estimate.json")
     parser.add_argument("--html-only", action="store_true", help="Stop after building estimate.html")
     parser.add_argument("--from-json", metavar="PATH", help="Load estimate.json from file, skip pipeline")
+    parser.add_argument("--from-pipeline", metavar="PATH", help="Load pipeline_data JSON, skip IFC API fetch, run estimate builder")
     parser.add_argument("--output-dir", metavar="DIR", help="Output directory (default: current dir)")
     parser.add_argument("--version", metavar="VER", help="Supplement version override (e.g. 1.0)")
     return parser.parse_args()
@@ -51,9 +52,10 @@ def main():
     args = parse_args()
     project_name = " ".join(args.project_name) if args.project_name else None
 
-    if not project_name and not args.from_json:
+    if not project_name and not args.from_json and not args.from_pipeline:
         print("Usage: python3 generate.py \"Rose Brock\"")
         print("       python3 generate.py \"Rose Brock\" --skip-upload")
+        print("       python3 generate.py --from-pipeline pipeline_data.json")
         sys.exit(1)
 
     output_dir = Path(args.output_dir) if args.output_dir else Path(__file__).parent
@@ -79,6 +81,13 @@ def main():
             "notes": {"supplement": [], "momentum": [], "ifc": []},
         }
         project_folder_id = None
+    elif args.from_pipeline:
+        print(f"[generate] Loading pipeline data from payload: {args.from_pipeline}")
+        with open(args.from_pipeline) as f:
+            pipeline_data = json.load(f)
+        project_name = project_name or f"{pipeline_data.get('firstname', '')} {pipeline_data.get('lastname', 'UNKNOWN')}".strip()
+        project_folder_id = pipeline_data.get("project_folder_id")
+        print(f"[generate] Project: {project_name} (from payload, skipping IFC API)")
     else:
         print("[generate] Step 1/6: Running data pipeline...")
         from data_pipeline import run as pipeline_run

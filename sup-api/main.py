@@ -125,6 +125,13 @@ class EstimateRequest(BaseModel):
     adjuster_name: Optional[str] = Field(None, description="Adjuster name for tracking")
     adjuster_id: Optional[str] = Field(None, description="Adjuster ID for tracking")
     pricelist_override: Optional[str] = Field(None, description="Manual pricelist override code")
+    # Payload mode — if present, skip IFC API fetch and use this data directly
+    project: Optional[dict] = Field(None, description="Project details (id, name, address, drive_folder_id)")
+    claim: Optional[dict] = Field(None, description="Claim info (number, carrier, adjuster)")
+    flow_cards: Optional[List[dict]] = Field(None, description="Flow card / action tracker data")
+    insurance_estimate: Optional[dict] = Field(None, description="Parsed insurance estimate content")
+    eagleview_report: Optional[dict] = Field(None, description="Parsed EagleView report content")
+    bid_pdfs: Optional[dict] = Field(None, description="Extracted bid PDF text per trade tag")
 
 class MarkupRequest(BaseModel):
     project_name: str = Field(..., description="Project name")
@@ -157,6 +164,7 @@ class RegisterPricelistRequest(BaseModel):
     region: str = Field("TX", description="Region code")
     description: Optional[str] = Field(None, description="Human-readable description")
     sheet_tab: Optional[str] = Field(None, description="Google Sheet tab name")
+
 
 class EstimateResponse(BaseModel):
     success: bool
@@ -402,10 +410,12 @@ async def generate_estimate(req: EstimateRequest, request: Request):
 
     project_name = normalize_project_name(req.project_name)
     request_id = make_request_id("/v1/estimate", project_name)
-    carrier = req.carrier or "Unknown"
+    carrier = req.carrier or (req.claim.get("carrier") if req.claim else None) or "Unknown"
     version = req.version or "1.0"
+    has_payload = req.flow_cards is not None  # Payload mode if flow_cards present
+    mode = "payload" if has_payload else "api-fetch"
 
-    logger.info(f"[{request_id}] Estimate requested: '{project_name}' (carrier={carrier}, version={version})")
+    logger.info(f"[{request_id}] Estimate requested: '{project_name}' (carrier={carrier}, version={version}, mode={mode})")
 
     # Dedup
     if request_id in _active_requests:
@@ -436,13 +446,6 @@ async def generate_estimate(req: EstimateRequest, request: Request):
         logger.info(f"[{request_id}] Pricelist: {selected_pricelist} ({pricelist_reason})")
 
         # ── Build command ──────────────────────────────────
-        cmd = [VENV_PYTHON, "-u", str(PDF_GENERATOR / "generate.py"), project_name]
-        if req.skip_upload:
-            cmd.append("--skip-upload")
-        if req.version:
-            cmd.extend(["--version", req.version])
-
-        # Pass learning intelligence + pricelist as env vars
         env_extra = {
             "SELECTED_PRICELIST": selected_pricelist or "",
             "PRICELIST_REASON": pricelist_reason or "",
@@ -456,7 +459,33 @@ async def generate_estimate(req: EstimateRequest, request: Request):
             })
             env_extra["CARRIER_CONTEXT"] = carrier
 
+        if has_payload:
+            # Payload mode: convert IFC data → pipeline_data, use --from-pipeline
+            pipeline_data = _convert_payload_to_pipeline_data(req)
+            pipeline_json_path = PDF_GENERATOR / f"_payload_{request_id}.json"
+            with open(pipeline_json_path, "w") as f:
+                json.dump(pipeline_data, f, indent=2)
+
+            cmd = [VENV_PYTHON, "-u", str(PDF_GENERATOR / "generate.py"),
+                   "--from-pipeline", str(pipeline_json_path)]
+            logger.info(f"[{request_id}] Using payload mode — pipeline data saved to {pipeline_json_path}")
+        else:
+            # Fallback: Sup fetches from IFC API
+            cmd = [VENV_PYTHON, "-u", str(PDF_GENERATOR / "generate.py"), project_name]
+
+        if req.skip_upload:
+            cmd.append("--skip-upload")
+        if req.version:
+            cmd.extend(["--version", req.version])
+
         result = await run_script(cmd, cwd=str(PDF_GENERATOR), timeout=900, env_extra=env_extra)
+
+        # Clean up temp payload file
+        if has_payload:
+            try:
+                pipeline_json_path.unlink(missing_ok=True)
+            except Exception:
+                pass
 
         if not result["success"]:
             logger.error(f"[{request_id}] Pipeline failed (exit {result['exit_code']}): {result['stderr'][:200]}")
@@ -520,6 +549,99 @@ async def generate_estimate(req: EstimateRequest, request: Request):
         event = _active_requests.pop(request_id, None)
         if event:
             event.set()
+
+
+def _convert_payload_to_pipeline_data(req) -> dict:
+    """
+    Convert IFC platform payload format → pipeline_data dict that
+    estimate_builder.build_estimate() expects.
+    Works with EstimateRequest (payload fields optional).
+    """
+    project = req.project or {}
+    claim = req.claim or {}
+    project_name = project.get("name") or getattr(req, "project_name", "UNKNOWN")
+    lastname = project_name.strip().split()[-1].upper() if project_name else "UNKNOWN"
+
+    # Insurance estimate → ins_data
+    ins_data = {}
+    ins_content = req.insurance_estimate.get("content", "")
+    if ins_content:
+        ins_data = {"raw_markdown": ins_content, "items": []}
+
+    # EagleView → ev_data
+    ev_data = {}
+    ev_content = req.eagleview_report.get("content", "")
+    if ev_content:
+        ev_data = {"raw_markdown": ev_content}
+
+    # Flow cards → action_trackers
+    action_trackers = []
+    for card in req.flow_cards:
+        action_trackers.append({
+            "id": card.get("id"),
+            "tag": card.get("tag", ""),
+            "original_sub_bid_price": card.get("original_sub_bid"),
+            "retail_exactimate_bid": card.get("retail_exactimate_bid"),
+            "latest_rcv_rcv": card.get("latest_rcv_rcv"),
+            "latest_rcv_op": card.get("latest_rcv_op"),
+            "doing_the_work_status": card.get("doing_the_work"),
+            "production_status": card.get("production_status"),
+            "trade_status": card.get("trade_status"),
+            "supplement_notes": card.get("supplement_notes"),
+            "subcontractor": card.get("subcontractor"),
+        })
+
+    # Bid PDFs → bids
+    bids = []
+    for tag, content in req.bid_pdfs.items():
+        bid_text = content.get("content", "") if isinstance(content, dict) else str(content)
+        if bid_text:
+            matching_card = next((c for c in req.flow_cards if c.get("tag") == tag), {})
+            bids.append({
+                "tag": tag,
+                "wholesale": matching_card.get("original_sub_bid", 0),
+                "retail": matching_card.get("retail_exactimate_bid", 0),
+                "text": bid_text,
+                "source": "payload",
+            })
+
+    # Claims
+    claims = {
+        "claim_number": claim.get("claim_number") or claim.get("number", ""),
+        "insurance_company": claim.get("carrier") or claim.get("company", ""),
+        "date_of_loss": claim.get("date_of_loss", ""),
+        "adjuster_name": claim.get("adjuster_name", ""),
+    }
+
+    # Address
+    address_str = project.get("address", "")
+    address = {"full": address_str}
+
+    # Drive folder
+    drive_link = project.get("google_drive_link", "") or project.get("drive_folder_id", "")
+    project_folder_id = drive_link.split("/")[-1] if "/" in drive_link else drive_link
+
+    return {
+        "project": project,
+        "project_id": project.get("id"),
+        "project_folder_id": project_folder_id or None,
+        "lastname": lastname,
+        "firstname": project_name.split()[0] if project_name and " " in project_name else "",
+        "notes": {"ifc": [], "supplement": [], "momentum": [], "untagged": []},
+        "claims": claims,
+        "address": address,
+        "ins_data": ins_data,
+        "ins_by_tag": {},
+        "ev_data": ev_data,
+        "action_trackers": action_trackers,
+        "bids": bids,
+        "pricelist": {},
+        "prior_corrections": [],
+        "itel_data": None,
+        "gutter_measurements": None,
+    }
+
+
 
 
 @app.post("/v1/edit", response_model=EditResponse, dependencies=[Depends(verify_api_key)])
