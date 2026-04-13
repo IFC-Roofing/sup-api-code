@@ -26,12 +26,12 @@ WORK="/opt/sup-repo/tools"
 
 # sup-api: sync all .py files
 for f in "$REPO"/sup-api/*.py; do
-    [ -f "$f" ] && cp "$f" "$WORK/sup-api/$(basename "$f")"
+    [ -f "$f" ] && cp -f "$f" "$WORK/sup-api/$(basename "$f")" 2>/dev/null || true
 done
 
 # pdf-generator: sync all .py and .json files
 for f in "$REPO"/pdf-generator/*.py "$REPO"/pdf-generator/*.json; do
-    [ -f "$f" ] && cp "$f" "$WORK/pdf-generator/$(basename "$f")"
+    [ -f "$f" ] && cp -f "$f" "$WORK/pdf-generator/$(basename "$f")" 2>/dev/null || true
 done
 
 # pdf-generator templates + assets
@@ -40,32 +40,32 @@ done
 
 # skills
 for f in "$REPO"/skills/*.py; do
-    [ -f "$f" ] && cp "$f" "$WORK/skills/$(basename "$f")"
+    [ -f "$f" ] && cp -f "$f" "$WORK/skills/$(basename "$f")" 2>/dev/null || true
 done
 [ -d "$REPO/skills/prompts" ] && cp -r "$REPO/skills/prompts/"* "$WORK/skills/prompts/" 2>/dev/null || true
 
 # bid-markup
 for f in "$REPO"/bid-markup/*.py; do
-    [ -f "$f" ] && cp "$f" "$WORK/bid-markup/$(basename "$f")"
+    [ -f "$f" ] && cp -f "$f" "$WORK/bid-markup/$(basename "$f")" 2>/dev/null || true
 done
 
 # profit-margin
 for f in "$REPO"/profit-margin/*.py; do
-    [ -f "$f" ] && cp "$f" "$WORK/profit-margin/$(basename "$f")"
+    [ -f "$f" ] && cp -f "$f" "$WORK/profit-margin/$(basename "$f")" 2>/dev/null || true
 done
 
 # file-puller
 for f in "$REPO"/file-puller/*.py; do
-    [ -f "$f" ] && cp "$f" "$WORK/file-puller/$(basename "$f")"
+    [ -f "$f" ] && cp -f "$f" "$WORK/file-puller/$(basename "$f")" 2>/dev/null || true
 done
 
 # parsers
 for f in "$REPO"/parsers/*.py; do
-    [ -f "$f" ] && cp "$f" "$WORK/parsers/$(basename "$f")"
+    [ -f "$f" ] && cp -f "$f" "$WORK/parsers/$(basename "$f")" 2>/dev/null || true
 done
 
 # Also sync to /opt/sup/tools/sup-api/ (where systemd points)
-cp "$WORK/sup-api/main.py" /opt/sup/tools/sup-api/main.py
+cp -f "$WORK/sup-api/main.py" /opt/sup/tools/sup-api/main.py 2>/dev/null || true
 
 # Fix ownership
 chown -R sup:sup "$WORK" /opt/sup/tools/sup-api/main.py
