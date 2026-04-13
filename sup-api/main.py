@@ -61,6 +61,9 @@ logging.basicConfig(
 logger = logging.getLogger("sup-api")
 
 # ── Paths ──────────────────────────────────────────────────────
+# NOTE: The three-up walk from sup-api/main.py lands correctly on the live server
+# (/opt/sup-repo/) but is off by one level locally. Override via SUP_WORKSPACE env
+# (see .env) to point at .../sup-api-code/ when running uvicorn on a laptop.
 WORKSPACE = Path(os.environ.get("SUP_WORKSPACE", str(Path(__file__).parent.parent.parent)))
 PDF_GENERATOR = WORKSPACE / "tools" / "pdf-generator"
 SKILLS_DIR = WORKSPACE / "tools" / "skills"
@@ -139,21 +142,6 @@ class EstimateRequest(BaseModel):
     existing_supplements: Optional[dict] = Field(None, description="Existing supplement versions")
     file_readiness: Optional[dict] = Field(None, description="File readiness status from IFC app")
 
-class EstimateFromPayloadRequest(BaseModel):
-    """Full project data payload from IFC platform — bypasses IFC API fetch."""
-    project: dict = Field(..., description="Project details (id, name, address, status, drive_folder_id)")
-    claim: dict = Field(default_factory=dict, description="Claim info (number, carrier, adjuster)")
-    flow_cards: List[dict] = Field(default_factory=list, description="Flow card / action tracker data")
-    op_tracker: dict = Field(default_factory=dict, description="O&P tracker data")
-    pricelist_tracker: dict = Field(default_factory=dict, description="Pricelist tracker data")
-    insurance_estimate: dict = Field(default_factory=dict, description="Parsed insurance estimate content")
-    eagleview_report: dict = Field(default_factory=dict, description="Parsed EagleView report content")
-    bid_pdfs: dict = Field(default_factory=dict, description="Extracted bid PDF text per trade tag")
-    existing_supplements: dict = Field(default_factory=dict, description="Previous supplement versions")
-    version: Optional[str] = Field(None, description="Supplement version (e.g. '1.0')")
-    skip_upload: bool = Field(False, description="Skip Google Drive upload")
-    pricelist_override: Optional[str] = Field(None, description="Manual pricelist override code")
-
 class MarkupRequest(BaseModel):
     project_name: str = Field(..., description="Project name")
 
@@ -201,6 +189,28 @@ class EstimateResponse(BaseModel):
     event_id: Optional[int] = None
     error: Optional[str] = None
     request_id: Optional[str] = None
+
+class EstimateFromPayloadRequest(BaseModel):
+    """Full project data payload from IFC platform — bypasses IFC API fetch."""
+    project: dict = Field(..., description="Project details (id, name, address, status, drive_folder_id)")
+    claim: dict = Field(default_factory=dict, description="Claim info (number, carrier, adjuster)")
+    flow_cards: List[dict] = Field(default_factory=list, description="Flow card / action tracker data")
+    op_tracker: dict = Field(default_factory=dict, description="O&P tracker data")
+    pricelist_tracker: dict = Field(default_factory=dict, description="Pricelist tracker data")
+    insurance_estimate: dict = Field(default_factory=dict, description="Parsed insurance estimate content")
+    eagleview_report: dict = Field(default_factory=dict, description="Parsed EagleView report content")
+    bid_pdfs: dict = Field(default_factory=dict, description="Extracted bid PDF text per trade tag")
+    existing_supplements: dict = Field(default_factory=dict, description="Previous supplement versions")
+    conversation_history: dict = Field(
+        default_factory=dict,
+        description=(
+            "AI-distilled 5-field summary of all project chat rooms produced by Rails "
+            "(strategy, scope_changes, estimate_instructions, carrier_behavior, context)."
+        ),
+    )
+    version: Optional[str] = Field(None, description="Supplement version (e.g. '1.0')")
+    skip_upload: bool = Field(False, description="Skip Google Drive upload")
+    pricelist_override: Optional[str] = Field(None, description="Manual pricelist override code")
 
 class EditRequest(BaseModel):
     project_name: str = Field(..., description="Project name (e.g. 'Rose Brock')")
@@ -653,6 +663,14 @@ def _convert_payload_to_pipeline_data(req) -> dict:
     drive_link = project.get("google_drive_link", "") or project.get("drive_folder_id", "")
     project_folder_id = drive_link.split("/")[-1] if "/" in drive_link else drive_link
 
+    # Conversation history: 5-field summary distilled from all project chat rooms by Rails
+    # (Supplements::SummarizeConversationContext). Missing on api-fetch-mode EstimateRequest,
+    # present on EstimateFromPayloadRequest. Always normalized to the canonical 5-field shape
+    # so downstream renderers (estimate_builder._format_conversation_history) never branch on nulls.
+    conversation_history = _normalize_conversation_history(
+        getattr(req, "conversation_history", None) or {}
+    )
+
     return {
         "project": project,
         "project_id": project.get("id"),
@@ -660,6 +678,7 @@ def _convert_payload_to_pipeline_data(req) -> dict:
         "lastname": lastname,
         "firstname": project_name.split()[0] if project_name and " " in project_name else "",
         "notes": {"ifc": [], "supplement": [], "momentum": [], "untagged": []},
+        "conversation_history": conversation_history,
         "claims": claims,
         "address": address,
         "ins_data": ins_data,
@@ -675,6 +694,27 @@ def _convert_payload_to_pipeline_data(req) -> dict:
         "pricelist_tracker": getattr(req, "pricelist_tracker", None) or {},
         "existing_supplements": getattr(req, "existing_supplements", None) or {},
     }
+
+
+# Canonical 5-field shape produced by Rails Supplements::SummarizeConversationContext.
+# Authored by Alvaro (Slack 2026-04-12).
+CONVERSATION_HISTORY_FIELDS = (
+    "strategy",
+    "scope_changes",
+    "estimate_instructions",
+    "carrier_behavior",
+    "context",
+)
+
+
+def _normalize_conversation_history(raw: dict) -> dict:
+    """Guarantee the 5-field shape regardless of what Rails sent.
+
+    Missing or non-string values become empty strings so the downstream prompt
+    renderer never has to branch on nulls.
+    """
+    raw = raw or {}
+    return {field: (str(raw.get(field, "")) if raw.get(field) else "") for field in CONVERSATION_HISTORY_FIELDS}
 
 
 

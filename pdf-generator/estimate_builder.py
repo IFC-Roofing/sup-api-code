@@ -238,6 +238,7 @@ def build_estimate(pipeline_data: dict) -> dict:
     supp_notes     = "\n---\n".join(notes["supplement"]) or "(no @supplement notes)"
     momentum_notes = "\n---\n".join(notes.get("momentum", [])) or ""
     untagged_notes = "\n---\n".join(notes.get("untagged", [])) or ""
+    convo_history_text = _format_conversation_history(pipeline_data.get("conversation_history") or {})
     pricelist_sample = _format_pricelist_sample(pricelist)
     bids_text = _format_bids(bids)
     f9_matrix = _load_f9_matrix()
@@ -265,6 +266,7 @@ Price List: {PRICE_LIST_CODE}
 {supp_notes}
 {f"## PROJECT HISTORY (momentum notes — context only)" + chr(10) + momentum_notes if momentum_notes else ""}
 {f"## ADDITIONAL CONVO NOTES (untagged — may contain gameplan or strategy)" + chr(10) + untagged_notes if untagged_notes else ""}
+{convo_history_text}
 
 ## EAGLEVIEW MEASUREMENTS
 {ev_text}
@@ -2198,6 +2200,46 @@ def _format_ev_data(ev_data: dict) -> str:
                 lines.append(f"{k}: {v}")
 
     return "\n".join(lines) if lines else "(no EagleView measurements)"
+
+
+def _format_conversation_history(history: dict) -> str:
+    """Render the 5-field summary Rails built from all project chat rooms.
+
+    Fields (all may be empty strings): strategy, scope_changes,
+    estimate_instructions, carrier_behavior, context. Produced by
+    Supplements::SummarizeConversationContext on the IFC platform side using
+    Alvaro's prompt. Empty fields are omitted from output to keep the prompt
+    tight. If every field is empty, returns "" so the section is skipped
+    entirely (no empty header dangling in the prompt).
+    """
+    if not history or not isinstance(history, dict):
+        return ""
+
+    labels = [
+        ("strategy",              "Strategy (current game plan)"),
+        ("scope_changes",         "Scope Changes (overrides to flow cards)"),
+        ("estimate_instructions", "Estimate Instructions (one-off directions for THIS run)"),
+        ("carrier_behavior",      "Carrier Behavior (adjuster/carrier positions)"),
+        ("context",               "Context (round, prior sends, what's pending)"),
+    ]
+
+    blocks = []
+    for key, label in labels:
+        value = (history.get(key) or "").strip()
+        if value:
+            blocks.append(f"**{label}:**\n{value}")
+
+    if not blocks:
+        return ""
+
+    body = "\n\n".join(blocks)
+    return (
+        "## CONVERSATION CONTEXT (summarized from all project chat rooms)\n"
+        "Use this for deciding WHAT to include and HOW to argue items. Treat it "
+        "as the newest-wins source of truth for strategy. NEVER reference it in "
+        "F9 notes (same rule as @ifc/@supplement).\n\n"
+        f"{body}"
+    )
 
 
 def _format_bids(bids: list) -> str:
