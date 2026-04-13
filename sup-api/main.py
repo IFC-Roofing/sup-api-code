@@ -47,6 +47,14 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+# ── Env vars ───────────────────────────────────────────────────
+# Load sup-api-code/.env BEFORE reading any os.environ values. Without this,
+# local uvicorn runs (which don't inherit a repo-specific shell env) see
+# SUP_API_KEY / ANTHROPIC_API_KEY / SUP_WORKSPACE as empty and every request
+# 500s with "SUP_API_KEY not configured on server".
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent.parent / ".env")
+
 # ── Learning imports ───────────────────────────────────────────
 from learning_service import learning_service
 from enhanced_learning import enhanced_learning

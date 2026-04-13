@@ -28,13 +28,21 @@ SHARED_DRIVE_UPLOAD_FOLDER = "1tWeZivnrRjDtZq1eG6dHu4vHkBwgMWop"  # Generated Su
 import requests
 
 def get_service_account():
-    creds_path = ROOT / "google-drive-key.json"
+    # Path resolution: prefer explicit env override (GOOGLE_SERVICE_ACCOUNT_KEY),
+    # fall back to ROOT / google-drive-key.json.
+    #
+    # On prod (/opt/sup/) ROOT-relative path matches where systemd provisions the
+    # key — no env var needed. Locally, ROOT = sup-api-code/ but the key may live
+    # at the dev root above. Setting GOOGLE_SERVICE_ACCOUNT_KEY in .env bridges
+    # the gap without requiring a symlink. Same shape as SUP_WORKSPACE override.
+    creds_path = os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY") or str(ROOT / "google-drive-key.json")
+    subject = os.getenv("GOOGLE_SERVICE_ACCOUNT_SUBJECT", "sup@ifcroofing.com")
     from google.oauth2 import service_account
     scopes = [
         "https://www.googleapis.com/auth/drive",
         "https://www.googleapis.com/auth/spreadsheets.readonly",
     ]
-    return service_account.Credentials.from_service_account_file(str(creds_path), scopes=scopes).with_subject('sup@ifcroofing.com')
+    return service_account.Credentials.from_service_account_file(creds_path, scopes=scopes).with_subject(subject)
 
 
 # ─── IFC API ───────────────────────────────────────────────────────────────────
@@ -559,22 +567,38 @@ def extract_address(project: dict) -> dict:
 _pricelist_cache: Optional[dict] = None
 
 def load_pricelist() -> dict[str, dict]:
-    """Load pricelist from Google Sheet. Returns {description_lower: {remove, replace, unit, category}}"""
+    """Load pricelist from Google Sheet. Returns {description_lower: {remove, replace, unit, category}}.
+
+    Graceful fallback: if credentials are missing or Sheets access fails, caches and
+    returns an empty dict so lookup_price() returns None → items default to price=0.
+    That way the pipeline still produces a PDF; it just has zero prices. Better than
+    crashing the whole run with a FileNotFoundError or credential error.
+    """
     global _pricelist_cache
     if _pricelist_cache is not None:
         return _pricelist_cache
 
-    from googleapiclient.discovery import build
-    creds = get_service_account()
-    service = build("sheets", "v4", credentials=creds)
+    try:
+        from googleapiclient.discovery import build
+        creds = get_service_account()
+        service = build("sheets", "v4", credentials=creds)
 
-    result = service.spreadsheets().values().get(
-        spreadsheetId=PRICELIST_SHEET_ID,
-        range="Pricelist!A:Z",
-    ).execute()
-    rows = result.get("values", [])
+        result = service.spreadsheets().values().get(
+            spreadsheetId=PRICELIST_SHEET_ID,
+            range="Pricelist!A:Z",
+        ).execute()
+        rows = result.get("values", [])
+    except Exception as e:
+        print(
+            f"[data_pipeline] Pricelist load failed ({type(e).__name__}: {e}) — "
+            f"continuing with empty pricelist. Items will default to price=0.",
+            file=sys.stderr,
+        )
+        _pricelist_cache = {}
+        return {}
 
     if not rows:
+        _pricelist_cache = {}
         return {}
 
     headers = [h.lower().strip() for h in rows[0]]
