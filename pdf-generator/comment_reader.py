@@ -220,7 +220,7 @@ Translate each comment into one or more edit actions. Available actions:
 - {{"action": "remove_section", "section": "<name>"}}
 - {{"action": "remove_item", "section": "<name>", "description_contains": "<keyword>"}}
 - {{"action": "update_qty", "section": "<name>", "description_contains": "<keyword>", "new_qty": <number>}}
-- {{"action": "update_rate", "section": "<name>", "description_contains": "<keyword>", "new_replace_rate": <number>}}
+- {{"action": "update_item", "section": "<name>", "description_contains": "<keyword>", "new_replace_rate": <number>, "skip_pricelist": true}}  (use for rate changes — ALWAYS include skip_pricelist: true)
 - {{"action": "revert_to_ins", "section": "<name>", "description_contains": "<keyword>"}}
 - {{"action": "add_item", "section": "<name>", "description": "<Xactimate line item name>", "qty": <number>}}
 
