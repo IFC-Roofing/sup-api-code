@@ -935,11 +935,23 @@ def fetch_bids_from_flow(project_id: int, temp_dir: str, project_folder_id: str 
     import requests
     token = os.getenv("IFC_API_TOKEN")
     base_url = os.getenv("IFC_API_BASE", "https://omni.ifc.shibui.ar")
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = {"Authorization": f"Bearer {token}"} if token else {}
 
-    r = requests.get(f"{base_url}/action_trackers?project_id={project_id}", headers=headers)
-    r.raise_for_status()
-    trackers = r.json()
+    # Graceful fallback: if IFC API is unreachable or auth fails, return empty
+    # so generate.py line 115 falls through to fetch_bids_from_drive (which
+    # uses google-drive-key.json and needs no IFC API token). Covers local-dev
+    # runs with no IFC_API_TOKEN and transient prod outages.
+    try:
+        r = requests.get(f"{base_url}/action_trackers?project_id={project_id}", headers=headers, timeout=15)
+        r.raise_for_status()
+        trackers = r.json()
+    except (requests.exceptions.HTTPError, requests.exceptions.RequestException) as e:
+        print(
+            f"[data_pipeline] fetch_bids_from_flow: IFC API call failed "
+            f"({type(e).__name__}: {e}) — falling back to Drive-only bid fetch.",
+            file=sys.stderr,
+        )
+        return []
 
     bids = []
     for card in trackers:
