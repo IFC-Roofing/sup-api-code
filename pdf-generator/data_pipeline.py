@@ -27,6 +27,10 @@ SHARED_DRIVE_UPLOAD_FOLDER = "1tWeZivnrRjDtZq1eG6dHu4vHkBwgMWop"  # Generated Su
 
 import requests
 
+def _check_project_health(project_folder_id: str) -> dict:
+
+    return {}
+
 def get_service_account():
     # Path resolution: prefer explicit env override (GOOGLE_SERVICE_ACCOUNT_KEY),
     # fall back to ROOT / google-drive-key.json.
