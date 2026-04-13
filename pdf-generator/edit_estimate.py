@@ -31,6 +31,7 @@ import os
 import json
 import re
 from pathlib import Path
+from difflib import SequenceMatcher
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -112,20 +113,89 @@ def load_estimate(project_prefix: str) -> tuple:
     return data, path
 
 
+def _fuzzy_score(search: str, candidate: str) -> float:
+    """Combined similarity score: max of sequence ratio and token overlap.
+    
+    Sequence ratio handles typos/abbreviations.
+    Token overlap handles word reordering (e.g. 'Apron flashing counterflashing'
+    vs 'R&R Counterflashing - Apron flashing').
+    """
+    a = search.lower()
+    b = candidate.lower()
+    
+    # Sequence similarity
+    seq_score = SequenceMatcher(None, a, b).ratio()
+    
+    # Token overlap (Jaccard-ish on meaningful words)
+    stop = {'r&r', 'r', 'the', 'a', 'an', 'of', 'for', 'to', 'and', 'in', 'on', 'at', '-', '/', '&'}
+    tokens_a = {w for w in re.split(r'[\s\-/,]+', a) if w and w not in stop and len(w) > 1}
+    tokens_b = {w for w in re.split(r'[\s\-/,]+', b) if w and w not in stop and len(w) > 1}
+    
+    if tokens_a and tokens_b:
+        overlap = len(tokens_a & tokens_b)
+        token_score = overlap / max(len(tokens_a), len(tokens_b))
+    else:
+        token_score = 0.0
+    
+    return max(seq_score, token_score)
+
+
+FUZZY_THRESHOLD = 0.55
+
+
 def find_items(sections: list, section_name: str, desc_contains: str) -> list:
-    """Find matching items across sections."""
-    matches = []
+    """Find matching items across sections.
+    
+    Strategy:
+      1. Exact substring match (original behavior)
+      2. If zero results, fuzzy fallback — pick best match above FUZZY_THRESHOLD
+    """
     section_lower = section_name.lower() if section_name else None
     desc_lower = desc_contains.lower() if desc_contains else None
     
+    # Filter sections first
+    candidate_sections = []
     for section in sections:
         if section_lower and section_lower not in section["name"].lower():
             continue
+        candidate_sections.append(section)
+    
+    # Pass 1: exact substring
+    matches = []
+    for section in candidate_sections:
         for item in section.get("line_items", []):
             if desc_lower and desc_lower not in item.get("description", "").lower():
                 continue
             matches.append((section, item))
-    return matches
+    
+    if matches or not desc_lower:
+        return matches
+    
+    # Pass 2: fuzzy fallback — find best match across all candidate items
+    best_score = 0.0
+    best_match = None
+    for section in candidate_sections:
+        for item in section.get("line_items", []):
+            item_desc = item.get("description", "").lower()
+            # Score: max of full-string ratio and whether search is a close substring
+            score = _fuzzy_score(desc_lower, item_desc)
+            # Also try token overlap for partial matches (e.g. "steep" in long description)
+            if desc_lower in item_desc:
+                score = 1.0  # shouldn't reach here, but safety net
+            if score > best_score:
+                best_score = score
+                best_match = (section, item)
+    
+    if best_match and best_score >= FUZZY_THRESHOLD:
+        item_desc = best_match[1].get("description", "")
+        print(f"  [fuzzy match] '{desc_contains}' → '{item_desc}' (score={best_score:.2f})")
+        return [best_match]
+    
+    if best_match:
+        item_desc = best_match[1].get("description", "")
+        print(f"  [fuzzy miss] '{desc_contains}' best='{item_desc}' (score={best_score:.2f} < {FUZZY_THRESHOLD})")
+    
+    return []
 
 
 # ─── Edit Actions ─────────────────────────────────────────────────────────────
