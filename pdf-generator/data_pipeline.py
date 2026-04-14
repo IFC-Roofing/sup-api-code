@@ -765,7 +765,7 @@ MARKUP_RATE = 0.30  # kept for reference; retail price now comes from Flow
 
 # These trades are billed as Xactimate line items (EV measurements), NOT as single bid items.
 # Their Flow cards hold the expected Xactimate total for reference only.
-XACTIMATE_TRADES = {"@shingle_roof", "@garage", "@roof", "@flat_roof", "@detached_garage_roof", "@gutter"}
+XACTIMATE_TRADES = {"@shingle_roof", "@roof", "@flat_roof", "@detached_garage_roof", "@gutter"}
 
 def fetch_action_trackers(project_id: int) -> list[dict]:
     """Fetch all action tracker cards for a project from IFC API."""
@@ -1070,12 +1070,10 @@ def fetch_bids_from_flow(project_id: int, temp_dir: str, project_folder_id: str 
             print(f"[pipeline]   [{trade}] skipped — no bid amount from Flow or PDF")
             continue
 
-        # Skip Xactimate trades that have no actual bid (just reference totals)
-        if trade in XACTIMATE_TRADES and not has_bid:
-            print(f"[pipeline]   [{trade}] skipped — Xactimate line-item trade, no bid")
+        # Xactimate trades ALWAYS use Xactimate line items, never bids
+        if trade in XACTIMATE_TRADES:
+            print(f"[pipeline]   [{trade}] skipped — always Xactimate, never bid (has_bid={has_bid}, ${retail:,.2f})")
             continue
-        if trade in XACTIMATE_TRADES and has_bid:
-            print(f"[pipeline]   [{trade}] has bid despite being Xactimate trade — treating as bid item (${retail:,.2f})")
 
         if not sub_name:
             sub_name = _tag_to_trade_label(trade)
