@@ -569,16 +569,18 @@ def extract_address(project: dict) -> dict:
 # ─── Pricelist ─────────────────────────────────────────────────────────────────
 
 _pricelist_cache: Optional[dict] = None
+_pricelist_by_code: Optional[dict] = None
 
 def load_pricelist() -> dict[str, dict]:
-    """Load pricelist from Google Sheet. Returns {description_lower: {remove, replace, unit, category}}.
+    """Load pricelist from Google Sheet.
+
+    Returns {description_lower: {code, description, remove, replace, unit, trade, ...}}.
+    Also populates _pricelist_by_code for code-based lookups.
 
     Graceful fallback: if credentials are missing or Sheets access fails, caches and
     returns an empty dict so lookup_price() returns None → items default to price=0.
-    That way the pipeline still produces a PDF; it just has zero prices. Better than
-    crashing the whole run with a FileNotFoundError or credential error.
     """
-    global _pricelist_cache
+    global _pricelist_cache, _pricelist_by_code
     if _pricelist_cache is not None:
         return _pricelist_cache
 
@@ -599,10 +601,12 @@ def load_pricelist() -> dict[str, dict]:
             file=sys.stderr,
         )
         _pricelist_cache = {}
+        _pricelist_by_code = {}
         return {}
 
     if not rows:
         _pricelist_cache = {}
+        _pricelist_by_code = {}
         return {}
 
     headers = [h.lower().strip() for h in rows[0]]
@@ -615,8 +619,10 @@ def load_pricelist() -> dict[str, dict]:
 
     # Detect format: new sheet has explicit "remove" + "replace" columns
     has_split_columns = "remove" in headers and "replace" in headers
+    has_code_column = "code" in headers
 
     pricelist = {}
+    by_code = {}
     for row in rows[1:]:
         if len(row) < 3:
             continue
@@ -626,11 +632,9 @@ def load_pricelist() -> dict[str, dict]:
             continue
 
         if has_split_columns:
-            # New format: Remove and Replace columns are explicit
             remove_rate = _parse_float(d.get("remove", 0))
             replace_rate = _parse_float(d.get("replace", 0))
         else:
-            # Old format: single "unit price" column, R&R items need splitting
             price = _parse_float(d.get("unit price", 0) or d.get("unit_price", 0) or d.get("replace", 0))
             desc_lower_tmp = desc.lower()
             if desc_lower_tmp.startswith("r&r "):
@@ -640,22 +644,69 @@ def load_pricelist() -> dict[str, dict]:
                 remove_rate = 0.0
                 replace_rate = price
 
-        desc_lower = desc.lower()
-        pricelist[desc_lower] = {
+        code = (d.get("code", "") or "").strip() if has_code_column else ""
+
+        entry = {
+            "code": code,
             "description": desc,
             "unit": d.get("unit", "EA"),
             "remove": remove_rate,
             "replace": replace_rate,
             "trade": d.get("trade", ""),
+            "tax": _parse_float(d.get("tax", 0)),
             "is_material": _guess_is_material(desc),
         }
 
+        desc_lower = desc.lower()
+        pricelist[desc_lower] = entry
+
+        # Index by code (uppercase, stripped) — some codes share (e.g. RFGSTEEP
+        # for both remove and replace). First entry wins; lookup_price_by_code
+        # handles duplicates by checking remove vs replace context.
+        if code:
+            code_key = code.upper().replace(" ", "")
+            if code_key not in by_code:
+                by_code[code_key] = []
+            by_code[code_key].append(entry)
+
     _pricelist_cache = pricelist
+    _pricelist_by_code = by_code
+    print(f"[pipeline] Pricelist loaded: {len(pricelist)} items, {len(by_code)} unique codes")
     return pricelist
 
 
-def lookup_price(description: str) -> Optional[dict]:
-    """Fuzzy-match a description against the pricelist. Returns pricing dict or None."""
+def lookup_price_by_code(code: str) -> Optional[dict]:
+    """Look up a pricelist entry by Xactimate code. Returns pricing dict or None.
+
+    For codes with multiple entries (e.g., RFGSTEEP has both remove and replace lines),
+    returns the first match. Caller should use the remove/replace rates from the entry.
+    """
+    global _pricelist_by_code
+    if _pricelist_by_code is None:
+        load_pricelist()
+    if not _pricelist_by_code:
+        return None
+    code_key = code.upper().replace(" ", "").strip()
+    entries = _pricelist_by_code.get(code_key)
+    if entries:
+        return entries[0]
+    return None
+
+
+def lookup_price(description: str, code: str = None) -> Optional[dict]:
+    """Look up pricing. Tries code first (exact), then description (fuzzy).
+
+    Args:
+        description: Line item description for fuzzy matching.
+        code: Optional Xactimate code for exact matching (e.g., 'RFG300S').
+    """
+    # 1. Code match — instant, unambiguous
+    if code:
+        result = lookup_price_by_code(code)
+        if result:
+            return result
+
+    # 2. Description matching (existing fuzzy logic)
     pl = load_pricelist()
     desc_lower = description.lower().strip()
 
@@ -668,13 +719,13 @@ def lookup_price(description: str) -> Optional[dict]:
     if desc_norm.startswith("r&r "):
         desc_norm = desc_norm[4:]
 
-    # Try substring match — if description is contained in a pricelist key or vice versa
+    # Substring match
     for key, val in pl.items():
         key_norm = key[4:] if key.startswith("r&r ") else key
         if desc_norm in key or key_norm in desc_lower:
             return val
 
-    # Fuzzy match — word overlap, excluding stopwords
+    # Fuzzy match — word overlap
     STOPWORDS = {"the", "a", "an", "of", "for", "to", "in", "on", "at", "by", "or", "and", "&",
                  "-", "w/", "w/out", "up", "per", "sq", "sf", "lf", "ea", "ft", "hr"}
     desc_words = set(desc_lower.split()) - STOPWORDS
@@ -688,14 +739,12 @@ def lookup_price(description: str) -> Optional[dict]:
         if not key_words:
             continue
         overlap = len(desc_words & key_words)
-        # Score as percentage of the smaller set (Jaccard-like)
         min_len = min(len(desc_words), len(key_words))
         score = overlap / min_len if min_len > 0 else 0
         if score > best_score:
             best_score = score
             best = val
 
-    # Require at least 50% word overlap (excluding stopwords)
     if best_score >= 0.5:
         return best
     return None
