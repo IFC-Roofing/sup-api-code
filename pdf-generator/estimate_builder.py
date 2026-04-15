@@ -73,6 +73,110 @@ def apply_waste(base_sq: float, waste_pct: float) -> float:
 
 # ─── Section Ordering ──────────────────────────────────────────────────────────
 
+# ─── Gutter Section Builder (deterministic, no AI) ────────────────────────────
+
+def _build_gutter_section(gutter_measurements: dict, ins_data: dict, pricelist: dict) -> dict | None:
+    """
+    Build the Gutters section deterministically from bid measurements + pricelist.
+    Compares bid LF vs INS LF and uses whichever is higher.
+    Returns a fully-calculated section dict, or None if no gutter data.
+    """
+    if not gutter_measurements:
+        return None
+
+    bid_gutter_lf = gutter_measurements.get("gutter_lf", 0)
+    bid_downspout_lf = gutter_measurements.get("downspout_lf", 0)
+    splashguards = gutter_measurements.get("splashguards", 0)
+
+    if bid_gutter_lf == 0 and bid_downspout_lf == 0:
+        return None
+
+    # Sum INS gutter/downspout LF across all sections
+    ins_gutter_lf = 0
+    ins_downspout_lf = 0
+    if ins_data:
+        for ins_item in ins_data.get("line_items", []):
+            desc_lower = (ins_item.get("description") or "").lower()
+            qty = float(ins_item.get("quantity") or ins_item.get("qty") or 0)
+            unit = (ins_item.get("unit") or "").upper()
+            if unit != "LF":
+                continue
+            if any(kw in desc_lower for kw in ["gutter", "seamless"]):
+                if "downspout" not in desc_lower:
+                    ins_gutter_lf += qty
+            if "downspout" in desc_lower or "down spout" in desc_lower:
+                ins_downspout_lf += qty
+
+    # Use whichever source gives higher LF
+    final_gutter_lf = max(bid_gutter_lf, ins_gutter_lf)
+    final_downspout_lf = max(bid_downspout_lf, ins_downspout_lf)
+    source_gutter = "adjusted" if ins_gutter_lf > 0 else "added"
+    source_downspout = "adjusted" if ins_downspout_lf > 0 else "added"
+
+    print(f"[estimate_builder] Gutter section: bid={bid_gutter_lf}/{bid_downspout_lf} LF, INS={ins_gutter_lf}/{ins_downspout_lf} LF → using {final_gutter_lf}/{final_downspout_lf} LF")
+    if splashguards:
+        print(f"[estimate_builder] Gutter section: {splashguards} splashguards from bid")
+
+    # Look up pricelist rates
+    def _get_rate(desc_key: str) -> dict:
+        for key, val in pricelist.items():
+            if desc_key.lower() in key:
+                return val
+        return {"remove": 0.0, "replace": 0.0, "is_material": True}
+
+    line_items = []
+    section_totals = {"remove": 0.0, "replace": 0.0, "tax": 0.0, "op": 0.0, "total": 0.0}
+
+    def _add_item(desc, qty, unit, pricing, source):
+        math_result = calc_line_item(qty, pricing.get("remove", 0), pricing.get("replace", 0), pricing.get("is_material", True))
+        item = {
+            "num": 0,
+            "description": desc,
+            "qty": float(qty),
+            "unit": unit,
+            "remove_rate": pricing.get("remove", 0),
+            "replace_rate": pricing.get("replace", 0),
+            **math_result,
+            "is_material": True,
+            "is_bid": False,
+            "source": source,
+            "ins_item_num": None,
+            "ins_total": None,
+            "f9": "",
+            "photo_anchor": "",
+            "sub_name": "",
+        }
+        line_items.append(item)
+        for k in section_totals:
+            section_totals[k] = round(section_totals[k] + math_result[k], 2)
+
+    if final_gutter_lf > 0:
+        _add_item('R&R Gutter / downspout - aluminum - up to 5"', final_gutter_lf, "LF",
+                  _get_rate('gutter / downspout - aluminum - up to 5'), source_gutter)
+
+    if final_downspout_lf > 0:
+        pricing = _get_rate("downspout - aluminum")
+        if pricing.get("replace", 0) == 0:
+            pricing = _get_rate('gutter / downspout - aluminum - up to 5')
+        _add_item("R&R Downspout - aluminum", final_downspout_lf, "LF", pricing, source_downspout)
+
+    if splashguards > 0:
+        _add_item("R&R Gutter splash guard", splashguards, "EA",
+                  _get_rate("gutter splash guard"), "added")
+
+    if not line_items:
+        return None
+
+    return {
+        "name": "Gutters",
+        "coverage": "Dwelling",
+        "line_items": line_items,
+        "totals": section_totals,
+    }
+
+
+# ─── Section Ordering ──────────────────────────────────────────────────────────
+
 # Sections matching these keywords get pinned in this exact order.
 # Anything not matched is sorted by section total (descending) between
 # the last matched "normal" section and the "tail" sections (debris, general, o&p).
@@ -135,19 +239,17 @@ def f9_bid_item(description: str, amount: float, sub_name: str, damage_type: str
         ins_refs = ", ".join(str(i) for i in ins_line_items)
         lines = [
             f"Our line item covers Insurance line item(s) {ins_refs}.",
-            f"We are requesting for our sub bid to cover the full scope of the {description.lower()}.",
-            f"1. Our sub bid cost is ${amount:,.2f}.",
-            f"   a. Please see attached Photo Report showing {damage_type} to the {area_str}.",
-            f"   b. Please see attached {sub_name} bid for the confirmation of price.",
+            f"Hail damage was identified during inspection on the {area_str}.",
+            f"1. Please see attached Photo Report for documentation of hail impacts.",
+            f"2. Our sub bid cost is ${amount:,.2f}. Please see attached {sub_name} bid.",
         ]
     else:
         # INS has nothing for this trade — left out entirely
         lines = [
             f"The Insurance report left out the {description}.",
-            "We are requesting for our sub bid.",
-            f"1. Our sub bid cost is ${amount:,.2f}.",
-            f"   a. Please see attached Photo Report showing {damage_type} to the {area_str}.",
-            f"   b. Please see attached {sub_name} bid for the confirmation of price.",
+            f"Hail damage was identified during inspection on the {area_str}.",
+            f"1. Please see attached Photo Report for documentation of hail impacts.",
+            f"2. Our sub bid cost is ${amount:,.2f}. Please see attached {sub_name} bid.",
         ]
     return "\n".join(lines)
 
@@ -251,6 +353,14 @@ def build_estimate(pipeline_data: dict) -> dict:
     gutter_measurements = pipeline_data.get('gutter_measurements')
     gutter_text = _format_gutter_measurements(gutter_measurements)
 
+    # Pre-build gutter section deterministically (no AI)
+    from data_pipeline import load_pricelist
+    prebuilt_gutter = _build_gutter_section(gutter_measurements, ins_data, load_pricelist())
+    if prebuilt_gutter:
+        gutter_prompt_text = "GUTTERS ARE PRE-BUILT. Do NOT include any gutter, downspout, or splashguard line items in your response. The Gutters section will be injected automatically after your response. Skip all gutter-related items entirely."
+    else:
+        gutter_prompt_text = gutter_text
+
     prompt = f"""You are Sup, an AI supplement builder for IFC Roofing. Your job is to build a complete insurance supplement estimate.
 
 ## PROJECT
@@ -285,8 +395,8 @@ RULE: If the ITEL report specifies a shingle type, year, or product (e.g. '40-ye
 ## SUB BIDS (already marked up 30% wholesale → retail)
 {bids_text}
 
-## GUTTER MEASUREMENTS (from sub bid — use with XACTIMATE pricing, NOT bid price)
-{gutter_text}
+## GUTTER MEASUREMENTS
+{gutter_prompt_text}
 
 {corrections_text}
 
@@ -332,6 +442,7 @@ Build a complete IFC supplement estimate as a JSON object following this EXACT s
 - One bid can cover multiple scopes (doors + fence + siding). Each scope = separate bid line item in its matching section.
 - F9 NEGLIGIBLE THRESHOLD (1%): If the quantity difference between INS and IFC is less than 1% of the INS quantity, do NOT write an F9 for that item. The difference is too small to justify arguing. Just use the INS quantity as-is (source="ins"). Example: INS says 94.33 SQ and EV says 94.50 SQ → difference is 0.18% → no F9, use INS qty.
 - Pricelist price differences are NOT worth an F9. Only write F9s for quantity/scope disputes.
+- SHINGLE FELT RULE: For the main shingle line item, match whatever description INS used ("with felt" or "without felt"). Do NOT fight over this — it's a minor difference not worth an F9. If INS didn't specify either way, default to "w/ felt". The goal is to avoid generating an F9 over a felt/no-felt distinction.
 - ⚠️ F9 DOLLAR COMPARISONS BANNED: NEVER write "Per Xactimate pricing costs $X while Insurance report is $Y" or "The difference is $X." in F9 notes. This draws the adjuster's attention to pricing differences which we do NOT want. F9s must argue QUANTITY and SCOPE only. Say "We are requesting X [unit] based on EagleView measurements" — do NOT mention dollar amounts, cost differences, or compare our total vs INS total. The ONLY dollar amount allowed in an F9 is the total cost of a bid item ("Our sub bid cost is $X").
 - When INS pays more than our bid on a trade, keep their higher amount — don't adjust down.
 - Domino effect: roof tear-off justifies flashing, starter, IWS. Include all flashing types affected by tear-off.
@@ -400,7 +511,6 @@ Lines marked with "⚠️ CARRIER NOTE:" contain critical information about what
 9. DO NOT write F9 notes. Leave f9="" on ALL items. F9 notes are generated by a separate post-processor after your response.
    Focus entirely on correct structure, quantities, sources, and pricing.
 10. Sort sections: Roof first, then Gutters, then remaining trades by total (highest first), then Debris/General/O&P last.
-    LINE ITEM ORDER WITHIN SECTIONS: Pair remove/install items together. Tear-off (remove) line immediately followed by its matching install (put-back) line. Example: "Remove Laminated - comp. shingle rfg. - w/ felt" → immediately followed by "Laminated - comp. shingle rfg. - w/out felt". Same for steep charges: "Remove Additional charge for steep roof" → "Additional charge for steep roof". Then remaining items in logical order: felt, starter, ridge cap, drip edge, valley metal, flashing, vents, chimney, then bid items last.
 11. Group "Labor Minimums Applied" items in their own section.
 12. If 3+ trades: add O&P line item at end with ALL amounts = $0 (replace_rate=0, remove_rate=0, replace=0, remove=0, tax=0, op=0, total=0) and boilerplate F9. This is a signal line — never put actual dollar amounts on it.
 13. retail_total in SUB BIDS is the price to request from insurance — use it directly as the replace value.
@@ -537,11 +647,14 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
             "totals": section_totals,
         })
 
+    # Inject pre-built gutter section (replaces any AI-generated gutter section)
+    if prebuilt_gutter:
+        sections = [s for s in sections if "gutter" not in s["name"].lower()]
+        sections.append(prebuilt_gutter)
+        print(f"[estimate_builder] Injected pre-built Gutters section ({len(prebuilt_gutter['line_items'])} items)")
+
     # Sort sections
     sections.sort(key=section_sort_key)
-
-    # Post-process: pair remove/install items within each section
-    _pair_remove_install_items(sections)
 
     # Grand totals
     grand = {"remove": 0.0, "replace": 0.0, "tax": 0.0, "op": 0.0, "total": 0.0}
@@ -586,6 +699,19 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
     # Post-process: enforce INS qty floor (our qty must never be below INS qty)
     _enforce_ins_qty_floor(sections, pipeline_data.get("ins_data", {}))
 
+    # Post-process: enforce O&P section is truly last
+    _enforce_op_last(sections)
+
+    # Post-process: re-number items sequentially after all adds/removes
+    num = 1
+    for s in sections:
+        for item in s["line_items"]:
+            item["num"] = num
+            num += 1
+
+    # Post-process: strip F9s from items where our qty matches INS qty (agreement)
+    _strip_agreement_f9s(sections)
+
     # Post-process: map INS line numbers to our items (for F9 references)
     _map_ins_line_nums(sections, pipeline_data.get("ins_data", {}))
 
@@ -604,6 +730,13 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
             if item.get("source") == "ins" and item.get("f9"):
                 print(f"[estimate_builder] Stripped F9 from INS item: {item.get('description', '')}")
                 item["f9"] = ""
+
+    # Final re-number after F9 generation (in case F9 post-processors added items)
+    num = 1
+    for s in sections:
+        for item in s["line_items"]:
+            item["num"] = num
+            num += 1
 
     # Recalculate section + grand totals after all post-processing
     grand = {"remove": 0.0, "replace": 0.0, "tax": 0.0, "op": 0.0, "total": 0.0}
@@ -636,70 +769,41 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
 
 # ─── Helpers ───────────────────────────────────────────────────────────────────
 
-def _pair_remove_install_items(sections: list):
+def _enforce_op_last(sections: list):
     """
-    Post-process: within each section, pair remove/install items together.
-    Tear-off (remove) line immediately followed by its matching install (put-back).
-    E.g.: "Remove Laminated - comp. shingle rfg." → "Laminated - comp. shingle rfg."
-    Same for steep charges, high roof charges, etc.
-    Items that aren't part of a remove/install pair keep their relative order.
+    Post-process: ensure the O&P section is the very last section.
+    Moves it to the end if it's not already there.
     """
-    # Keywords that signal a "remove" line whose install pair follows
-    REMOVE_PREFIX = "remove "
+    op_idx = None
+    for i, section in enumerate(sections):
+        name_lower = section["name"].lower()
+        if "o&p" in name_lower or name_lower in ("overhead", "overhead & profit", "overhead and profit"):
+            op_idx = i
+            break
+    if op_idx is not None and op_idx != len(sections) - 1:
+        op_section = sections.pop(op_idx)
+        sections.append(op_section)
+        print(f"[estimate_builder] Moved O&P section to last position")
 
+
+def _strip_agreement_f9s(sections: list):
+    """
+    Post-process: for items tagged source='adjusted' where our qty matches INS qty
+    (within 1%), downgrade to source='ins' and strip the F9. These are agreement items.
+    """
     for section in sections:
-        items = section.get("line_items", [])
-        if len(items) < 2:
-            continue
-
-        # Build pairs: find each "Remove X" and its matching install "X"
-        used_indices = set()
-        paired_groups = []  # list of (remove_item, install_item) or (standalone_item,)
-
-        for i, item in enumerate(items):
-            if i in used_indices:
+        for item in section.get("line_items", []):
+            if item.get("source") != "adjusted":
                 continue
-            desc = (item.get("description") or "").strip()
-            desc_lower = desc.lower()
-
-            if desc_lower.startswith(REMOVE_PREFIX):
-                # This is a remove line — find its install pair
-                install_desc_fragment = desc_lower[len(REMOVE_PREFIX):].strip()
-                # Also try matching without "Remove " prefix: e.g. remove="Remove Additional charge for steep"
-                # install="Additional charge for steep"
-                best_match = None
-                best_idx = None
-                for j, other in enumerate(items):
-                    if j == i or j in used_indices:
-                        continue
-                    other_desc = (other.get("description") or "").strip().lower()
-                    # Skip other remove items
-                    if other_desc.startswith(REMOVE_PREFIX):
-                        continue
-                    # Match: install description starts with or contains the remove fragment
-                    if (install_desc_fragment in other_desc
-                            or other_desc.startswith(install_desc_fragment[:30])):
-                        best_match = other
-                        best_idx = j
-                        break  # take first match (closest in order)
-
-                if best_match is not None:
-                    paired_groups.append((item, best_match))
-                    used_indices.add(i)
-                    used_indices.add(best_idx)
-                else:
-                    paired_groups.append((item,))
-                    used_indices.add(i)
-            else:
-                paired_groups.append((item,))
-                used_indices.add(i)
-
-        # Flatten paired groups back into ordered list
-        new_items = []
-        for group in paired_groups:
-            new_items.extend(group)
-
-        section["line_items"] = new_items
+            ins_qty = item.get("ins_qty", 0)
+            our_qty = item.get("qty", 0)
+            if ins_qty and our_qty:
+                diff_pct = abs(our_qty - ins_qty) / ins_qty if ins_qty else 0
+                if diff_pct < 0.01:  # < 1% difference = agreement
+                    if item.get("f9"):
+                        print(f"[estimate_builder] Stripped F9 from agreement item (diff {diff_pct:.2%}): {item.get('description', '')}")
+                        item["f9"] = ""
+                    item["source"] = "ins"
 
 
 def _fix_op_signal_line(sections: list):
@@ -762,9 +866,12 @@ def _fix_descriptions(sections: list):
                 item["description"] = f"{cleaned} (Bid Item)" if "(Bid Item)" not in cleaned else cleaned
                 print(f"[estimate_builder] Fixed placeholder: '{old}' → '{item['description']}'")
 
-            # Fix doubled "(Bid Item)" suffix
-            if "(Bid Item) (Bid Item)" in item.get("description", ""):
-                item["description"] = item["description"].replace("(Bid Item) (Bid Item)", "(Bid Item)")
+            # Strip ALL "(Bid Item)" from description — the HTML template adds it via is_bid flag
+            if "(Bid Item)" in item.get("description", ""):
+                old = item["description"]
+                item["description"] = item["description"].replace(" (Bid Item)", "").replace("(Bid Item)", "").strip()
+                if item["description"] != old:
+                    print(f"[estimate_builder] Stripped '(Bid Item)' from description: '{old}' → '{item['description']}'")
 
             # Detect street address in bid item descriptions
             if item.get("is_bid") and _re.search(r'\d+\s+[A-Z][a-z]+\s+(Trail|St|Ave|Blvd|Dr|Ln|Rd|Way|Ct|Pl|Circle|Pkwy)', item.get("description", "")):
@@ -1448,9 +1555,10 @@ def _generate_f9s(sections: list, f9_matrix: list, pipeline_data: dict):
 ### STANDARD PATTERNS (use as defaults, adapt when context demands it)
 - source="adjusted" with ins_line_nums: Reference which INS line item(s) we cover, state the additional qty we're requesting, and justify with EagleView or scope evidence.
 - source="added" with no INS match: State that INS left this out, what we're requesting, and why it's needed (EagleView, domino effect, pre-loss condition, etc.).
-- is_bid=true: Reference our sub bid cost, name the sub, reference the attached bid. If INS has partial coverage, reference their line items.
+- is_bid=true: The default argument for bid items is HAIL DAMAGE. These trades (fence, windows, garage doors, siding, etc.) are being supplemented because of hail hits documented in the photo report. The F9 should: (1) state that hail damage was identified during inspection, (2) direct the adjuster to the attached photo report for evidence of hail impacts, (3) reference our sub bid cost and name the sub, (4) reference the attached bid. Keep it short — the photo report does the heavy lifting. Do NOT write long explanations about what the bid covers or the scope of work. If INS has partial coverage, reference their line items.
 
 ### CONTEXT-SPECIFIC ARGUMENTS
+- PAINT / PRIME items on roof fixtures (pipe jacks, vents, roof jacks): Use PRE-LOSS CONDITION argument, NOT rust/weather resistance. The F9 should state: these fixtures were painted prior to the loss (pre-loss condition). During roof replacement, the existing paint is damaged/disturbed. We are requesting prime & paint to restore the fixture to its pre-loss condition. Direct the adjuster to the photo report for pre-loss condition documentation. Do NOT mention rust prevention, weather resistance, or UV protection — insurance doesn't care about that.
 - Step flashing / apron flashing: ALWAYS use domino effect (tear-off disturbs existing, cannot be reused). Never claim hail damage on flashing.
 - Steep charges: Reference EagleView pitch distribution showing the steep portion.
 - High roof charges: Reference EagleView showing 2+ story structure.
@@ -2347,12 +2455,15 @@ def _format_gutter_measurements(gutter_data: dict) -> str:
     ]
     if gutter_data.get("miters"):
         lines.append(f"Miters: {gutter_data['miters']}")
+    if gutter_data.get("splashguards"):
+        lines.append(f"Splashguards: {gutter_data['splashguards']}")
     for item in gutter_data.get("other_items", []):
         lines.append(f"{item['description']}: {item['qty']} {item['unit']}")
     lines.append("")
     lines.append("USE THESE MEASUREMENTS to build individual Xactimate gutter line items:")
     lines.append("  - R&R Gutter / downspout - aluminum - up to 5\" → use Gutter LF")
-    lines.append("  - R&R Downspout - aluminum → use Downspout LF")  
+    lines.append("  - R&R Downspout - aluminum → use Downspout LF")
+    lines.append("  - Splashguard - aluminum → use Splashguards count (EA) if present")
     lines.append("  - Miters → include if present")
     lines.append("DO NOT submit gutters as a single bid item. Build line-by-line Xactimate items.")
     return "\n".join(lines)

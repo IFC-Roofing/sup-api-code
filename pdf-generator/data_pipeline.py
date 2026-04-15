@@ -27,26 +27,14 @@ SHARED_DRIVE_UPLOAD_FOLDER = "1tWeZivnrRjDtZq1eG6dHu4vHkBwgMWop"  # Generated Su
 
 import requests
 
-def _check_project_health(project_folder_id: str) -> dict:
-
-    return {}
-
 def get_service_account():
-    # Path resolution: prefer explicit env override (GOOGLE_SERVICE_ACCOUNT_KEY),
-    # fall back to ROOT / google-drive-key.json.
-    #
-    # On prod (/opt/sup/) ROOT-relative path matches where systemd provisions the
-    # key — no env var needed. Locally, ROOT = sup-api-code/ but the key may live
-    # at the dev root above. Setting GOOGLE_SERVICE_ACCOUNT_KEY in .env bridges
-    # the gap without requiring a symlink. Same shape as SUP_WORKSPACE override.
-    creds_path = os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY") or str(ROOT / "google-drive-key.json")
-    subject = os.getenv("GOOGLE_SERVICE_ACCOUNT_SUBJECT", "sup@ifcroofing.com")
+    creds_path = ROOT / "google-drive-key.json"
     from google.oauth2 import service_account
     scopes = [
         "https://www.googleapis.com/auth/drive",
         "https://www.googleapis.com/auth/spreadsheets.readonly",
     ]
-    return service_account.Credentials.from_service_account_file(creds_path, scopes=scopes).with_subject(subject)
+    return service_account.Credentials.from_service_account_file(str(creds_path), scopes=scopes).with_subject('sup@ifcroofing.com')
 
 
 # ─── IFC API ───────────────────────────────────────────────────────────────────
@@ -569,44 +557,24 @@ def extract_address(project: dict) -> dict:
 # ─── Pricelist ─────────────────────────────────────────────────────────────────
 
 _pricelist_cache: Optional[dict] = None
-_pricelist_by_code: Optional[dict] = None
 
 def load_pricelist() -> dict[str, dict]:
-    """Load pricelist from Google Sheet.
-
-    Returns {description_lower: {code, description, remove, replace, unit, trade, ...}}.
-    Also populates _pricelist_by_code for code-based lookups.
-
-    Graceful fallback: if credentials are missing or Sheets access fails, caches and
-    returns an empty dict so lookup_price() returns None → items default to price=0.
-    """
-    global _pricelist_cache, _pricelist_by_code
+    """Load pricelist from Google Sheet. Returns {description_lower: {remove, replace, unit, category}}"""
+    global _pricelist_cache
     if _pricelist_cache is not None:
         return _pricelist_cache
 
-    try:
-        from googleapiclient.discovery import build
-        creds = get_service_account()
-        service = build("sheets", "v4", credentials=creds)
+    from googleapiclient.discovery import build
+    creds = get_service_account()
+    service = build("sheets", "v4", credentials=creds)
 
-        result = service.spreadsheets().values().get(
-            spreadsheetId=PRICELIST_SHEET_ID,
-            range="Pricelist!A:Z",
-        ).execute()
-        rows = result.get("values", [])
-    except Exception as e:
-        print(
-            f"[data_pipeline] Pricelist load failed ({type(e).__name__}: {e}) — "
-            f"continuing with empty pricelist. Items will default to price=0.",
-            file=sys.stderr,
-        )
-        _pricelist_cache = {}
-        _pricelist_by_code = {}
-        return {}
+    result = service.spreadsheets().values().get(
+        spreadsheetId=PRICELIST_SHEET_ID,
+        range="Pricelist!A:Z",
+    ).execute()
+    rows = result.get("values", [])
 
     if not rows:
-        _pricelist_cache = {}
-        _pricelist_by_code = {}
         return {}
 
     headers = [h.lower().strip() for h in rows[0]]
@@ -619,10 +587,8 @@ def load_pricelist() -> dict[str, dict]:
 
     # Detect format: new sheet has explicit "remove" + "replace" columns
     has_split_columns = "remove" in headers and "replace" in headers
-    has_code_column = "code" in headers
 
     pricelist = {}
-    by_code = {}
     for row in rows[1:]:
         if len(row) < 3:
             continue
@@ -632,9 +598,11 @@ def load_pricelist() -> dict[str, dict]:
             continue
 
         if has_split_columns:
+            # New format: Remove and Replace columns are explicit
             remove_rate = _parse_float(d.get("remove", 0))
             replace_rate = _parse_float(d.get("replace", 0))
         else:
+            # Old format: single "unit price" column, R&R items need splitting
             price = _parse_float(d.get("unit price", 0) or d.get("unit_price", 0) or d.get("replace", 0))
             desc_lower_tmp = desc.lower()
             if desc_lower_tmp.startswith("r&r "):
@@ -644,69 +612,22 @@ def load_pricelist() -> dict[str, dict]:
                 remove_rate = 0.0
                 replace_rate = price
 
-        code = (d.get("code", "") or "").strip() if has_code_column else ""
-
-        entry = {
-            "code": code,
+        desc_lower = desc.lower()
+        pricelist[desc_lower] = {
             "description": desc,
             "unit": d.get("unit", "EA"),
             "remove": remove_rate,
             "replace": replace_rate,
             "trade": d.get("trade", ""),
-            "tax": _parse_float(d.get("tax", 0)),
             "is_material": _guess_is_material(desc),
         }
 
-        desc_lower = desc.lower()
-        pricelist[desc_lower] = entry
-
-        # Index by code (uppercase, stripped) — some codes share (e.g. RFGSTEEP
-        # for both remove and replace). First entry wins; lookup_price_by_code
-        # handles duplicates by checking remove vs replace context.
-        if code:
-            code_key = code.upper().replace(" ", "")
-            if code_key not in by_code:
-                by_code[code_key] = []
-            by_code[code_key].append(entry)
-
     _pricelist_cache = pricelist
-    _pricelist_by_code = by_code
-    print(f"[pipeline] Pricelist loaded: {len(pricelist)} items, {len(by_code)} unique codes")
     return pricelist
 
 
-def lookup_price_by_code(code: str) -> Optional[dict]:
-    """Look up a pricelist entry by Xactimate code. Returns pricing dict or None.
-
-    For codes with multiple entries (e.g., RFGSTEEP has both remove and replace lines),
-    returns the first match. Caller should use the remove/replace rates from the entry.
-    """
-    global _pricelist_by_code
-    if _pricelist_by_code is None:
-        load_pricelist()
-    if not _pricelist_by_code:
-        return None
-    code_key = code.upper().replace(" ", "").strip()
-    entries = _pricelist_by_code.get(code_key)
-    if entries:
-        return entries[0]
-    return None
-
-
-def lookup_price(description: str, code: str = None) -> Optional[dict]:
-    """Look up pricing. Tries code first (exact), then description (fuzzy).
-
-    Args:
-        description: Line item description for fuzzy matching.
-        code: Optional Xactimate code for exact matching (e.g., 'RFG300S').
-    """
-    # 1. Code match — instant, unambiguous
-    if code:
-        result = lookup_price_by_code(code)
-        if result:
-            return result
-
-    # 2. Description matching (existing fuzzy logic)
+def lookup_price(description: str) -> Optional[dict]:
+    """Fuzzy-match a description against the pricelist. Returns pricing dict or None."""
     pl = load_pricelist()
     desc_lower = description.lower().strip()
 
@@ -719,13 +640,13 @@ def lookup_price(description: str, code: str = None) -> Optional[dict]:
     if desc_norm.startswith("r&r "):
         desc_norm = desc_norm[4:]
 
-    # Substring match
+    # Try substring match — if description is contained in a pricelist key or vice versa
     for key, val in pl.items():
         key_norm = key[4:] if key.startswith("r&r ") else key
         if desc_norm in key or key_norm in desc_lower:
             return val
 
-    # Fuzzy match — word overlap
+    # Fuzzy match — word overlap, excluding stopwords
     STOPWORDS = {"the", "a", "an", "of", "for", "to", "in", "on", "at", "by", "or", "and", "&",
                  "-", "w/", "w/out", "up", "per", "sq", "sf", "lf", "ea", "ft", "hr"}
     desc_words = set(desc_lower.split()) - STOPWORDS
@@ -739,12 +660,14 @@ def lookup_price(description: str, code: str = None) -> Optional[dict]:
         if not key_words:
             continue
         overlap = len(desc_words & key_words)
+        # Score as percentage of the smaller set (Jaccard-like)
         min_len = min(len(desc_words), len(key_words))
         score = overlap / min_len if min_len > 0 else 0
         if score > best_score:
             best_score = score
             best = val
 
+    # Require at least 50% word overlap (excluding stopwords)
     if best_score >= 0.5:
         return best
     return None
@@ -765,7 +688,7 @@ MARKUP_RATE = 0.30  # kept for reference; retail price now comes from Flow
 
 # These trades are billed as Xactimate line items (EV measurements), NOT as single bid items.
 # Their Flow cards hold the expected Xactimate total for reference only.
-XACTIMATE_TRADES = {"@shingle_roof", "@roof", "@flat_roof", "@detached_garage_roof", "@gutter"}
+XACTIMATE_TRADES = {"@shingle_roof", "@garage", "@roof", "@flat_roof", "@detached_garage_roof", "@gutter"}
 
 def fetch_action_trackers(project_id: int) -> list[dict]:
     """Fetch all action tracker cards for a project from IFC API."""
@@ -984,23 +907,11 @@ def fetch_bids_from_flow(project_id: int, temp_dir: str, project_folder_id: str 
     import requests
     token = os.getenv("IFC_API_TOKEN")
     base_url = os.getenv("IFC_API_BASE", "https://omni.ifc.shibui.ar")
-    headers = {"Authorization": f"Bearer {token}"} if token else {}
+    headers = {"Authorization": f"Bearer {token}"}
 
-    # Graceful fallback: if IFC API is unreachable or auth fails, return empty
-    # so generate.py line 115 falls through to fetch_bids_from_drive (which
-    # uses google-drive-key.json and needs no IFC API token). Covers local-dev
-    # runs with no IFC_API_TOKEN and transient prod outages.
-    try:
-        r = requests.get(f"{base_url}/action_trackers?project_id={project_id}", headers=headers, timeout=15)
-        r.raise_for_status()
-        trackers = r.json()
-    except (requests.exceptions.HTTPError, requests.exceptions.RequestException) as e:
-        print(
-            f"[data_pipeline] fetch_bids_from_flow: IFC API call failed "
-            f"({type(e).__name__}: {e}) — falling back to Drive-only bid fetch.",
-            file=sys.stderr,
-        )
-        return []
+    r = requests.get(f"{base_url}/action_trackers?project_id={project_id}", headers=headers)
+    r.raise_for_status()
+    trackers = r.json()
 
     bids = []
     for card in trackers:
@@ -1070,10 +981,12 @@ def fetch_bids_from_flow(project_id: int, temp_dir: str, project_folder_id: str 
             print(f"[pipeline]   [{trade}] skipped — no bid amount from Flow or PDF")
             continue
 
-        # Xactimate trades ALWAYS use Xactimate line items, never bids
-        if trade in XACTIMATE_TRADES:
-            print(f"[pipeline]   [{trade}] skipped — always Xactimate, never bid (has_bid={has_bid}, ${retail:,.2f})")
+        # Skip Xactimate trades that have no actual bid (just reference totals)
+        if trade in XACTIMATE_TRADES and not has_bid:
+            print(f"[pipeline]   [{trade}] skipped — Xactimate line-item trade, no bid")
             continue
+        if trade in XACTIMATE_TRADES and has_bid:
+            print(f"[pipeline]   [{trade}] has bid despite being Xactimate trade — treating as bid item (${retail:,.2f})")
 
         if not sub_name:
             sub_name = _tag_to_trade_label(trade)
@@ -1693,13 +1606,24 @@ def _extract_sub_name(text: str, file_name: str) -> str:
     def _is_ifc(s: str) -> bool:
         return any(skip in s.upper() for skip in ["IFC", "ROOFING AND CONSTRUCTION", "COLLEYVILLE", "5115", "RECIPIENT"])
 
+    def _is_junk(s: str) -> bool:
+        """Check if a string is a common PDF artifact, not a company name."""
+        s_lower = s.lower().strip()
+        # "Page 1 of 2", "Page 1/2", etc.
+        if re.match(r'^page\s+\d+\s*(of|/)\s*\d+$', s_lower):
+            return True
+        # Pure date patterns
+        if re.match(r'^\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}$', s_lower):
+            return True
+        return False
+
     # Pattern 0: Company name BEFORE "ESTIMATE/QUOTE" header (HiTech, etc.)
     for i, line in enumerate(lines[:15]):
         if line.upper() in ("ESTIMATE", "QUOTE", "PROPOSAL", "INVOICE"):
             # Look backwards for company name (first non-address, non-IFC line with mixed case)
             for j in range(i - 1, -1, -1):
                 candidate = lines[j]
-                if _is_address(candidate) or _is_ifc(candidate):
+                if _is_address(candidate) or _is_ifc(candidate) or _is_junk(candidate):
                     continue
                 if len(candidate) > 4:
                     # Skip pure numbers, dates, phone numbers
@@ -1726,12 +1650,12 @@ def _extract_sub_name(text: str, file_name: str) -> str:
     skip_words = {"ifc", "roofing", "recipient:", "construction", "5115", "colleyville",
                   "total", "estimate", "date", "address", "phone", "email",
                   "po box", "invoice", "quote", "proposal", "bill to", "ship to",
-                  "for", "to", "from", "issued", "valid", "subtotal"}
+                  "for", "to", "from", "issued", "valid", "subtotal", "page"}
     for line in lines[:10]:
         # Skip lines that are labels (end with ":" or are all-caps single words)
         if line.endswith(":") or (line.isupper() and len(line.split()) <= 2):
             continue
-        if _is_address(line) or _is_ifc(line):
+        if _is_address(line) or _is_ifc(line) or _is_junk(line):
             continue
         if len(line) > 4 and not any(s in line.lower() for s in skip_words):
             if re.search(r'[A-Z][a-z]', line):  # mixed case = company name
@@ -1743,7 +1667,7 @@ def _extract_sub_name(text: str, file_name: str) -> str:
     for line in reversed(lines[-15:]):
         if line.endswith(":") or (line.isupper() and len(line.split()) <= 2):
             continue
-        if _is_address(line) or _is_ifc(line):
+        if _is_address(line) or _is_ifc(line) or _is_junk(line):
             continue
         if len(line) > 4 and not any(s in line.lower() for s in skip_words):
             if re.search(r'[A-Z][a-z]', line):  # mixed case = company name
@@ -2339,6 +2263,7 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
         gutter_lf = 0
         downspout_lf = 0
         miters = 0
+        splashguards = 0
         other_items = []
         wholesale_total = 0.0
 
@@ -2366,12 +2291,24 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
             if miter_match:
                 miters += int(miter_match.group(1))
                 continue
+
+            # Pattern: "15 EA Splashguards" or "15 Splash Guards"
+            splash_match = re.search(r'(\d+)\s*(?:EA|ea|pc|pcs)?\s*(?:splash\s*guard|splashguard|kick[\s-]*out|diverter)', line_lower)
+            if splash_match:
+                splashguards += int(splash_match.group(1))
+                continue
             
             # Also catch "14\nMiters" pattern (quantity on description line)
             if "miter" in line_lower or "elbow" in line_lower:
                 num_match = re.search(r'(\d+)', line)
                 if num_match:
                     miters += int(num_match.group(1))
+
+            # Also catch splashguard on its own line
+            if any(kw in line_lower for kw in ["splash guard", "splashguard", "kick out", "kickout", "diverter"]):
+                num_match = re.search(r'(\d+)', line)
+                if num_match:
+                    splashguards += int(num_match.group(1))
 
             # Catch total
             total_match = re.search(r'(?:total|subtotal|balance)[:\s]*\$?\s*([\d,]+\.?\d*)', line_lower)
@@ -2402,7 +2339,7 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
                             "role": "user",
                             "content": (
                                 "Extract gutter measurements from this bid. Reply with ONLY a JSON object:\n"
-                                '{"gutter_lf": 0, "downspout_lf": 0, "miters": 0}\n'
+                                '{"gutter_lf": 0, "downspout_lf": 0, "miters": 0, "splashguards": 0}\n'
                                 "Fill in the actual numbers. If a measurement isn't listed, use 0.\n\n"
                                 f"{full_text[:2000]}"
                             )
@@ -2414,7 +2351,8 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
                         gutter_lf = parsed.get("gutter_lf", 0)
                         downspout_lf = parsed.get("downspout_lf", 0)
                         miters = parsed.get("miters", 0)
-                        print(f"[pipeline] Gutter measurements via AI: {gutter_lf} LF gutter, {downspout_lf} LF downspout, {miters} miters")
+                        splashguards = parsed.get("splashguards", 0)
+                        print(f"[pipeline] Gutter measurements via AI: {gutter_lf} LF gutter, {downspout_lf} LF downspout, {miters} miters, {splashguards} splashguards")
             except Exception as e:
                 print(f"[pipeline] AI gutter parse fallback failed: {e}")
 
@@ -2427,11 +2365,12 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
             "gutter_lf": int(gutter_lf),
             "downspout_lf": int(downspout_lf),
             "miters": int(miters),
+            "splashguards": int(splashguards),
             "other_items": other_items,
             "wholesale_total": wholesale_total,
             "raw_text": full_text[:1500],
         }
-        print(f"[pipeline] Gutter bid parsed: {sub_name} — {int(gutter_lf)} LF gutter, {int(downspout_lf)} LF downspout, {int(miters)} miters (${wholesale_total:,.2f} wholesale)")
+        print(f"[pipeline] Gutter bid parsed: {sub_name} — {int(gutter_lf)} LF gutter, {int(downspout_lf)} LF downspout, {int(miters)} miters, {int(splashguards)} splashguards (${wholesale_total:,.2f} wholesale)")
         return result
 
     except Exception as e:
