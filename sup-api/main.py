@@ -538,6 +538,11 @@ async def generate_estimate(req: EstimateRequest, request: Request):
                 request_id=request_id,
             )
 
+        # Log key pipeline diagnostics on success
+        for line in result["stdout"].splitlines():
+            if any(kw in line for kw in ["[gutter_bid]", "[estimate_builder] Gutter", "[estimate_builder] Injected", "[estimate_builder] Paired", "[estimate_builder] Stripped", "[pipeline] Sub name", "[pipeline] ⚠", "[pipeline] ✅ Gutter", "No Original Bids"]):
+                logger.info(f"[{request_id}] {line.strip()}")
+
         parsed = parse_estimate_output(result["stdout"])
         strategies_used = parse_strategies_from_output(result["stdout"])
 
@@ -819,6 +824,11 @@ async def estimate_from_payload(req: EstimateFromPayloadRequest, request: Reques
                 error=f"Pipeline failed (exit {result['exit_code']}): {result['stderr'][:500]}",
                 request_id=request_id,
             )
+
+        # Log key pipeline diagnostics on success
+        for line in result["stdout"].splitlines():
+            if any(kw in line for kw in ["[gutter_bid]", "[estimate_builder] Gutter", "[estimate_builder] Injected", "[estimate_builder] Paired", "[estimate_builder] Stripped", "[pipeline] Sub name", "[pipeline] ⚠", "[pipeline] ✅ Gutter", "No Original Bids"]):
+                logger.info(f"[{request_id}] {line.strip()}")
 
         parsed = parse_estimate_output(result["stdout"])
         strategies_used = parse_strategies_from_output(result["stdout"])
