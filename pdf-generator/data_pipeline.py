@@ -1583,7 +1583,36 @@ def _parse_bid_pdf(pdf_path: str, trade_tag: str, file_name: str) -> Optional[di
 
 
 def _extract_sub_name(text: str, file_name: str) -> str:
-    """Extract subcontractor company name from bid text."""
+    """Extract subcontractor company name from bid text.
+    Uses AI extraction with heuristic fallback."""
+    # Try AI extraction first (fast, single-shot)
+    try:
+        import anthropic
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        if api_key:
+            client = anthropic.Anthropic(api_key=api_key)
+            msg = client.messages.create(
+                model="claude-sonnet-4-6",
+                max_tokens=60,
+                messages=[{
+                    "role": "user",
+                    "content": (
+                        "Extract the subcontractor company name from this bid/estimate. "
+                        "NOT the customer or recipient (IFC Roofing is the customer). "
+                        "Reply with ONLY the company name, nothing else. "
+                        "If you can't find it, reply UNKNOWN.\n\n"
+                        f"{text[:1500]}"
+                    )
+                }]
+            )
+            ai_name = msg.content[0].text.strip().strip('"').strip("'")
+            if ai_name and ai_name != "UNKNOWN" and len(ai_name) > 2 and len(ai_name) < 80:
+                print(f"[pipeline] Sub name via AI: '{ai_name}'")
+                return ai_name
+    except Exception as e:
+        print(f"[pipeline] AI sub name extraction failed: {e}")
+
+    # Heuristic fallback
     lines = [l.strip() for l in text.split("\n") if l.strip()]
 
     def _is_address(s: str) -> bool:
