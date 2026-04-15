@@ -699,6 +699,9 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
     # Post-process: enforce INS qty floor (our qty must never be below INS qty)
     _enforce_ins_qty_floor(sections, pipeline_data.get("ins_data", {}))
 
+    # Post-process: pair remove + replace items adjacent within each section
+    _pair_remove_replace(sections)
+
     # Post-process: enforce O&P section is truly last
     _enforce_op_last(sections)
 
@@ -769,6 +772,79 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
 
 
 # ─── Helpers ───────────────────────────────────────────────────────────────────
+
+def _pair_remove_replace(sections: list):
+    """
+    Post-process: within each section, move 'Remove ...' items to be immediately
+    before their matching replace/install counterpart.
+    
+    Matching logic: strip 'Remove ' prefix from description, then fuzzy-match
+    against other items in the same section.
+    """
+    import re as _re
+
+    def _norm(desc: str) -> str:
+        d = desc.lower().strip()
+        d = _re.sub(r'^remove\s+', '', d)
+        d = _re.sub(r'^r&r\s+', '', d)
+        d = _re.sub(r'^detach\s*&\s*reset\s+', '', d)
+        d = _re.sub(r'[^a-z0-9 ]', '', d)
+        return _re.sub(r'\s+', ' ', d).strip()
+
+    moved = 0
+    for section in sections:
+        items = section.get("line_items", [])
+        if len(items) < 2:
+            continue
+
+        # Find all remove items and their intended partners
+        i = 0
+        while i < len(items):
+            desc = items[i].get("description", "")
+            if not desc.lower().startswith("remove "):
+                i += 1
+                continue
+
+            remove_norm = _norm(desc)
+            # Look for matching replace item (not already adjacent)
+            best_j = None
+            best_score = 0
+            for j in range(len(items)):
+                if j == i:
+                    continue
+                other_desc = items[j].get("description", "")
+                if other_desc.lower().startswith("remove "):
+                    continue  # skip other remove items
+                other_norm = _norm(other_desc)
+                if not other_norm or not remove_norm:
+                    continue
+                # Check word overlap
+                r_words = set(remove_norm.split())
+                o_words = set(other_norm.split())
+                overlap = len(r_words & o_words)
+                min_len = min(len(r_words), len(o_words))
+                if min_len > 0:
+                    score = overlap / min_len
+                    if score > best_score and score >= 0.6:
+                        best_score = score
+                        best_j = j
+
+            if best_j is not None and best_j != i + 1:
+                # Move remove item to just before its partner
+                remove_item = items.pop(i)
+                # Adjust index after pop
+                insert_at = best_j if best_j > i else best_j
+                items.insert(insert_at, remove_item)
+                print(f"[estimate_builder] Paired: '{desc}' moved before '{items[insert_at + 1]['description']}'")
+                moved += 1
+                # Don't increment i — re-check this position
+                continue
+
+            i += 1
+
+    if moved:
+        print(f"[estimate_builder] Remove/replace pairing: moved {moved} item(s)")
+
 
 def _enforce_op_last(sections: list):
     """
