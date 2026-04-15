@@ -355,7 +355,12 @@ def build_estimate(pipeline_data: dict) -> dict:
 
     # Pre-build gutter section deterministically (no AI)
     from data_pipeline import load_pricelist
+    print(f"[estimate_builder] Gutter measurements received: {gutter_measurements}")
     prebuilt_gutter = _build_gutter_section(gutter_measurements, ins_data, load_pricelist())
+    print(f"[estimate_builder] Gutter pre-builder result: {'YES (' + str(len(prebuilt_gutter['line_items'])) + ' items)' if prebuilt_gutter else 'None'}")
+    if prebuilt_gutter:
+        for item in prebuilt_gutter['line_items']:
+            print(f"[estimate_builder] Gutter item: {item['description']} = {item['qty']} {item['unit']}")
     if prebuilt_gutter:
         gutter_prompt_text = "GUTTERS ARE PRE-BUILT. Do NOT include any gutter, downspout, or splashguard line items in your response. The Gutters section will be injected automatically after your response. Skip all gutter-related items entirely."
     else:
