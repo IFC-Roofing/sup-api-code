@@ -2378,7 +2378,7 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
             "downspout_lf": int(downspout_lf),
             "miters": int(miters),
             "splashguards": int(splashguards),
-            "other_items": other_items,
+            "other_items": [],
             "wholesale_total": wholesale_total,
             "raw_text": full_text[:1500],
         }
@@ -2386,7 +2386,9 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
         return result
 
     except Exception as e:
-        print(f"[pipeline] Gutter bid parse failed: {e}")
+        import traceback
+        print(f"[gutter_bid] Gutter bid parse failed: {e}")
+        traceback.print_exc()
         return None
 
 
