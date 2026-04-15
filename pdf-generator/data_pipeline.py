@@ -1615,6 +1615,9 @@ def _extract_sub_name(text: str, file_name: str) -> str:
         # Pure date patterns
         if re.match(r'^\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}$', s_lower):
             return True
+        # "Prepared for", "Prepared by", "Submitted to", etc.
+        if re.match(r'^(prepared|submitted|sent|billed|issued)\s+(for|to|by)\b', s_lower):
+            return True
         return False
 
     # Pattern 0: Company name BEFORE "ESTIMATE/QUOTE" header (HiTech, etc.)
@@ -2023,13 +2026,16 @@ def run(project_name: str, temp_dir: str = None) -> dict:
 
     # 10. Parse gutter bid for measurements (gutters use Xactimate pricing, not bid price)
     gutter_measurements = None
-    if health.get("folder_ids", {}).get("original_bids"):
-        print("[pipeline] Checking for gutter bid measurements...")
-        gutter_measurements = parse_gutter_bid(health["folder_ids"]["original_bids"], td)
+    ob_folder = health.get("folder_ids", {}).get("original_bids")
+    if ob_folder:
+        print(f"[pipeline] Checking for gutter bid measurements (Original Bids: {ob_folder})...")
+        gutter_measurements = parse_gutter_bid(ob_folder, td)
         if gutter_measurements:
             print(f"[pipeline] ✅ Gutter measurements from bid: {gutter_measurements}")
         else:
             print("[pipeline] No gutter bid found — gutter scope from INS/EV only")
+    else:
+        print("[pipeline] ⚠️ No Original Bids folder found — skipping gutter bid search")
 
     return {
         "project": project,
@@ -2206,13 +2212,16 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
         ).execute()
         
         gutter_folder_id = None
-        for f in resp.get("files", []):
+        subfolders = resp.get("files", [])
+        print(f"[gutter_bid] Subfolders in Original Bids: {[f['name'] for f in subfolders]}")
+        for f in subfolders:
             if "gutter" in f["name"].lower():
                 gutter_folder_id = f["id"]
+                print(f"[gutter_bid] Found @gutter folder: {f['name']} ({f['id']})")
                 break
         
         if not gutter_folder_id:
-            # Try searching PDFs in the root original bids folder
+            print("[gutter_bid] No @gutter subfolder found, searching root Original Bids")
             gutter_folder_id = original_bids_folder_id
 
         # Find PDF in gutter folder (skip Archive subfolder)
@@ -2235,7 +2244,9 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
                 pdf_file = files[0]
 
         if not pdf_file:
+            print(f"[gutter_bid] No gutter PDF found in folder {gutter_folder_id}")
             return None
+        print(f"[gutter_bid] Using PDF: {pdf_file['name']} ({pdf_file['id']})")
 
         # Download
         tmp_path = os.path.join(temp_dir, f"gutter_bid_{pdf_file['id']}.pdf")
