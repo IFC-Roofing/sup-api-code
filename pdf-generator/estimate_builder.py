@@ -607,15 +607,26 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
             is_material = bool(item.get("is_material", True))
             is_bid = bool(item.get("is_bid", False))
 
+            desc = item.get("description", "")
+
             # Safety net: if non-bid item has 0 rates, look up from pricelist
             if not is_bid and replace_rate == 0 and remove_rate == 0 and qty > 0:
-                desc = item.get("description", "")
                 pricing = lookup_price(desc)
                 if pricing and pricing.get("replace", 0) > 0:
                     remove_rate = pricing["remove"]
                     replace_rate = pricing["replace"]
                     is_material = pricing.get("is_material", is_material)
                     print(f"[estimate_builder] Pricelist fallback: '{desc}' rates were 0 → remove={remove_rate}, replace={replace_rate}")
+
+            # Safety net: "Remove" items should have remove rate, not replace rate
+            # Opus sometimes puts all cost in replace_rate even for remove-only items
+            if not is_bid and desc.lower().startswith("remove ") and remove_rate == 0 and replace_rate > 0:
+                pricing = lookup_price(desc)
+                if pricing and pricing.get("remove", 0) > 0 and pricing.get("replace", 0) == 0:
+                    print(f"[estimate_builder] Rate column fix: '{desc}' — swapping replace_rate {replace_rate} to remove_rate {pricing['remove']}")
+                    remove_rate = pricing["remove"]
+                    replace_rate = 0.0
+                    is_material = pricing.get("is_material", is_material)
 
             math = calc_line_item(qty, remove_rate, replace_rate, is_material, is_bid)
 
@@ -1628,8 +1639,10 @@ def _generate_f9s(sections: list, f9_matrix: list, pipeline_data: dict):
             for bid in bids:
                 if item.get("sub_name") and item["sub_name"].lower() in bid.get("sub_name", "").lower():
                     block["bid_scope"] = bid.get("scope", "")
-                    block["bid_retail"] = bid.get("retail_total", 0)
+                    block["sub_bid_cost"] = bid.get("wholesale_total", 0)  # actual sub price (what the sub charges)
                     block["bid_line_items"] = bid.get("bid_line_items_text", "")
+                    # Remove 'total' for bid items to prevent AI using O&P-inflated number
+                    block.pop("total", None)
                     break
 
         items_block.append(block)
@@ -1661,7 +1674,7 @@ def _generate_f9s(sections: list, f9_matrix: list, pipeline_data: dict):
 ### STANDARD PATTERNS (use as defaults, adapt when context demands it)
 - source="adjusted" with ins_line_nums: Reference which INS line item(s) we cover, state the additional qty we're requesting, and justify with EagleView or scope evidence.
 - source="added" with no INS match: State that INS left this out, what we're requesting, and why it's needed (EagleView, domino effect, pre-loss condition, etc.).
-- is_bid=true: The default argument for bid items is HAIL DAMAGE. These trades (fence, windows, garage doors, siding, etc.) are being supplemented because of hail hits documented in the photo report. The F9 should: (1) state that hail damage was identified during inspection, (2) direct the adjuster to the attached photo report for evidence of hail impacts, (3) reference our sub bid cost and name the sub, (4) reference the attached bid. Keep it short — the photo report does the heavy lifting. Do NOT write long explanations about what the bid covers or the scope of work. If INS has partial coverage, reference their line items.
+- is_bid=true: The default argument for bid items is HAIL DAMAGE. These trades (fence, windows, garage doors, siding, etc.) are being supplemented because of hail hits documented in the photo report. The F9 should: (1) state that hail damage was identified during inspection, (2) direct the adjuster to the attached photo report for evidence of hail impacts, (3) reference our sub bid cost (use the `sub_bid_cost` field — this is the actual sub price, NOT the total or retail which includes our markup and O&P), (4) reference the attached bid. Keep it short — the photo report does the heavy lifting. Do NOT write long explanations about what the bid covers or the scope of work. If INS has partial coverage, reference their line items.
 
 ### CONTEXT-SPECIFIC ARGUMENTS
 - PAINT / PRIME items on roof fixtures (pipe jacks, vents, roof jacks): Use PRE-LOSS CONDITION argument, NOT rust/weather resistance. The F9 should state: these fixtures were painted prior to the loss (pre-loss condition). During roof replacement, the existing paint is damaged/disturbed. We are requesting prime & paint to restore the fixture to its pre-loss condition. Direct the adjuster to the photo report for pre-loss condition documentation. Do NOT mention rust prevention, weather resistance, or UV protection — insurance doesn't care about that.
@@ -1913,9 +1926,10 @@ def _inject_missing_bids(sections: list, bids: list):
         op = round(retail * OP_RATE, 2)
         total = round(retail + op, 2)
 
+        wholesale = bid.get("wholesale_total", round(retail / 1.3, 2))
         f9 = f9_bid_item(
             description=scope,
-            amount=retail,
+            amount=wholesale,  # actual sub bid cost, not retail/O&P
             sub_name=sub_name,
         )
 
