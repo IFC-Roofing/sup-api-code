@@ -2289,135 +2289,84 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
         with open(tmp_path, "wb") as f:
             f.write(fh.getvalue())
 
-        # Extract text
+        # Render first page to image for vision extraction
         doc = _fitz.open(tmp_path)
-        full_text = "\n".join(page.get_text() for page in doc)
-        doc.close()
-
-        if not full_text.strip():
+        if len(doc) == 0:
+            doc.close()
             return None
 
-        # Extract sub name
+        # Grab text for sub name extraction
+        full_text = "\n".join(page.get_text() for page in doc)
         sub_name = _extract_sub_name(full_text, pdf_file["name"])
 
-        # Parse measurements from bid text
+        # Render page 1 to PNG for vision
+        page = doc[0]
+        pix = page.get_pixmap(dpi=200)
+        img_path = os.path.join(temp_dir, f"gutter_bid_{pdf_file['id']}.png")
+        pix.save(img_path)
+        doc.close()
+
+        # Read image as base64
+        import base64
+        with open(img_path, "rb") as img_f:
+            img_b64 = base64.b64encode(img_f.read()).decode()
+
+        # Vision extraction via Sonnet
+        import anthropic
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        if not api_key:
+            print("[gutter_bid] No ANTHROPIC_API_KEY - cannot parse gutter bid")
+            return None
+
+        client = anthropic.Anthropic(api_key=api_key)
+        msg = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=200,
+            messages=[{
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image",
+                        "source": {"type": "base64", "media_type": "image/png", "data": img_b64}
+                    },
+                    {
+                        "type": "text",
+                        "text": (
+                            "Extract gutter measurements from this bid image. Reply with ONLY a JSON object:\n"
+                            '{"gutter_lf": 0, "downspout_lf": 0, "miters": 0, "splashguards": 0, "wholesale_total": 0}\n'
+                            "Fill in the actual numbers from the bid. LF = linear feet. "
+                            "wholesale_total = the bid total amount. If a measurement isn't listed, use 0."
+                        )
+                    }
+                ]
+            }]
+        )
+        ai_text = msg.content[0].text.strip()
+        print(f"[gutter_bid] Vision response: {ai_text}")
+
+        # Parse JSON - handle markdown code blocks
+        if "```" in ai_text:
+            ai_text = ai_text.split("```")[1]
+            if ai_text.startswith("json"):
+                ai_text = ai_text[4:]
+            ai_text = ai_text.strip()
+
         gutter_lf = 0
         downspout_lf = 0
         miters = 0
         splashguards = 0
-        other_items = []
         wholesale_total = 0.0
 
-        lines = full_text.split("\n")
-        for i, line in enumerate(lines):
-            line_lower = line.lower().strip()
-            
-            # Pattern A: "432 FT 5" Gutters" or "432 LF Gutters" — qty + desc on same line
-            qty_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:FT|LF|ft|lf)\s+(.+)', line.strip())
-            if qty_match:
-                qty = float(qty_match.group(1))
-                desc = qty_match.group(2).strip()
-                desc_lower = desc.lower()
-                if any(kw in desc_lower for kw in ["gutter", "5\"", "5\"", "6\"", "6\"", "seamless"]):
-                    gutter_lf += qty
-                elif any(kw in desc_lower for kw in ["downspout", "down spout", "2x3", "3x4"]):
-                    downspout_lf += qty
-                else:
-                    other_items.append({"description": desc, "qty": qty, "unit": "LF"})
-                continue
-
-            # Pattern B: "245 Lf" or "245 LF" on its own line — look at PREVIOUS line for description
-            qty_only = re.match(r'^(\d+(?:\.\d+)?)\s*(?:FT|LF|ft|lf)\s*$', line.strip())
-            if qty_only and i > 0:
-                qty = float(qty_only.group(1))
-                prev_line = lines[i - 1].strip()
-                prev_lower = prev_line.lower()
-                if any(kw in prev_lower for kw in ["gutter", "k-style", "k style", "5\"", "5\"", "6\"", "6\"", "seamless"]):
-                    gutter_lf += qty
-                elif any(kw in prev_lower for kw in ["downspout", "down spout", "2x3", "3x4"]):
-                    downspout_lf += qty
-                else:
-                    other_items.append({"description": prev_line, "qty": qty, "unit": "LF"})
-                continue
-
-            # Pattern: "14 Miters 5"" or "14 EA Elbows"
-            miter_match = re.search(r'(\d+)\s*(?:EA|ea|pc|pcs)?\s*(?:miter|elbow|end\s*cap)', line_lower)
-            if miter_match:
-                miters += int(miter_match.group(1))
-                continue
-
-            # Pattern: "15 EA Splashguards" or "15 Splash Guards"
-            splash_match = re.search(r'(\d+)\s*(?:EA|ea|pc|pcs)?\s*(?:splash\s*guard|splashguard|kick[\s-]*out|diverter)', line_lower)
-            if splash_match:
-                splashguards += int(splash_match.group(1))
-                continue
-            
-            # Also catch "14\nMiters" pattern (quantity on description line)
-            if "miter" in line_lower or "elbow" in line_lower:
-                num_match = re.search(r'(\d+)', line)
-                if num_match:
-                    miters += int(num_match.group(1))
-
-            # Also catch splashguard on its own line (may have qty on a later line)
-            if any(kw in line_lower for kw in ["splash guard", "splashguard", "kick out", "kickout", "diverter", "valley shield"]):
-                num_match = re.search(r'(\d+)', line)
-                if num_match and not re.search(r'\$', line):
-                    splashguards += int(num_match.group(1))
-                elif not num_match:
-                    # Look ahead for a standalone number line (within 3 lines)
-                    for j in range(i + 1, min(i + 4, len(lines))):
-                        ahead = lines[j].strip()
-                        if re.match(r'^\d+$', ahead):
-                            splashguards += int(ahead)
-                            break
-                        if re.search(r'\$', ahead):  # hit a price line, stop
-                            break
-
-            # Catch total
-            total_match = re.search(r'(?:total|subtotal|balance)[:\s]*\$?\s*([\d,]+\.?\d*)', line_lower)
-            if total_match:
-                try:
-                    wholesale_total = float(total_match.group(1).replace(",", ""))
-                except ValueError:
-                    pass
-
-        # Also try structured table pattern: "Description Quantity Unit price Amount"
-        # Pattern: number followed by price followed by amount
-        table_pattern = re.compile(r'(\d+)\s+([\d.]+)\s+([\d,]+\.\d{2})')
-        for match in table_pattern.finditer(full_text):
-            # These are table rows — already handled above via the line-by-line parser
-            pass
-
-        if gutter_lf == 0 and downspout_lf == 0:
-            # Couldn't parse measurements — try AI fallback
-            try:
-                import anthropic
-                api_key = os.getenv("ANTHROPIC_API_KEY")
-                if api_key:
-                    client = anthropic.Anthropic(api_key=api_key)
-                    msg = client.messages.create(
-                        model="claude-sonnet-4-6",
-                        max_tokens=200,
-                        messages=[{
-                            "role": "user",
-                            "content": (
-                                "Extract gutter measurements from this bid. Reply with ONLY a JSON object:\n"
-                                '{"gutter_lf": 0, "downspout_lf": 0, "miters": 0, "splashguards": 0}\n'
-                                "Fill in the actual numbers. If a measurement isn't listed, use 0.\n\n"
-                                f"{full_text[:2000]}"
-                            )
-                        }]
-                    )
-                    ai_text = msg.content[0].text.strip()
-                    if ai_text.startswith("{"):
-                        parsed = json.loads(ai_text)
-                        gutter_lf = parsed.get("gutter_lf", 0)
-                        downspout_lf = parsed.get("downspout_lf", 0)
-                        miters = parsed.get("miters", 0)
-                        splashguards = parsed.get("splashguards", 0)
-                        print(f"[pipeline] Gutter measurements via AI: {gutter_lf} LF gutter, {downspout_lf} LF downspout, {miters} miters, {splashguards} splashguards")
-            except Exception as e:
-                print(f"[pipeline] AI gutter parse fallback failed: {e}")
+        if ai_text.startswith("{"):
+            parsed = json.loads(ai_text)
+            gutter_lf = parsed.get("gutter_lf", 0)
+            downspout_lf = parsed.get("downspout_lf", 0)
+            miters = parsed.get("miters", 0)
+            splashguards = parsed.get("splashguards", 0)
+            wholesale_total = float(parsed.get("wholesale_total", 0))
+            print(f"[gutter_bid] Vision parsed: {gutter_lf} LF gutter, {downspout_lf} LF downspout, {miters} miters, {splashguards} splashguards (${wholesale_total:,.2f})")
+        else:
+            print(f"[gutter_bid] Vision response not JSON - parse failed")
 
         if gutter_lf == 0 and downspout_lf == 0:
             print(f"[pipeline] WARNING: Found gutter bid PDF but couldn't extract measurements")
