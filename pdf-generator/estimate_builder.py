@@ -145,6 +145,7 @@ def _build_gutter_section(gutter_measurements: dict, ins_data: dict, pricelist: 
             "f9": "",
             "photo_anchor": "",
             "sub_name": "",
+            "prebuilt": True,  # protect from QA agent description changes
         }
         line_items.append(item)
         for k in section_totals:
@@ -690,6 +691,9 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
     # Post-process: remove duplicate bid items
     _dedup_bid_items(sections)
 
+    # Post-process: strip gutter/downspout items Opus duplicated outside the Gutters section
+    _strip_duplicate_gutter_items(sections)
+
     # Post-process: inject any missing bids the AI dropped
     _inject_missing_bids(sections, bids)
 
@@ -1145,6 +1149,14 @@ def _fix_steep_waste(sections: list, ev_data: dict):
     for section in sections:
         items = section.get("line_items", [])
 
+        # Find tear-off / shingle remove qty (needed for high roof assertion)
+        tearoff_qty_local = None
+        for _item in items:
+            _dl = _item.get("description", "").lower()
+            if ("tear off" in _dl and "shingle" in _dl) or ("remove" in _dl and ("comp. shingle" in _dl or "composition shingle" in _dl or "laminated" in _dl) and "ridge" not in _dl and "hip" not in _dl):
+                tearoff_qty_local = _item.get("qty", 0)
+                break
+
         # ── Steep charges ─────────────────────────────────────
         for item in items:
             desc_lower = item.get("description", "").lower()
@@ -1168,6 +1180,16 @@ def _fix_steep_waste(sections: list, ev_data: dict):
                         print(f"[estimate_builder] Fixed steep waste: '{item['description']}' qty {actual_add} → {expected_add} SQ (waste {waste_pct}%)")
 
             # ── High roof charges ─────────────────────────────
+            # High roof REMOVE = tear-off qty (full measured roof, not INS)
+            if "remove additional charge for high" in desc_lower:
+                if tearoff_qty_local and abs(item.get("qty", 0) - tearoff_qty_local) > 0.01:
+                    old_qty = item["qty"]
+                    item["qty"] = tearoff_qty_local
+                    new_math = calc_line_item(tearoff_qty_local, item.get("remove_rate", 0), item.get("replace_rate", 0), item.get("is_material", False), item.get("is_bid", False))
+                    item.update(new_math)
+                    print(f"[estimate_builder] Fixed high roof remove: '{item['description']}' qty {old_qty} → {tearoff_qty_local} SQ (must match tear-off)")
+
+            # High roof ADD = tear-off × waste
             if "additional charge for high" in desc_lower and "remove" not in desc_lower:
                 remove_item = next(
                     (r for r in items
@@ -1948,6 +1970,40 @@ def _dedup_bid_items(sections: list):
                 seen_xact.add(key)
             deduped.append(item)
         section["line_items"] = deduped
+
+
+def _strip_duplicate_gutter_items(sections: list):
+    """
+    Remove gutter/downspout/splash guard items that Opus duplicated outside the
+    pre-built 'Gutters' section.  The deterministic gutter pre-builder is the
+    single source of truth — any gutter lines the AI added elsewhere are dupes.
+    """
+    GUTTER_KEYWORDS = ["gutter", "downspout", "splash guard"]
+    has_gutters_section = any(
+        s.get("name", "").lower().strip() == "gutters" for s in sections
+    )
+    if not has_gutters_section:
+        return  # no pre-built section → nothing to strip
+
+    for section in sections:
+        if section.get("name", "").lower().strip() == "gutters":
+            continue  # keep the real section
+        original = section.get("line_items", [])
+        filtered = []
+        for item in original:
+            dl = item.get("description", "").lower()
+            if any(kw in dl for kw in GUTTER_KEYWORDS) and not item.get("is_bid"):
+                print(f"[estimate_builder] Stripped duplicate gutter item from '{section.get('name', '')}': '{item.get('description', '')}' {item.get('qty', 0)} {item.get('unit', '')}")
+            else:
+                filtered.append(item)
+        if len(filtered) < len(original):
+            section["line_items"] = filtered
+            # Recalculate section totals
+            for key in ["remove", "replace", "tax", "op", "total"]:
+                section[key] = round(sum(i.get(key, 0) for i in filtered), 2)
+
+    # Remove now-empty sections
+    sections[:] = [s for s in sections if s.get("line_items")]
 
 
 def _inject_paint_companions(sections: list):

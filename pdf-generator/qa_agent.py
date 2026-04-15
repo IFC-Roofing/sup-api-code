@@ -430,6 +430,11 @@ def _apply_corrections(estimate: dict, corrections: list, pipeline_data: dict) -
         section, item = item_map[line_num]
         old_qty = item.get("qty", 0)
         changed = False
+
+        # Skip prebuilt items (e.g., deterministic gutter section)
+        if item.get("prebuilt"):
+            print(f"[qa_agent] Line {line_num}: skipping prebuilt item '{item.get('description', '')}'")
+            continue
         
         # Apply description change (must come before rate lookup)
         if fix.get("description"):
