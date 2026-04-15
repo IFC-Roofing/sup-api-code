@@ -709,11 +709,12 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
             item["num"] = num
             num += 1
 
+    # Post-process: map INS line numbers to our items (for F9 references)
+    # MUST run before _strip_agreement_f9s so ins_qty is populated
+    _map_ins_line_nums(sections, pipeline_data.get("ins_data", {}))
+
     # Post-process: strip F9s from items where our qty matches INS qty (agreement)
     _strip_agreement_f9s(sections)
-
-    # Post-process: map INS line numbers to our items (for F9 references)
-    _map_ins_line_nums(sections, pipeline_data.get("ins_data", {}))
 
     # Post-process: generate F9 notes (template selection + Sonnet fill)
     _generate_f9s(sections, f9_matrix, pipeline_data)
@@ -866,12 +867,13 @@ def _fix_descriptions(sections: list):
                 item["description"] = f"{cleaned} (Bid Item)" if "(Bid Item)" not in cleaned else cleaned
                 print(f"[estimate_builder] Fixed placeholder: '{old}' → '{item['description']}'")
 
-            # Strip ALL "(Bid Item)" from description — the HTML template adds it via is_bid flag
-            if "(Bid Item)" in item.get("description", ""):
-                old = item["description"]
-                item["description"] = item["description"].replace(" (Bid Item)", "").replace("(Bid Item)", "").strip()
-                if item["description"] != old:
-                    print(f"[estimate_builder] Stripped '(Bid Item)' from description: '{old}' → '{item['description']}'")
+            # Strip ALL "(Bid Item)" variants from description — the HTML template adds it via is_bid flag
+            import re as _re_bid
+            old_desc = item.get("description", "")
+            cleaned_desc = _re_bid.sub(r'\s*\(\s*[Bb]id\s+[Ii]tem\s*\)', '', old_desc).strip()
+            if cleaned_desc != old_desc:
+                item["description"] = cleaned_desc
+                print(f"[estimate_builder] Stripped '(Bid Item)' from description: '{old_desc}' → '{cleaned_desc}'")
 
             # Detect street address in bid item descriptions
             if item.get("is_bid") and _re.search(r'\d+\s+[A-Z][a-z]+\s+(Trail|St|Ave|Blvd|Dr|Ln|Rd|Way|Ct|Pl|Circle|Pkwy)', item.get("description", "")):

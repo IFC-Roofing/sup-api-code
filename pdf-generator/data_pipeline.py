@@ -986,7 +986,8 @@ def fetch_bids_from_flow(project_id: int, temp_dir: str, project_folder_id: str 
             print(f"[pipeline]   [{trade}] skipped — Xactimate line-item trade, no bid")
             continue
         if trade in XACTIMATE_TRADES and has_bid:
-            print(f"[pipeline]   [{trade}] has bid despite being Xactimate trade — treating as bid item (${retail:,.2f})")
+            print(f"[pipeline]   [{trade}] has bid but is Xactimate trade — skipping bid item (${retail:,.2f}). Measurements only.")
+            continue
 
         if not sub_name:
             sub_name = _tag_to_trade_label(trade)
@@ -2279,11 +2280,10 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
         wholesale_total = 0.0
 
         lines = full_text.split("\n")
-        for line in lines:
+        for i, line in enumerate(lines):
             line_lower = line.lower().strip()
             
-            # Pattern: "432 FT 5" Gutters" or "432 LF Gutters" or similar
-            # Also: "223 FT 2x3 Downspouts"
+            # Pattern A: "432 FT 5" Gutters" or "432 LF Gutters" — qty + desc on same line
             qty_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:FT|LF|ft|lf)\s+(.+)', line.strip())
             if qty_match:
                 qty = float(qty_match.group(1))
@@ -2295,6 +2295,20 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
                     downspout_lf += qty
                 else:
                     other_items.append({"description": desc, "qty": qty, "unit": "LF"})
+                continue
+
+            # Pattern B: "245 Lf" or "245 LF" on its own line — look at PREVIOUS line for description
+            qty_only = re.match(r'^(\d+(?:\.\d+)?)\s*(?:FT|LF|ft|lf)\s*$', line.strip())
+            if qty_only and i > 0:
+                qty = float(qty_only.group(1))
+                prev_line = lines[i - 1].strip()
+                prev_lower = prev_line.lower()
+                if any(kw in prev_lower for kw in ["gutter", "k-style", "k style", "5\"", "5\"", "6\"", "6\"", "seamless"]):
+                    gutter_lf += qty
+                elif any(kw in prev_lower for kw in ["downspout", "down spout", "2x3", "3x4"]):
+                    downspout_lf += qty
+                else:
+                    other_items.append({"description": prev_line, "qty": qty, "unit": "LF"})
                 continue
 
             # Pattern: "14 Miters 5"" or "14 EA Elbows"
@@ -2315,11 +2329,20 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
                 if num_match:
                     miters += int(num_match.group(1))
 
-            # Also catch splashguard on its own line
-            if any(kw in line_lower for kw in ["splash guard", "splashguard", "kick out", "kickout", "diverter"]):
+            # Also catch splashguard on its own line (may have qty on a later line)
+            if any(kw in line_lower for kw in ["splash guard", "splashguard", "kick out", "kickout", "diverter", "valley shield"]):
                 num_match = re.search(r'(\d+)', line)
-                if num_match:
+                if num_match and not re.search(r'\$', line):
                     splashguards += int(num_match.group(1))
+                elif not num_match:
+                    # Look ahead for a standalone number line (within 3 lines)
+                    for j in range(i + 1, min(i + 4, len(lines))):
+                        ahead = lines[j].strip()
+                        if re.match(r'^\d+$', ahead):
+                            splashguards += int(ahead)
+                            break
+                        if re.search(r'\$', ahead):  # hit a price line, stop
+                            break
 
             # Catch total
             total_match = re.search(r'(?:total|subtotal|balance)[:\s]*\$?\s*([\d,]+\.?\d*)', line_lower)
