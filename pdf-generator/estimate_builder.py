@@ -743,6 +743,11 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
     # Post-process: generate F9 notes (template selection + Sonnet fill)
     _generate_f9s(sections, f9_matrix, pipeline_data)
 
+    # Post-process: force-overwrite bid F9s with deterministic version
+    # Opus sometimes writes F9s for bid items despite being told not to,
+    # and uses the total (with O&P) instead of the replace value.
+    _force_bid_f9s(sections, pipeline_data.get("bids", []))
+
     # Post-process: strip dollar comparisons from F9 notes (safety net)
     _strip_f9_dollar_comparisons(sections)
 
@@ -1638,6 +1643,7 @@ def _generate_f9s(sections: list, f9_matrix: list, pipeline_data: dict):
         if item.get("is_bid"):
             # sub_bid_cost = replace value (retail, no O&P) — matches the marked-up bid attachment
             block["sub_bid_cost"] = item.get("replace", item.get("replace_rate", 0))
+            print(f"[estimate_builder] BID F9 DEBUG: desc={item.get('description')} sub_bid_cost={block['sub_bid_cost']} replace={item.get('replace')} total={item.get('total')} op={item.get('op')}")
             # Always remove total for bid items to prevent AI using O&P-inflated number
             block.pop("total", None)
             if bids:
@@ -1676,7 +1682,7 @@ def _generate_f9s(sections: list, f9_matrix: list, pipeline_data: dict):
 ### STANDARD PATTERNS (use as defaults, adapt when context demands it)
 - source="adjusted" with ins_line_nums: Reference which INS line item(s) we cover, state the additional qty we're requesting, and justify with EagleView or scope evidence.
 - source="added" with no INS match: State that INS left this out, what we're requesting, and why it's needed (EagleView, domino effect, pre-loss condition, etc.).
-- is_bid=true: The default argument for bid items is HAIL DAMAGE. These trades (fence, windows, garage doors, siding, etc.) are being supplemented because of hail hits documented in the photo report. The F9 should: (1) state that hail damage was identified during inspection, (2) direct the adjuster to the attached photo report for evidence of hail impacts, (3) reference our sub bid cost (use the `sub_bid_cost` field — this is the replace/retail value shown on the estimate line, NOT the total which includes O&P), (4) reference the attached bid. Keep it short — the photo report does the heavy lifting. Do NOT write long explanations about what the bid covers or the scope of work. If INS has partial coverage, reference their line items.
+- is_bid=true: The default argument for bid items is HAIL DAMAGE. These trades (fence, windows, garage doors, siding, etc.) are being supplemented because of hail hits documented in the photo report. The F9 should: (1) state that hail damage was identified during inspection, (2) direct the adjuster to the attached photo report for evidence of hail impacts, (3) write "Our sub bid cost is $X" where X is EXACTLY the `sub_bid_cost` value from the item data — do NOT add O&P, do NOT multiply by 1.2, do NOT use any other number. Copy it verbatim. (4) reference the attached bid. Keep it short — the photo report does the heavy lifting. Do NOT write long explanations about what the bid covers or the scope of work. If INS has partial coverage, reference their line items.
 
 ### CONTEXT-SPECIFIC ARGUMENTS
 - PAINT / PRIME items on roof fixtures (pipe jacks, vents, roof jacks): Use PRE-LOSS CONDITION argument, NOT rust/weather resistance. The F9 should state: these fixtures were painted prior to the loss (pre-loss condition). During roof replacement, the existing paint is damaged/disturbed. We are requesting prime & paint to restore the fixture to its pre-loss condition. Direct the adjuster to the photo report for pre-loss condition documentation. Do NOT mention rust prevention, weather resistance, or UV protection — insurance doesn't care about that.
@@ -1985,6 +1991,43 @@ def _dedup_bid_items(sections: list):
                 seen_xact.add(key)
             deduped.append(item)
         section["line_items"] = deduped
+
+
+def _force_bid_f9s(sections: list, bids: list):
+    """
+    Force-overwrite F9 notes on bid items with the deterministic template.
+    Opus sometimes writes bid F9s despite instructions to leave them empty,
+    and uses the total (replace + O&P) instead of just the replace value.
+    This ensures bid F9s always use the correct amount.
+    """
+    for section in sections:
+        for item in section.get("line_items", []):
+            if not item.get("is_bid"):
+                continue
+
+            sub_name = item.get("sub_name", "")
+            replace_val = item.get("replace", item.get("replace_rate", 0))
+            description = item.get("description", "")
+
+            # Find matching bid for INS line context
+            ins_line_items = None
+            if bids:
+                for bid in bids:
+                    if sub_name and sub_name.lower() in bid.get("sub_name", "").lower():
+                        ins_line_items = item.get("ins_item_nums", None)
+                        break
+
+            old_f9 = item.get("f9", "")
+            item["f9"] = f9_bid_item(
+                description=section.get("name", description),
+                amount=replace_val,
+                sub_name=sub_name,
+                ins_line_items=ins_line_items,
+            )
+            if old_f9 and old_f9 != item["f9"]:
+                print(f"[estimate_builder] BID F9 OVERWRITE: {sub_name} — old had '${old_f9.split('$')[1][:10] if '$' in old_f9 else '?'}', new uses ${replace_val:,.2f}")
+            else:
+                print(f"[estimate_builder] BID F9 SET: {sub_name} — ${replace_val:,.2f}")
 
 
 def _strip_duplicate_gutter_items(sections: list):

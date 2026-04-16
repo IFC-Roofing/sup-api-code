@@ -783,6 +783,12 @@ async def estimate_from_payload(req: EstimateFromPayloadRequest, request: Reques
         selected_pricelist = req.pricelist_override or "Pricelist"
         pricelist_reason = "override" if req.pricelist_override else "active sheet tab"
 
+        # ── Save raw IFC payload for debugging ─────────────
+        raw_payload_path = PDF_GENERATOR / f"_raw_payload_{request_id}.json"
+        with open(raw_payload_path, "w") as f:
+            json.dump(req.dict(), f, indent=2, default=str)
+        logger.info(f"[{request_id}] Raw IFC payload saved to {raw_payload_path}")
+
         # ── Convert IFC payload → pipeline_data JSON ───────
         pipeline_data = _convert_payload_to_pipeline_data(req)
         pipeline_json_path = PDF_GENERATOR / f"_payload_{request_id}.json"
