@@ -552,7 +552,7 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
         for attempt in range(1, 4):  # 3 attempts
             try:
                 resp = client.messages.create(
-                    model="claude-opus-4-6",
+                    model="claude-opus-4-7",
                     max_tokens=16000,
                     messages=[{"role": "user", "content": p}]
                 )
