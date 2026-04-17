@@ -299,7 +299,12 @@ def markup_pdf(input_path, output_path, markup=0.30):
             role = _classify_span(bbox, page_idx)
             # If AI says this is a qty or skip column, don't touch it
             if role in qty_roles or role == 'skip' or role == 'description':
-                return text
+                # Exception: inline prose with a $ amount (e.g. "A deposit of $X").
+                # Column x-ranges from the table page misclassify these on other pages.
+                has_dollar = bool(re.search(r'[\$Š]\s?[\d,]+\.\d{2}', text))
+                has_words = bool(re.search(r'[A-Za-z]{2,}', text))
+                if not (has_dollar and has_words):
+                    return text
         
         # ─── Line total override: use recomputed value instead of markup ───
         if override_total is not None and role == 'line_total':
