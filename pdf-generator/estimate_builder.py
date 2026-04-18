@@ -609,14 +609,20 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
 
             desc = item.get("description", "")
 
-            # Safety net: if non-bid item has 0 rates, look up from pricelist
-            if not is_bid and replace_rate == 0 and remove_rate == 0 and qty > 0:
+            # ALWAYS enforce pricelist rates for non-bid Xactimate items.
+            # The AI often invents rates or bakes O&P into rates instead of
+            # using the pricelist values directly. This is the single source
+            # of truth — if we have a pricelist match, use it.
+            if not is_bid and qty > 0:
                 pricing = lookup_price(desc)
-                if pricing and pricing.get("replace", 0) > 0:
-                    remove_rate = pricing["remove"]
-                    replace_rate = pricing["replace"]
+                if pricing and (pricing.get("replace", 0) > 0 or pricing.get("remove", 0) > 0):
+                    pl_remove = pricing["remove"]
+                    pl_replace = pricing["replace"]
+                    if abs(remove_rate - pl_remove) > 0.01 or abs(replace_rate - pl_replace) > 0.01:
+                        print(f"[estimate_builder] Pricelist enforcement: '{desc}' AI rates (rem={remove_rate}, rep={replace_rate}) → pricelist (rem={pl_remove}, rep={pl_replace})")
+                    remove_rate = pl_remove
+                    replace_rate = pl_replace
                     is_material = pricing.get("is_material", is_material)
-                    print(f"[estimate_builder] Pricelist fallback: '{desc}' rates were 0 → remove={remove_rate}, replace={replace_rate}")
 
             # Safety net: "Remove" items should have remove rate, not replace rate
             # Opus sometimes puts all cost in replace_rate even for remove-only items
