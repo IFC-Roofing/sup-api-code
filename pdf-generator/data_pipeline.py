@@ -19,6 +19,24 @@ sys.path.insert(0, str(ROOT / "tools" / "parsers"))
 
 load_dotenv(ROOT / ".env")
 
+
+def _log_anthropic_usage(resp, label: str = "pipeline"):
+    """Log token usage and estimated cost from an Anthropic API response."""
+    try:
+        usage = resp.usage
+        input_tk = getattr(usage, 'input_tokens', 0)
+        output_tk = getattr(usage, 'output_tokens', 0)
+        model = getattr(resp, 'model', '') or ''
+        # Sonnet: $3/$15, Opus: $15/$75
+        is_opus = 'opus' in model.lower()
+        rate_in = 15 if is_opus else 3
+        rate_out = 75 if is_opus else 15
+        cost_in = input_tk * rate_in / 1_000_000
+        cost_out = output_tk * rate_out / 1_000_000
+        print(f"[{label}] Tokens: {input_tk:,} in + {output_tk:,} out = {input_tk+output_tk:,} total | Cost: ${cost_in:.4f} + ${cost_out:.4f} = ${cost_in+cost_out:.4f}")
+    except Exception:
+        pass  # Don't break pipeline over logging
+
 IFC_BASE_URL = os.getenv("IFC_BASE_URL", "https://omni.ifc.shibui.ar")
 IFC_API_TOKEN = os.getenv("IFC_API_TOKEN")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
@@ -1198,6 +1216,7 @@ Rules:
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}]
         )
+        _log_anthropic_usage(resp, "bid_scope_extract")
         raw = resp.content[0].text.strip()
         if raw.startswith("```"):
             raw = re.sub(r"^```[a-z]*\n?", "", raw)
@@ -1492,6 +1511,7 @@ def _get_sub_name_from_folder(folder_link: str) -> str:
                             )
                         }]
                     )
+                    _log_anthropic_usage(msg, "sub_name_extract")
                     ai_name = msg.content[0].text.strip()
                     if ai_name and len(ai_name) < 80:
                         name = ai_name
@@ -1605,6 +1625,7 @@ def _extract_sub_name(text: str, file_name: str) -> str:
                     )
                 }]
             )
+            _log_anthropic_usage(msg, "sub_name_vision")
             ai_name = msg.content[0].text.strip().strip('"').strip("'")
             if ai_name and ai_name != "UNKNOWN" and len(ai_name) > 2 and len(ai_name) < 80:
                 print(f"[pipeline] Sub name via AI: '{ai_name}'")
@@ -2341,6 +2362,7 @@ def parse_gutter_bid(original_bids_folder_id: str, temp_dir: str) -> Optional[di
                 ]
             }]
         )
+        _log_anthropic_usage(msg, "gutter_vision")
         ai_text = msg.content[0].text.strip()
         print(f"[gutter_bid] Vision response: {ai_text}")
 

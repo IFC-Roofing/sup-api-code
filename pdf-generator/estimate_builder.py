@@ -560,6 +560,14 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
                 if text.startswith("```"):
                     text = re.sub(r"^```[a-z]*\n?", "", text)
                     text = re.sub(r"\n?```$", "", text)
+                # Log token usage
+                usage = resp.usage
+                input_tk = getattr(usage, 'input_tokens', 0)
+                output_tk = getattr(usage, 'output_tokens', 0)
+                # Opus pricing: $15/M input, $75/M output
+                cost_in = input_tk * 15 / 1_000_000
+                cost_out = output_tk * 75 / 1_000_000
+                print(f"[estimate_builder] Tokens: {input_tk:,} in + {output_tk:,} out = {input_tk+output_tk:,} total | Cost: ${cost_in:.3f} + ${cost_out:.3f} = ${cost_in+cost_out:.3f}")
                 return text, resp.stop_reason
             except (anthropic.InternalServerError, anthropic.APIStatusError) as e:
                 last_err = e
@@ -1723,6 +1731,14 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
                     messages=[{"role": "user", "content": prompt}]
                 )
                 raw = resp.content[0].text.strip()
+                # Log token usage
+                usage = resp.usage
+                input_tk = getattr(usage, 'input_tokens', 0)
+                output_tk = getattr(usage, 'output_tokens', 0)
+                # Sonnet pricing: $3/M input, $15/M output
+                cost_in = input_tk * 3 / 1_000_000
+                cost_out = output_tk * 15 / 1_000_000
+                print(f"[estimate_builder] F9 Tokens: {input_tk:,} in + {output_tk:,} out = {input_tk+output_tk:,} total | Cost: ${cost_in:.4f} + ${cost_out:.4f} = ${cost_in+cost_out:.4f}")
                 if resp.stop_reason == "max_tokens":
                     print(f"[estimate_builder] F9 gen: response truncated at max_tokens ({len(raw)} chars) — will attempt JSON repair")
                 break

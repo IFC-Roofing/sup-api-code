@@ -290,6 +290,17 @@ def _call_anthropic(images_b64, prompt=None, model="claude-sonnet-4-6", verbose=
         messages=[{"role": "user", "content": content}],
         temperature=0.1,
     )
+    # Log token usage
+    try:
+        usage = response.usage
+        input_tk = getattr(usage, 'input_tokens', 0)
+        output_tk = getattr(usage, 'output_tokens', 0)
+        rate_in = 15 if 'opus' in model.lower() else 3
+        rate_out = 75 if 'opus' in model.lower() else 15
+        cost = input_tk * rate_in / 1e6 + output_tk * rate_out / 1e6
+        print(f"[ins_parser] Tokens: {input_tk:,} in + {output_tk:,} out | Cost: ${cost:.4f}", file=sys.stderr)
+    except Exception:
+        pass
     return response.content[0].text
 
 
