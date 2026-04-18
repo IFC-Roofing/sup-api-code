@@ -31,20 +31,39 @@ sys.path.insert(0, str(Path(__file__).parent))
 VENV_SITE = Path(__file__).parent / ".venv" / "lib"
 if VENV_SITE.exists():
     import site
+
     for p in VENV_SITE.glob("python*/site-packages"):
         site.addsitedir(str(p))
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="IFC Supplement PDF Generator")
-    parser.add_argument("project_name", nargs="*", help="Project name (e.g. 'Rose Brock')")
+    parser.add_argument(
+        "project_name", nargs="*", help="Project name (e.g. 'Rose Brock')"
+    )
     parser.add_argument("--skip-upload", action="store_true", help="Skip Drive upload")
-    parser.add_argument("--json-only", action="store_true", help="Stop after building estimate.json")
-    parser.add_argument("--html-only", action="store_true", help="Stop after building estimate.html")
-    parser.add_argument("--from-json", metavar="PATH", help="Load estimate.json from file, skip pipeline")
-    parser.add_argument("--from-pipeline", metavar="PATH", help="Load pipeline_data JSON, skip IFC API fetch, run estimate builder")
-    parser.add_argument("--output-dir", metavar="DIR", help="Output directory (default: current dir)")
-    parser.add_argument("--version", metavar="VER", help="Supplement version override (e.g. 1.0)")
+    parser.add_argument(
+        "--json-only", action="store_true", help="Stop after building estimate.json"
+    )
+    parser.add_argument(
+        "--html-only", action="store_true", help="Stop after building estimate.html"
+    )
+    parser.add_argument(
+        "--from-json",
+        metavar="PATH",
+        help="Load estimate.json from file, skip pipeline",
+    )
+    parser.add_argument(
+        "--from-pipeline",
+        metavar="PATH",
+        help="Load pipeline_data JSON, skip IFC API fetch, run estimate builder",
+    )
+    parser.add_argument(
+        "--output-dir", metavar="DIR", help="Output directory (default: current dir)"
+    )
+    parser.add_argument(
+        "--version", metavar="VER", help="Supplement version override (e.g. 1.0)"
+    )
     return parser.parse_args()
 
 
@@ -53,8 +72,8 @@ def main():
     project_name = " ".join(args.project_name) if args.project_name else None
 
     if not project_name and not args.from_json and not args.from_pipeline:
-        print("Usage: python3 generate.py \"Rose Brock\"")
-        print("       python3 generate.py \"Rose Brock\" --skip-upload")
+        print('Usage: python3 generate.py "Rose Brock"')
+        print('       python3 generate.py "Rose Brock" --skip-upload')
         print("       python3 generate.py --from-pipeline pipeline_data.json")
         sys.exit(1)
 
@@ -62,11 +81,11 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"IFC Supplement PDF Generator — {run_id}")
     if project_name:
         print(f"Project: {project_name}")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     # ── Step 1: Data Pipeline ─────────────────────────────────
     if args.from_json:
@@ -85,47 +104,64 @@ def main():
         print(f"[generate] Loading pipeline data from payload: {args.from_pipeline}")
         with open(args.from_pipeline) as f:
             pipeline_data = json.load(f)
-        project_name = project_name or f"{pipeline_data.get('firstname', '')} {pipeline_data.get('lastname', 'UNKNOWN')}".strip()
+        project_name = (
+            project_name
+            or f"{pipeline_data.get('firstname', '')} {pipeline_data.get('lastname', 'UNKNOWN')}".strip()
+        )
         project_folder_id = pipeline_data.get("project_folder_id")
         print(f"[generate] Project: {project_name} (from payload, skipping IFC API)")
 
         # Payload has project/claim/flow/INS/EV — but we still need to pull
         # bids from Drive, load pricelist, and fetch gutter measurements
         import tempfile
+
         td = tempfile.mkdtemp(prefix="sup_payload_")
 
         if project_folder_id:
             from data_pipeline import (
-                fetch_bids_from_flow, fetch_bids_from_drive,
-                _split_multi_scope_bids, load_pricelist,
-                parse_gutter_bid, fetch_itel_report,
-                find_previous_estimate, read_pdf_comments,
-                _check_project_health,
+                fetch_bids_from_drive,
+                _split_multi_scope_bids,
+                load_pricelist,
+                parse_gutter_bid,
+                fetch_itel_report,
+                find_previous_estimate,
+                read_pdf_comments,
+                drive_health_check,
             )
 
             # Bids from Drive
             project_id = pipeline_data.get("project_id")
-            print("[generate/payload] Fetching bids from Drive...")
-            health = _check_project_health(project_folder_id)
-            bids = []
-            if project_id:
-                bids = fetch_bids_from_flow(project_id, td, project_folder_id=project_folder_id,
-                                           health_folder_ids=health.get("folder_ids"))
-                print(f"[generate/payload] Flow bids: {len(bids)}")
-            if not bids:
+            # Prefer bids from payload; fallback to legacy fetching if missing
+            # Updated: use drive_health_check (replaced deprecated _check_project_health)
+            health = drive_health_check(project_folder_id)
+
+            bids = pipeline_data.get("bids") or []
+
+            if bids:
+                print(f"[generate/payload] Using payload bids: {len(bids)}")
+            else:
+                print(
+                    "[generate/payload] No bids in payload — skipping IFC API and falling back to Drive only"
+                )
                 bids = fetch_bids_from_drive(project_folder_id, td)
                 print(f"[generate/payload] Drive bids: {len(bids)}")
 
             # Multi-scope split
             if bids and health.get("folder_ids", {}).get("original_bids"):
-                bids = _split_multi_scope_bids(bids, health["folder_ids"]["original_bids"], td)
+                bids = _split_multi_scope_bids(
+                    bids, health["folder_ids"]["original_bids"], td
+                )
                 print(f"[generate/payload] Bids after scope split: {len(bids)}")
 
             pipeline_data["bids"] = bids
 
             # Pricelist
             print("[generate/payload] Loading pricelist...")
-            pipeline_data["pricelist"] = load_pricelist()
+            try:
+                pipeline_data["pricelist"] = load_pricelist()
+            except Exception as e:
+                print(f"[generate/payload] ⚠️ Skipping pricelist (local dev): {e}")
+                pipeline_data["pricelist"] = {}
 
             # Gutter measurements
             if health.get("folder_ids", {}).get("original_bids"):
@@ -145,18 +181,25 @@ def main():
             prev_id = find_previous_estimate(lastname)
             if prev_id:
                 comments = read_pdf_comments(prev_id)
-                corrections = [c for c in comments if not c["resolved"] and c["comment"]]
+                corrections = [
+                    c for c in comments if not c["resolved"] and c["comment"]
+                ]
                 if corrections:
                     pipeline_data["prior_corrections"] = corrections
                     print(f"[generate/payload] {len(corrections)} prior correction(s)")
 
-            print(f"[generate/payload] Payload enrichment complete — {len(bids)} bids, pricelist loaded")
+            print(
+                f"[generate/payload] Payload enrichment complete — {len(bids)} bids, pricelist loaded"
+            )
         else:
-            print("[generate/payload] ⚠️  No project_folder_id — can't fetch bids or Drive files")
+            print(
+                "[generate/payload] ⚠️  No project_folder_id — can't fetch bids or Drive files"
+            )
             pipeline_data["pricelist"] = {}
     else:
         print("[generate] Step 1/6: Running data pipeline...")
         from data_pipeline import run as pipeline_run
+
         pipeline_data = pipeline_run(project_name)
         project_folder_id = pipeline_data.get("project_folder_id")
 
@@ -165,11 +208,13 @@ def main():
     if not args.from_json:
         print("\n[generate] Step 2/6: Building estimate (AI)...")
         from estimate_builder import build_estimate
+
         estimate = build_estimate(pipeline_data)
 
         # ── Step 2.5: QA Agent (AI review + corrections) ─────
         print("\n[generate] Step 2.5/6: Running QA review...")
         from qa_agent import qa_review
+
         estimate = qa_review(estimate, pipeline_data)
 
         # Save pipeline data for standalone QA reruns
@@ -179,7 +224,9 @@ def main():
                 "ev_data": pipeline_data.get("ev_data", {}),
                 "ins_data": pipeline_data.get("ins_data", {}),
                 "bids": pipeline_data.get("bids", []),
-                "pricelist": {k: v for k, v in pipeline_data.get("pricelist", {}).items()},
+                "pricelist": {
+                    k: v for k, v in pipeline_data.get("pricelist", {}).items()
+                },
                 "notes": pipeline_data.get("notes", {}),
                 "lastname": pipeline_data.get("lastname", ""),
             }
@@ -203,6 +250,7 @@ def main():
     # ── Step 3: HTML Renderer ─────────────────────────────────
     print("\n[generate] Step 3/6: Rendering HTML...")
     from html_renderer import render as render_html
+
     html_path = str(output_dir / f"{pipeline_data['lastname']}_estimate.html")
     render_html(estimate, html_path)
 
@@ -214,7 +262,10 @@ def main():
     # ── Step 4: PDF Renderer ──────────────────────────────────
     print("\n[generate] Step 4/6: Generating PDF...")
     from pdf_renderer import render as render_pdf
-    lastname = pipeline_data.get("lastname", estimate.get("estimate_name", "ESTIMATE").split("_")[0])
+
+    lastname = pipeline_data.get(
+        "lastname", estimate.get("estimate_name", "ESTIMATE").split("_")[0]
+    )
     pdf_filename = f"{lastname}_IFC Supp {args.version or '1.0'}.pdf"
     pdf_path = str(output_dir / pdf_filename)
     render_pdf(html_path, pdf_path)
@@ -229,6 +280,7 @@ def main():
     else:
         print("\n[generate] Step 5/6: Uploading to project Supplement folder...")
         from uploader import upload
+
         file_id = upload(
             pdf_path,
             project_name=project_name or pipeline_data.get("lastname", "UNKNOWN"),
@@ -243,9 +295,16 @@ def main():
 
     # ── Step 6: Flow Package ──────────────────────────────────
     print("\n[generate] Step 6/6: Generating Flow card package...")
-    from flow_package import generate_flow_package, print_flow_summary, save_flow_package
+    from flow_package import (
+        generate_flow_package,
+        print_flow_summary,
+        save_flow_package,
+    )
+
     flow_pkg = generate_flow_package(estimate, pipeline_data)
-    flow_path = save_flow_package(flow_pkg, output_dir, pipeline_data.get("lastname", "ESTIMATE"))
+    flow_path = save_flow_package(
+        flow_pkg, output_dir, pipeline_data.get("lastname", "ESTIMATE")
+    )
     print(f"[generate] Flow package saved: {flow_path}")
 
     # ── Final Summary ─────────────────────────────────────────
@@ -255,21 +314,29 @@ def main():
 
     print("⚠️  REVIEW REQUIRED BEFORE SENDING TO INSURANCE")
     print("Human review gate — never send directly from this script.")
-    print("="*60)
+    print("=" * 60)
 
 
 def _print_summary(estimate: dict):
     sections = estimate.get("sections", [])
     total_items = sum(len(s["line_items"]) for s in sections)
-    added = sum(1 for s in sections for i in s["line_items"] if i.get("source") == "added")
-    adjusted = sum(1 for s in sections for i in s["line_items"] if i.get("source") == "adjusted")
-    ins_items = sum(1 for s in sections for i in s["line_items"] if i.get("source") == "ins")
+    added = sum(
+        1 for s in sections for i in s["line_items"] if i.get("source") == "added"
+    )
+    adjusted = sum(
+        1 for s in sections for i in s["line_items"] if i.get("source") == "adjusted"
+    )
+    ins_items = sum(
+        1 for s in sections for i in s["line_items"] if i.get("source") == "ins"
+    )
 
     print(f"\n📋 Estimate Summary: {estimate.get('estimate_name', '')}")
     print(f"   Insured:     {estimate.get('policy_holder', '')}")
     print(f"   Address:     {estimate.get('address', '')}")
     print(f"   Sections:    {len(sections)}")
-    print(f"   Total items: {total_items} ({ins_items} copied, {added} added, {adjusted} adjusted)")
+    print(
+        f"   Total items: {total_items} ({ins_items} copied, {added} added, {adjusted} adjusted)"
+    )
     print(f"   Price List:  {estimate.get('price_list', '')}")
     print()
     print(f"   Remove Total:  ${estimate.get('remove_total', 0):>12,.2f}")

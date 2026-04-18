@@ -354,10 +354,12 @@ def build_estimate(pipeline_data: dict) -> dict:
     gutter_measurements = pipeline_data.get('gutter_measurements')
     gutter_text = _format_gutter_measurements(gutter_measurements)
 
-    # Pre-build gutter section deterministically (no AI)
-    from data_pipeline import load_pricelist
+    # Pre-build gutter section deterministically (no AI) using the pricelist
+    # already present in pipeline_data. Payload mode may have intentionally
+    # fallen back to {} when Google Sheets is unavailable, so re-fetching here
+    # would bypass that resilience and crash the run.
     print(f"[estimate_builder] Gutter measurements received: {gutter_measurements}")
-    prebuilt_gutter = _build_gutter_section(gutter_measurements, ins_data, load_pricelist())
+    prebuilt_gutter = _build_gutter_section(gutter_measurements, ins_data, pricelist or {})
     print(f"[estimate_builder] Gutter pre-builder result: {'YES (' + str(len(prebuilt_gutter['line_items'])) + ' items)' if prebuilt_gutter else 'None'}")
     if prebuilt_gutter:
         for item in prebuilt_gutter['line_items']:
@@ -599,7 +601,7 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
         raw = _repair_truncated_json(raw)
 
     print("[estimate_builder] Parsing AI response...")
-    ai_result = json.loads(raw)
+    ai_result = _parse_ai_json_response(raw, context="estimate")
 
     # Post-process: calculate all math, enrich items
     sections = []
@@ -615,7 +617,7 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
             is_material = bool(item.get("is_material", True))
             is_bid = bool(item.get("is_bid", False))
 
-            desc = item.get("description", "")
+            desc = _normalize_description(item.get("description", ""))
 
             # ALWAYS enforce pricelist rates for non-bid Xactimate items.
             # The AI often invents rates or bakes O&P into rates instead of
@@ -635,7 +637,11 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
             # Safety net: "Remove" items should have remove rate, not replace rate
             # Opus sometimes puts all cost in replace_rate even for remove-only items
             if not is_bid and desc.lower().startswith("remove ") and remove_rate == 0 and replace_rate > 0:
-                pricing = lookup_price(desc)
+                try:
+                    pricing = lookup_price(desc)
+                except Exception as e:
+                    pricing = None
+                    print(f"[estimate_builder] Rate-column fallback failed for {desc!r}: {e}")
                 if pricing and pricing.get("remove", 0) > 0 and pricing.get("replace", 0) == 0:
                     print(f"[estimate_builder] Rate column fix: '{desc}' — swapping replace_rate {replace_rate} to remove_rate {pricing['remove']}")
                     remove_rate = pricing["remove"]
@@ -646,7 +652,7 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
 
             processed_item = {
                 "num": item_counter,
-                "description": item.get("description", ""),
+                "description": desc,
                 "qty": qty,
                 "unit": item.get("unit", "EA"),
                 "remove_rate": remove_rate,
@@ -2828,6 +2834,82 @@ def _repair_truncated_json(raw: str) -> str:
     if patch:
         print(f"[estimate_builder] JSON repair: appended '{patch}' to close {len(stack)} open bracket(s)")
     return repaired
+
+
+def _parse_ai_json_response(raw: str, context: str = "estimate") -> dict:
+    """
+    Parse model output into JSON with a few defensive cleanup passes.
+    Claude usually returns clean JSON here, but occasional fence wrappers,
+    explanatory text, or truncated tails should not kill the whole pipeline.
+    """
+    cleaned = raw.strip()
+    candidates = []
+
+    def add_candidate(text: str):
+        text = (text or "").strip()
+        if text and text not in candidates:
+            candidates.append(text)
+
+    add_candidate(cleaned)
+
+    # Remove a surrounding markdown fence if present.
+    unfenced = re.sub(r"^\s*```(?:json)?\s*", "", cleaned)
+    unfenced = re.sub(r"\s*```\s*$", "", unfenced)
+    add_candidate(unfenced)
+
+    # If Claude wrapped the JSON with extra prose, keep just the outer object.
+    start = unfenced.find("{")
+    end = unfenced.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        add_candidate(unfenced[start:end + 1])
+
+    # Common invalid JSON pattern: trailing comma before a close token.
+    for text in list(candidates):
+        add_candidate(re.sub(r",\s*([}\]])", r"\1", text))
+
+    # If the response looks truncated, try the existing bracket/string repair.
+    for text in list(candidates):
+        if not text.rstrip().endswith("}"):
+            add_candidate(_repair_truncated_json(text))
+
+    last_err = None
+    for attempt, candidate in enumerate(candidates, 1):
+        try:
+            if attempt > 1:
+                print(f"[estimate_builder] JSON parse retry {attempt}/{len(candidates)}")
+            return json.loads(candidate)
+        except json.JSONDecodeError as e:
+            last_err = e
+
+    debug_path = Path(__file__).parent / f"_{context}_bad_ai_response.txt"
+    try:
+        debug_path.write_text(raw, encoding="utf-8")
+        print(f"[estimate_builder] Saved unparseable AI response to {debug_path}")
+    except Exception as write_err:
+        print(f"[estimate_builder] Could not save bad AI response: {write_err}")
+
+    raise last_err
+
+
+def _normalize_description(value) -> str:
+    """
+    Claude occasionally returns structured values for description fields.
+    Normalize them back to a usable string before pricing/post-processing.
+    """
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        for key in ("description", "text", "name", "title", "label"):
+            candidate = value.get(key)
+            if isinstance(candidate, str) and candidate.strip():
+                return candidate
+        return json.dumps(value, sort_keys=True)
+    if isinstance(value, list):
+        parts = [_normalize_description(part) for part in value]
+        return " ".join(part for part in parts if part).strip()
+    return str(value)
 
 
 if __name__ == "__main__":

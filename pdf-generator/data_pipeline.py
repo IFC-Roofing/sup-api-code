@@ -647,6 +647,10 @@ def load_pricelist() -> dict[str, dict]:
 def lookup_price(description: str) -> Optional[dict]:
     """Fuzzy-match a description against the pricelist. Returns pricing dict or None."""
     pl = load_pricelist()
+    if description is None:
+        return None
+    if not isinstance(description, str):
+        description = str(description)
     desc_lower = description.lower().strip()
 
     # Exact match
