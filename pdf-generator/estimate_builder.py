@@ -623,7 +623,8 @@ Respond with ONLY the JSON object. No markdown, no explanation."""
             # The AI often invents rates or bakes O&P into rates instead of
             # using the pricelist values directly. This is the single source
             # of truth — if we have a pricelist match, use it.
-            if not is_bid and qty > 0:
+            is_op_line = desc.lower().strip() in ("overhead and profit", "overhead & profit", "o&p")
+            if not is_bid and qty > 0 and not is_op_line:
                 pricing = lookup_price(desc)
                 if pricing and (pricing.get("replace", 0) > 0 or pricing.get("remove", 0) > 0):
                     pl_remove = pricing["remove"]
@@ -2414,6 +2415,10 @@ def _filter_ins_for_bids(ins_data: dict, bids: list) -> dict:
 def _format_ins_items(ins_data: dict) -> str:
     items = ins_data.get("items", []) or ins_data.get("line_items", [])
     if not items:
+        # Payload mode: raw markdown from IFC app (text extraction, not parsed items)
+        raw = ins_data.get("raw_markdown", "")
+        if raw:
+            return f"(RAW INSURANCE ESTIMATE TEXT — parse line items from this)\n{raw}"
         return "(no insurance items parsed)"
     lines = []
     for i, item in enumerate(items, 1):
@@ -2493,6 +2498,12 @@ def _format_ev_data(ev_data: dict) -> str:
     """Format EagleView data for AI context. Handles both flat and nested structures."""
     if not ev_data:
         return "(no EagleView data)"
+
+    # Payload mode: raw markdown from IFC app (no parsed structure)
+    raw = ev_data.get("raw_markdown", "")
+    has_structured = any(ev_data.get(k) for k in ("area_sq", "roofing_summary", "metadata"))
+    if raw and not has_structured:
+        return f"(RAW EAGLEVIEW TEXT — extract measurements from this)\n{raw}"
 
     lines = []
 
@@ -2750,6 +2761,9 @@ def _format_ins_items_condensed(ins_data: dict) -> str:
     """Condensed version of INS items — drops section/room, shorter format to save tokens."""
     items = ins_data.get("items", []) or ins_data.get("line_items", [])
     if not items:
+        raw = ins_data.get("raw_markdown", "")
+        if raw:
+            return f"(RAW INSURANCE ESTIMATE TEXT)\n{raw}"
         return "(no insurance items parsed)"
     lines = []
     for i, item in enumerate(items, 1):
