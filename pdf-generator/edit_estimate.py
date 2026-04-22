@@ -86,12 +86,30 @@ def _update_item_from_pricelist(item: dict, description: str = None, skip_pricel
     
     pricing = lookup_price(desc)
     if pricing:
-        item["remove_rate"] = pricing["remove"]
-        item["replace_rate"] = pricing["replace"]
+        # Protect existing non-zero rates from being wiped by incomplete pricelist entries.
+        # If the item already has a rate and pricelist returns 0, keep the existing rate.
+        # This prevents description-only edits from nuking established R&R values
+        # (e.g. chimney flashing $891 → $37 because pricelist only had remove rate).
+        old_remove = item.get("remove_rate", 0) or 0
+        old_replace = item.get("replace_rate", 0) or 0
+        new_remove = pricing["remove"]
+        new_replace = pricing["replace"]
+        
+        item["remove_rate"] = new_remove if new_remove else old_remove
+        item["replace_rate"] = new_replace if new_replace else old_replace
         item["unit"] = pricing["unit"]
         item["is_material"] = pricing.get("is_material", _guess_is_material(desc))
         if description:
             item["description"] = pricing["description"]  # canonical name
+        
+        if (not new_remove and old_remove) or (not new_replace and old_replace):
+            preserved = []
+            if not new_remove and old_remove:
+                preserved.append(f"remove_rate=${old_remove}")
+            if not new_replace and old_replace:
+                preserved.append(f"replace_rate=${old_replace}")
+            print(f"  ⚠️ Pricelist had zero rate(s) — preserved existing: {', '.join(preserved)}")
+        
         return True
     return False
 
@@ -498,15 +516,95 @@ Return a JSON array of edit commands. No markdown, no explanation."""
 
 # ─── Batch Apply ──────────────────────────────────────────────────────────────
 
+# ─── F9 Consistency Check ─────────────────────────────────────────────────────
+
+def _check_f9_consistency(estimate: dict) -> list:
+    """Scan all items with F9s — flag any where dollar amounts in F9 text
+    don't match the item's actual math. Returns list of warnings."""
+    warnings = []
+    dollar_re = re.compile(r'\$([\d,]+\.?\d{0,2})')
+    
+    for section in estimate.get("sections", []):
+        for item in section.get("line_items", []):
+            f9 = item.get("f9", "")
+            if not f9:
+                continue
+            
+            # Extract all dollar amounts from F9 text
+            f9_amounts = []
+            for match in dollar_re.finditer(f9):
+                try:
+                    amt = float(match.group(1).replace(",", ""))
+                    if amt > 0:
+                        f9_amounts.append(amt)
+                except ValueError:
+                    continue
+            
+            if not f9_amounts:
+                continue
+            
+            # Item's actual values that F9 might reference
+            actual = {
+                round(item.get("total", 0), 2),
+                round(item.get("replace", 0), 2),
+                round(item.get("remove", 0), 2),
+                round(item.get("qty", 0) * item.get("replace_rate", 0), 2),
+                round(item.get("qty", 0) * item.get("remove_rate", 0), 2),
+                round(item.get("replace_rate", 0), 2),
+                round(item.get("remove_rate", 0), 2),
+                round(item.get("qty", 0), 2),
+            }
+            actual.discard(0)
+            
+            # Check each F9 dollar amount — does it match ANY actual value?
+            for amt in f9_amounts:
+                if amt not in actual:
+                    # Allow small rounding tolerance
+                    close = any(abs(amt - a) < 1.0 for a in actual if a > 0)
+                    if not close:
+                        warnings.append({
+                            "section": section["name"],
+                            "description": item.get("description", "?"),
+                            "line_num": item.get("num"),
+                            "f9_amount": amt,
+                            "actual_total": item.get("total", 0),
+                            "f9_snippet": f9[:120],
+                        })
+                        break  # one warning per item is enough
+    
+    return warnings
+
+
+# Patterns that indicate an edit did nothing
+_FAIL_PATTERNS = (
+    "No matching", "0 item(s)", "0 section(s)", "Removed 0",
+    "Unknown action", "missing 'description'", "missing 'fields'",
+)
+
+
+def _edit_failed(result: str) -> bool:
+    """Check if an apply_edit result string indicates failure."""
+    return any(p in result for p in _FAIL_PATTERNS)
+
+
 def apply_edits(project_prefix: str, edits: list) -> dict:
     """Apply a list of edits and save. Every edit recalculates, final refresh at end."""
     estimate, path = load_estimate(project_prefix)
     
     results = []
-    for edit in edits:
+    failed = []
+    for i, edit in enumerate(edits):
         result = apply_edit(estimate, edit)
         results.append(result)
-        print(f"  → {result}")
+        if _edit_failed(result):
+            failed.append({
+                "index": i,
+                "edit": edit,
+                "result": result,
+            })
+            print(f"  ❌ FAILED edit {i}: {result} | {edit}")
+        else:
+            print(f"  ✅ edit {i}: {result}")
     
     # Remove empty sections
     estimate["sections"] = [s for s in estimate["sections"] if s.get("line_items")]
@@ -514,12 +612,35 @@ def apply_edits(project_prefix: str, edits: list) -> dict:
     # Final totals refresh
     _refresh_totals(estimate)
     
+    # F9 consistency check — catch stale dollar amounts in F9 text
+    f9_warnings = _check_f9_consistency(estimate)
+    if f9_warnings:
+        print(f"\n⚠️ F9 CONSISTENCY: {len(f9_warnings)} item(s) have stale dollar amounts in F9:")
+        for w in f9_warnings:
+            print(f"  Line {w['line_num']}: {w['description']} — F9 says ${w['f9_amount']:,.2f} but actual total=${w['actual_total']:,.2f}")
+    
     # Save
     with open(path, "w") as f:
         json.dump(estimate, f, indent=2)
     
-    print(f"\n✅ Saved {path.name} — RCV: ${estimate.get('rcv_total', 0):,.2f}")
-    return {"path": str(path), "results": results, "rcv_total": estimate.get("rcv_total", 0)}
+    # Summary
+    applied = len(edits) - len(failed)
+    print(f"\n{'✅' if not failed else '⚠️'} Saved {path.name} — RCV: ${estimate.get('rcv_total', 0):,.2f} | {applied}/{len(edits)} edits applied")
+    if failed:
+        print(f"  ❌ {len(failed)} edit(s) FAILED (no matching items):")
+        for f_info in failed:
+            print(f"     [{f_info['index']}] {f_info['edit'].get('action', '?')}: "
+                  f"{f_info['edit'].get('description_contains', f_info['edit'].get('description', '?'))} → {f_info['result']}")
+    
+    return {
+        "path": str(path),
+        "results": results,
+        "rcv_total": estimate.get("rcv_total", 0),
+        "failed_edits": failed,
+        "f9_warnings": f9_warnings,
+        "applied_count": applied,
+        "total_count": len(edits),
+    }
 
 
 def rerender(project_prefix: str, skip_upload: bool = False, project_folder_id: str = None):

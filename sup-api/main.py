@@ -242,6 +242,8 @@ class ReviewCommentsResponse(BaseModel):
     success: bool
     comments_processed: Optional[int] = None
     edits_applied: Optional[int] = None
+    edits_failed: Optional[int] = None
+    failed_edit_details: Optional[List[dict]] = None
     edit_results: Optional[List[str]] = None
     pdf_url: Optional[str] = None
     message: Optional[str] = None
@@ -983,12 +985,18 @@ async def review_comments(req: ReviewCommentsRequest, request: Request):
 
         result = parse_skill_output(script_result["stdout"])
 
-        logger.info(f"[{request_id}] Comments processed: {result.get('comments_processed', 0)} → {result.get('edits_applied', 0)} edits")
+        edits_failed = result.get("edits_failed", 0)
+        if edits_failed:
+            logger.warning(f"[{request_id}] Comments processed with {edits_failed} FAILED edit(s): {result.get('failed_edit_details', [])}")
+        else:
+            logger.info(f"[{request_id}] Comments processed: {result.get('comments_processed', 0)} → {result.get('edits_applied', 0)} edits")
 
         return ReviewCommentsResponse(
             success=result.get("success", False),
             comments_processed=result.get("comments_processed"),
             edits_applied=result.get("edits_applied"),
+            edits_failed=edits_failed or None,
+            failed_edit_details=result.get("failed_edit_details") or None,
             edit_results=result.get("edit_results"),
             pdf_url=result.get("pdf_url"),
             message=result.get("message"),

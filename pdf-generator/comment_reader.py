@@ -232,6 +232,7 @@ IMPORTANT RULES:
 - For "add F9" or "write F9" comments: if the comment includes specific F9 text after the instruction, use that text as new_f9. If the comment is JUST "add F9" with no specific text, set new_f9 to "AUTO_GENERATE" — it will be generated separately.
 - MERGE MULTIPLE COMMENTS ON THE SAME ITEM: If two or more comments target the same line item (same section + description), combine them into ONE update_f9 action with the merged text. Do NOT emit two separate update_f9 actions for the same item — the second would overwrite the first. Combine all reviewer feedback into one cohesive F9 note.
 - ADD LINE ITEMS: If a comment says "add [item name] [qty] [unit]" or "we need [item name] here" — use add_item. The description should be the Xactimate line item name (e.g. "R&R Drip edge", "Step flashing", "Ice & water barrier"). Rates and F9 are auto-generated from the pricelist. If the comment mentions a bid item instead of Xactimate, use {{"action": "flag", "section": "<name>", "note": "<what bid needs to be added>"}} for human handling.
+- "UNBOLD" or "unbold this": This means STOP FIGHTING this item — accept insurance's value. Emit TWO actions: {{"action": "revert_to_ins", "section": "<name>", "description_contains": "<keyword>"}} AND {{"action": "clear_f9", "section": "<name>", "description_contains": "<keyword>"}}. Both target the same item.
 - Other instruction patterns: "move this to...", "split this into...", "this needs to be separate" → use "flag" action with a descriptive note.
 
 Match section names and descriptions to the actual estimate sections above.
@@ -273,19 +274,6 @@ Return ONLY a JSON array of edit actions. No explanation."""
                 print(f"  ⚠️ Could not find item '{desc_kw}' in estimate — skipping F9 generation")
     
     return edits
-    
-    # Parse response
-    response_text = response.content[0].text.strip()
-    # Handle markdown code blocks
-    if response_text.startswith("```"):
-        response_text = response_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-    
-    try:
-        edits = json.loads(response_text)
-        return edits
-    except json.JSONDecodeError:
-        print(f"⚠️ AI response was not valid JSON: {response_text[:200]}")
-        return []
 
 
 def resolve_comments(file_id: str, comment_ids: list):
@@ -387,15 +375,25 @@ def process_comments(project_name: str, file_id: str = None, dry_run: bool = Fal
     # Previously resolved comments automatically, but Vanessa wants to see them after edits
     print(f"\n[comment_reader] Keeping {len(comments)} comment(s) visible on Drive (not resolving).")
     
+    failed_edits = edit_result.get("failed_edits", [])
+    applied_count = edit_result.get("applied_count", len(edits))
+    
     result = {
         "success": True,
         "comments_processed": len(comments),
-        "edits_applied": len(edits),
+        "edits_applied": applied_count,
+        "edits_failed": len(failed_edits),
         "edit_results": edit_result.get("results", []),
+        "failed_edit_details": failed_edits,
         "pdf_url": pdf_url,
     }
     
-    print(f"\n✅ Done! Processed {len(comments)} comment(s) → {len(edits)} edit(s)")
+    if failed_edits:
+        print(f"\n⚠️ Done with failures! {len(comments)} comment(s) → {applied_count}/{len(edits)} edit(s) applied, {len(failed_edits)} FAILED")
+        for f_info in failed_edits:
+            print(f"  ❌ {f_info['edit'].get('action', '?')}: {f_info['edit'].get('description_contains', '?')} → {f_info['result']}")
+    else:
+        print(f"\n✅ Done! Processed {len(comments)} comment(s) → {len(edits)} edit(s)")
     if pdf_url:
         print(f"📄 Updated PDF: {pdf_url}")
     
